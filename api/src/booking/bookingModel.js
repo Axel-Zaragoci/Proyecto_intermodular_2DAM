@@ -46,3 +46,26 @@ const bookingDatabaseSchema = new Schema({
 });
 
 export const bookingDatabaseModel = mongoose.model('booking', bookingDatabaseSchema)
+
+export const bookingEntryDataSchema = new Schema({
+    room: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    client: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    checkInDate: {
+        type: Date,
+        required: true
+    },
+    checkOutDate: {
+        type: Date,
+        required: true
+    },
+    guests: {
+        type: Schema.Types.Number,
+        required: true
+    }
+})
