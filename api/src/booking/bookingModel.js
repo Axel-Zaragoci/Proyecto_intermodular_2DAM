@@ -1,32 +1,30 @@
-import mongoose from 'mongoose';
-const { Schema } = mongoose;
+import { Schema, Types, model } from 'mongoose';
 
 /**
- * @typedef booking
- * @description Documento correspondiente a los datos en MongoDB
+ * @typedef bookingSchema
  * 
- * @property {string} _id - Identificador único creado por MongoDB
- * @property {string} room - Identificador de la habitación
- * @property {string} client - Identificador del cliente
- * 
+ * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
+ * @property {import('mongoose').Types.ObjectId} room - Identificador de la habitación
+ * @property {import('mongoose').Types.ObjectId} client - Identificador del cliente
  * @property {Date} checkInDate - Fecha de inicio de la reserva
  * @property {Date} checkOutDate - Fecha de fin de la reserva
  * @property {Date} payDate - Fecha de pago, como la reserva se paga al hacerse, se indica que el dato sea la fecha de creación de la reserva
- * 
  * @property {number} totalPrice - Precio total de la reserva
  * @property {number} pricePerNight - Precio por noche de la reserva (Se guarda para facilitar el mostrar información en las aplicaciones correspondientes)
  * @property {number} offer - Porcentaje de descuento (Se guarda para facilitar el mostrar información en las aplicaciones correspondientes)
- * 
- * @property {string} status - Estado de la reserva, "Finalizada" para las que ya han pasado el checkOutDate, "Cancelada" para las reservas canceladas por el usuario o empleados y "Abierta" para el resto
+ * @property {"Finalizada"|"Cancelada"|"Abierta"} status - Estado de la reserva, "Finalizada" para las que ya han pasado el checkOutDate, "Cancelada" para las reservas canceladas por el usuario o empleados y "Abierta" para el resto
  * @property {number} guests - Cantidad de huéspedes en la habitación reservada
- */
+ * @property {number} totalNights - Cantidad total de noches
+ * 
+ * @description Documento correspondiente a los datos en MongoDB
+*/
 const bookingDatabaseSchema = new Schema({
     room: {
-        type: Schema.Types.ObjectId,
+        type: Types.ObjectId,
         required: true
     },
     client: {
-        type: Schema.Types.ObjectId,
+        type: Types.ObjectId,
         required: true
     },
     checkInDate: {
@@ -39,18 +37,18 @@ const bookingDatabaseSchema = new Schema({
     },
     payDate: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     },
     totalPrice: {
-        type: Schema.Types.Number,
+        type: Number,
         required: true
     },
     pricePerNight: {
-        type: Schema.Types.Number,
+        type: Number,
         required: true
     },
     offer: {
-        type: Schema.Types.Number,
+        type: Number,
         required: true
     },
     status: {
@@ -59,44 +57,63 @@ const bookingDatabaseSchema = new Schema({
         default: "Abierta"
     },
     guests: {
-        type: Schema.Types.Number,
+        type: Number,
+        required: true
+    },
+    totalNights: {
+        type: Number,
         required: true
     }
 });
 
-export const bookingDatabaseModel = mongoose.model('booking', bookingDatabaseSchema)
+export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 
-/**
- * @typedef bookingEntryData
- * @description Schema de los datos entrantes necesarios para crear una reserva
- * 
- * @property {string} room - Identificador de la habitación reservada
- * @property {string} client - Identificador del cliente que realiza la reserva
- * 
- * @property {Date} checkInDate - Fecha de inicio
- * @property {Date} checkOutDate - Fecha de fin
- * 
- * @property {number} guests - Cantidad de huéspedes en la habitación
- */
-export const bookingEntryDataSchema = new Schema({
-    room: {
-        type: Schema.Types.ObjectId,
-        required: true
-    },
-    client: {
-        type: Schema.Types.ObjectId,
-        required: true
-    },
-    checkInDate: {
-        type: Date,
-        required: true
-    },
-    checkOutDate: {
-        type: Date,
-        required: true
-    },
-    guests: {
-        type: Schema.Types.Number,
-        required: true
+/** Clase que obtiene los datos para la reserva */
+class BookingEntryData {
+    /**
+     * Crea una nueva entrada de datos
+     * @param {string} roomID 
+     * @param {string} clientID 
+     * @param {Date} checkInDate 
+     * @param {Date} checkOutDate 
+     * @param {number} guests 
+     */
+    constructor(roomID, clientID, checkInDate, checkOutDate, guests) {
+        this.roomID = roomID
+        this.clientID = clientID
+        this.checkInDate = checkInDate
+        this.checkOutDate = checkOutDate
+        this.guests = guests
+        this.ready = false
     }
-})
+
+    /**
+     * Completa los datos de la reserva para poder crearla
+     * @param {number} pricePerNight 
+     * @param {number} offer 
+     */
+    completeBookingData(pricePerNight, offer) {
+        this.offer = offer
+        this.totalNights = Math.ceil((this.checkOutDate.getTime() - this.checkInDate.getTime()) / (1000 * 60 * 60 * 24))
+        this.pricePerNight = pricePerNight * (1 - offer / 100)
+        this.totalPrice = this.totalNights * this.pricePerNight
+        this.ready = true
+    }
+
+    /**
+     * 
+     * @returns {import('mongoose').Document}
+     */
+    toDocument() {
+        if (!this.ready) throw new Error("Reserva no lista. Completa la información")
+        return new bookingDatabaseModel({room: this.roomID, 
+                                        client: this.clientID, 
+                                        checkInDate: this.checkInDate, 
+                                        checkOutDate: this.checkOutDate, 
+                                        totalPrice: this.totalPrice, 
+                                        pricePerNight: this.pricePerNight, 
+                                        offer: this.offer, 
+                                        guests: this.guests, 
+                                        totalNights: this.totalNights})
+    }
+}
