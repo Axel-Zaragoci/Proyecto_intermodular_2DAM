@@ -69,7 +69,7 @@ const bookingDatabaseSchema = new Schema({
 export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 
 /** Clase que obtiene los datos para la reserva */
-class BookingEntryData {
+export class BookingEntryData {
     /**
      * Crea una nueva entrada de datos
      * @param {string} roomID 
