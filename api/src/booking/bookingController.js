@@ -43,3 +43,27 @@ async function getBookings(req, res) {
         return res.status(500).json({ error: 'Error del servidor' });
     }
 }
+
+/**
+ * @type import("express").RequestHandler
+ * 
+ * @response {200} - Devuelve las reservas del cliente
+ * @response {400} - Falta el ID del cliente
+ * @response {404} - No se encontraron reservas para el cliente
+ * @response {500} - Error del servidor
+ */
+async function getBookingsByClientId(req, res) {
+    try {
+        const { clientId } = req.body;
+        if (!clientId) return res.status(400).json({ error: 'Se requiere ID del cliente' });
+
+        const bookings = await bookingDatabaseModel.find({ client: clientId });
+        if (!bookings) return res.status(404).json({ error: 'No se encontraron reservas para el cliente' });
+
+        return res.status(200).json(bookings);
+    }
+    catch (error) {
+        console.error('Error al obtener las reservas del cliente:', error);
+        return res.status(500).json({ error: 'Error del servidor' });
+    }
+}
