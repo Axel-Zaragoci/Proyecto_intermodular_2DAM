@@ -11,8 +11,8 @@ const router = Router();
 
 router.post("/", createRoom);
 router.get("/", getAllRooms);
-router.get("/:id", getRoomById);
-router.patch("/:id", updateRoom);
-router.delete("/:id", deleteRoom);
+router.get("/:roomID", getRoomById);
+router.patch("/:roomID", updateRoom);
+router.delete("/:roomID", deleteRoom);
 
 export default router;

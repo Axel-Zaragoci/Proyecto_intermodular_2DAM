@@ -1,9 +1,10 @@
 import express from 'express';
+require("dotenv").config();
 //import bookingRouter from './booking/bookingRouter.js';
 //import roomsRouter from './rooms/roomsController.js';
 //import usersRouter from './users/usersController.js';
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());

@@ -94,13 +94,13 @@ export const getAllRooms = async (req, res) => {
  * @returns {Promise<import("express").Response>} Habitación encontrada o error.
  *
  * @example
- * // GET /rooms/:id
+ * // GET /rooms/:roomID
  */
 export const getRoomById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
 
-    const room = await roomDatabaseModel.findById(id);
+    const room = await roomDatabaseModel.findById(roomID);
 
     // Si no existe, 404
     if (!room) return res.status(404).json({ message: "no se encontro esa habitacion" });
@@ -124,15 +124,15 @@ export const getRoomById = async (req, res) => {
  * @returns {Promise<import("express").Response>} Habitación actualizada o error.
  *
  * @example
- * // PATCH /rooms/:id
+ * // PATCH /rooms/:roomID
  * // body: { description: "Nueva descripción" }
  */
 export const updateRoom = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
 
     // Busca la room actual para usar valores por defecto si no vienen en el body
-    const room = await roomDatabaseModel.findById(id);
+    const room = await roomDatabaseModel.findById(roomID);
     if (!room) return res.status(404).json({ message: "Room no encontrada" });
 
     // Construye un objeto de entrada con fallback a valores actuales
@@ -186,13 +186,13 @@ export const updateRoom = async (req, res) => {
  * @returns {Promise<import("express").Response>} Mensaje de éxito con el doc eliminado o error.
  *
  * @example
- * // DELETE /rooms/:id
+ * // DELETE /rooms/:roomID
  */
 export const deleteRoom = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
 
-    const deleted = await roomDatabaseModel.findByIdAndDelete(id);
+    const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
 
     if (!deleted) return res.status(404).json({ message: "Room no encontrada" });
 
