@@ -1,4 +1,4 @@
-import { roomDatabaseModel, RoomEntryData } from "./roomsModel";
+import { roomDatabaseModel, RoomEntryData } from "./roomsModel.js";
 
 /**
  * Crea una nueva habitación.
