@@ -1,4 +1,4 @@
-import { roomDatabaseModel, RoomEntryData } from "./roomsModel";
+import { roomDatabaseModel, RoomEntryData } from "./roomsModel.js";
 
 /**
  * Crea una nueva habitación.
@@ -94,13 +94,13 @@ export const getAllRooms = async (req, res) => {
  * @returns {Promise<import("express").Response>} Habitación encontrada o error.
  *
  * @example
- * // GET /rooms/:roomID
+ * // GET /rooms/:id
  */
 export const getRoomById = async (req, res) => {
   try {
-    const { roomID } = req.params;
+    const { id } = req.params;
 
-    const room = await roomDatabaseModel.findById(roomID);
+    const room = await roomDatabaseModel.findById(id);
 
     // Si no existe, 404
     if (!room) return res.status(404).json({ message: "no se encontro esa habitacion" });
@@ -124,15 +124,15 @@ export const getRoomById = async (req, res) => {
  * @returns {Promise<import("express").Response>} Habitación actualizada o error.
  *
  * @example
- * // PATCH /rooms/:roomID
+ * // PATCH /rooms/:id
  * // body: { description: "Nueva descripción" }
  */
 export const updateRoom = async (req, res) => {
   try {
-    const { roomID } = req.params;
+    const { id } = req.params;
 
     // Busca la room actual para usar valores por defecto si no vienen en el body
-    const room = await roomDatabaseModel.findById(roomID);
+    const room = await roomDatabaseModel.findById(id);
     if (!room) return res.status(404).json({ message: "Room no encontrada" });
 
     // Construye un objeto de entrada con fallback a valores actuales
@@ -145,7 +145,7 @@ export const updateRoom = async (req, res) => {
       req.body.pricePerNight ?? room.pricePerNight
     );
 
-    // Completa campos opcionales con fallback a valores actuales
+    // Completa campos opcionales con recuerdo a valores actuales
     data.completeRoomData(
       req.body.extraBed ?? room.extraBed,
       req.body.crib ?? room.crib,
@@ -154,7 +154,7 @@ export const updateRoom = async (req, res) => {
       req.body.extraImages ?? room.extraImages
     );
 
-    // Valida la entrada (si tu clase implementa validate)
+    // Valida el objeto antes de actualizar
     data.validate();
 
     // Actualiza en BD
@@ -186,17 +186,125 @@ export const updateRoom = async (req, res) => {
  * @returns {Promise<import("express").Response>} Mensaje de éxito con el doc eliminado o error.
  *
  * @example
- * // DELETE /rooms/:roomID
+ * // DELETE /rooms/:id
  */
 export const deleteRoom = async (req, res) => {
   try {
-    const { roomID } = req.params;
+    const { id } = req.params;
 
-    const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
+    const deleted = await roomDatabaseModel.findByIdAndDelete(id);
 
     if (!deleted) return res.status(404).json({ message: "Room no encontrada" });
 
     return res.json({ message: "Room eliminada", deleted });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+
+/**
+ * Obtiene el listado de rooms con filtros por query params.
+ *
+ * @function getRoomsFiltered
+ * @param {import('express').Request} req - Petición HTTP.
+ * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
+ * @param {string} [req.query.name] - Filtro por nombre de la room.
+ * @param {string} [req.query.type] - Filtro por tipo de room.
+ * @param {string} [req.query.page] - Número de página para paginación.
+ * @param {string} [req.query.limit] - Límite de resultados por página.
+ * @param {import('express').Response} res - Respuesta HTTP.
+ * @param {import('express').NextFunction} next - Siguiente middleware.
+ * @returns {Promise<void>} No devuelve nada directamente, responde vía `res`.
+ */
+export const getRoomsFiltered = async (req, res) => {
+  try {
+    const {
+      type,
+      isAvailable,
+      minPrice,
+      maxPrice,
+      guests,
+      hasExtraBed,
+      hasCrib,
+      hasOffer,
+      extras,      
+      sortBy,      
+      sortOrder,   
+      limit,
+      page,
+    } = req.query;
+
+    const filter = {};
+
+    
+    if (type) filter.type = String(type);
+
+    
+    if (isAvailable !== undefined) {
+      filter.isAvailable = String(isAvailable).toLowerCase() === "true";
+    }
+
+    
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      filter.pricePerNight = {};
+      if (minPrice !== undefined) filter.pricePerNight.$gte = Number(minPrice);
+      if (maxPrice !== undefined) filter.pricePerNight.$lte = Number(maxPrice);
+    }
+
+    
+    if (guests !== undefined) {
+      filter.maxGuests = { $gte: Number(guests) };
+    }
+
+    
+    if (extras) {
+      const extrasArr = String(extras)
+        .split(",")
+    g    .map((e) => e.trim())
+        .filter(Boolean);
+
+      if (extrasArr.length) {
+        filter.extras = { $all: extrasArr };
+      }
+    }
+
+    // flags
+    if (hasExtraBed !== undefined) {
+      filter.extraBed = String(hasExtraBed).toLowerCase() === "true";
+    }
+    if (hasCrib !== undefined) {
+      filter.crib = String(hasCrib).toLowerCase() === "true";
+    }
+    if (hasOffer !== undefined) {
+      const wantOffer = String(hasOffer).toLowerCase() === "true";
+      filter.offer = wantOffer ? { $gt: 0 } : 0;
+    }
+
+    // sorting
+    const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
+    const sortField = allowedSort.has(sortBy) ? sortBy : "roomNumber";
+    const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+    const sort = { [sortField]: sortDir };
+
+    // pagination
+    const safeLimit = Math.min(Number(limit) || 20, 100);
+    const safePage = Math.max(Number(page) || 1, 1);
+    const skip = (safePage - 1) * safeLimit;
+
+    const [items, total] = await Promise.all([
+      roomDatabaseModel.find(filter).sort(sort).skip(skip).limit(safeLimit),
+      roomDatabaseModel.countDocuments(filter),
+    ]);
+
+    return res.json({
+      page: safePage,
+      limit: safeLimit,
+      total,
+      totalPages: Math.ceil(total / safeLimit),
+      items,
+      appliedFilter: filter,
+      sort,
+    });
   } catch (err) {
     return res.status(400).json({ message: err.message });
   }
