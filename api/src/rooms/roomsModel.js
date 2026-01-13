@@ -33,18 +33,18 @@ const roomDatabaseSchema = new Schema({
 
   pricePerNight: { type: Number, required: true, min: 0 },
 
-  // ---- OPCIONALES (los que te faltaban) ----
-  extraBed: { type: Boolean, default: false }, // Cama extra
-  crib: { type: Boolean, default: false },     // Cuna
+  // ---- Optionals ----
+  extraBed: { type: Boolean, default: false }, 
+  crib: { type: Boolean, default: false },     
 
-  // Oferta: lo normal es guardarla como porcentaje (0-100)
+  
   offer: { type: Number, default: 0, min: 0, max: 100 },
 
-  // Listas
+  
   extras: { type: [String], default: [] },
   extraImages: { type: [String], default: [] },
 
-  // ---- Defaults que pediste ----
+  // ---- Defaults ----
   isAvailable: { type: Boolean, default: true },
   rate: { type: Number, default: 0, min: 0, max: 5 },
 });
