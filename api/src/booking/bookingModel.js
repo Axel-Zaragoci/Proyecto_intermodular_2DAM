@@ -72,8 +72,8 @@ export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 export class BookingEntryData {
     /**
      * Crea una nueva entrada de datos
-     * @param {string} roomID 
-     * @param {string} clientID 
+     * @param {import('mongoose').Types.ObjectId | string} roomID 
+     * @param {import('mongoose').Types.ObjectId | string} clientID 
      * @param {Date} checkInDate 
      * @param {Date} checkOutDate 
      * @param {number} guests 
