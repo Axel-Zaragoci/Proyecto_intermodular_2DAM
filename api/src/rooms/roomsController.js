@@ -98,9 +98,9 @@ export const getAllRooms = async (req, res) => {
  */
 export const getRoomById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
 
-    const room = await roomDatabaseModel.findById(id);
+    const room = await roomDatabaseModel.findById(roomID);
 
     // Si no existe, 404
     if (!room) return res.status(404).json({ message: "no se encontro esa habitacion" });

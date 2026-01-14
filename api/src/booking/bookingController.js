@@ -92,3 +92,38 @@ async function getBookingsByRoomId(req, res) {
         return res.status(500).json({ error: 'Error del servidor' });
     }
 }
+
+
+/**
+ * @param {import("types").AuthenticatedRequest} req
+ * @param {import("express").Response} res
+ *  
+ * 
+ */
+async function createBooking(req, res) {
+    try {
+        const { roomID, checkInDate, checkOutDate, guests } = req.body;
+        const userID = req.session.userId;
+        if (!roomID) return res.status(400).json({ error: 'Se requiere ID de habitación'});
+        if (!checkInDate) return res.status(400).json({ error: 'Se requiere fecha de check in' });
+        if (!checkOutDate) return res.status(400).json({ error: 'Se requiere fecha de check out'});
+        if (!guests) return res.status(400).json({ error: 'Se requiere cantidad de huéspedes' });
+
+        const booking = new BookingEntryData(roomID, userID, checkInDate, checkOutDate, guests);
+        const room = await roomDatabaseModel.findById(roomID);
+        if (!room) return res.status(404).json({ error: 'No se encuentra habitación con ese ID' });
+        booking.completeBookingData(room.pricePerNight, room.offer);
+        try {
+            booking.validate()
+        }
+        catch(err) {
+            return res.status(400).json({ error: err.message });
+        }
+        bookingDatabaseModel.insertOne(booking);
+        return res.status(200).json({ status: 'Reserva creada correctamente'})
+    }
+    catch (error) {
+        console.error('Error al crear la reserva:', error);
+        return res.status(500).json({ error: 'Error del servidor' });
+    }
+}

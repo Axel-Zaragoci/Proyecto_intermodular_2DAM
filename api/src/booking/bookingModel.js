@@ -1,4 +1,5 @@
 import { Schema, Types, model } from 'mongoose';
+import { formatDate } from 'src/commons/date';
 
 /**
  * @typedef bookingSchema
@@ -98,6 +99,36 @@ export class BookingEntryData {
         this.pricePerNight = pricePerNight * (1 - offer / 100)
         this.totalPrice = this.totalNights * this.pricePerNight
         this.ready = true
+    }
+
+    validate() {
+        function isString(o) {
+            return typeof(o) === 'string' && o.trim().length != 0;
+        }
+        function isNumeric(o) {
+            return typeof(o) === 'number' && o > 0
+        }
+        function isNumericOr0(o) {
+            return typeof(o) === 'number' && o >= 0
+        }
+        function isDate(o) {
+            return formatDate(o) != null;
+        }
+
+        const errors = [];
+        if (!isString(this.roomID)) errors.push("El ID de la habitación es inválido");
+        if (!isString(this.clientID)) errors.push("El ID del usuario es inválido");
+        if (!isDate(this.checkInDate)) errors.push("La fecha de check-in es inválida");
+        if (!isDate(this.checkOutDate)) errors.push("La fecha de check-out es inválida");
+        if (!isNumeric(this.guests)) errors.push("La cantidad de huéspedes debe ser un número mayor que 0");
+        if (!isNumericOr0(this.offer)) errors.push("La oferta debe ser un número equivalente a 0 o más");
+        if (!isNumeric(this.totalNights)) errors.push("La cantidad de noches debe ser un número");
+        if (!isNumeric(this.pricePerNight)) errors.push("El precio por noche debe ser un número mayor a 0");
+        if (!isNumeric(this.totalPrice)) errors.push("El precio total debe ser un número mayor a 0");
+        
+        if (errors.length != 0) {
+            throw new Error(errors.join(", "));
+        }
     }
 
     /**
