@@ -4,14 +4,14 @@ import { Schema, model } from 'mongoose';
  * @typedef userSchema
  * 
  * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
- * @property {String} firstName - Nombre propio del usuario
- * @property {String} secondName - Apellido/s del usuario
- * @property {String} password - Contraseña del usuario
- * @property {String} dni - Documento de identidad del usuario
+ * @property {string} firstName - Nombre propio del usuario
+ * @property {string} secondName - Apellido/s del usuario
+ * @property {string} password - Contraseña del usuario
+ * @property {string} dni - Documento de identidad del usuario
  * @property {Date} bornDate - Fecha de nacimiento del usuario
- * @property {String} cityName - Ciudad de vivienda fiscal
+ * @property {string} cityName - Ciudad de vivienda fiscal
  * @property {"Hombre" | "Mujer"} gender - Genero del usuario
- * @property {String} imageRoute - Ruta de la imagen del usuario
+ * @property {string} imageRoute - Ruta de la imagen del usuario
  * @property {"Admin" | "Trabajador" | "Usuario"} rol - Rol del usuario
  * @property {Boolean} vipStatus - Estado membresia VIP del usuario, "true" cuenta con membresia acctiva, "false" no cuenta con membresia
  * 
@@ -69,3 +69,19 @@ const userDatabaseSchema = new Schema({
 });
 
 export const userDatabaseModel = model('user', userDatabaseSchema)
+
+class UserEntryData {
+    constructor(firstName, secondName, password, dni, bornDate, cityName, gender, imageRoute, rol, vipStatus) {
+        this.firstName = firstName
+        this.secondName = secondName
+        this.password = password
+        this.dni = dni
+        this.bornDate = bornDate
+        this.cityName = cityName
+        this.gender = gender
+        this.imageRoute = imageRoute
+        this.rol = rol || "Usuario"
+        this.vipStatus = vipStatus || false
+        
+    }
+}
