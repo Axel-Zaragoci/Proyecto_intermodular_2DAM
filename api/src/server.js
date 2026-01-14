@@ -1,15 +1,21 @@
 import express from 'express';
-import bookingRouter from './booking/bookingRouter.js';
-//import roomsRouter from './rooms/roomsController.js';
+import connectDB from './config/db.js';
+import dotenv from "dotenv"
+
+dotenv.config()
+//import bookingRouter from './booking/bookingRouter.js';
+import roomsRouter from './rooms/roomsRouter.js';
 //import usersRouter from './users/usersController.js';
 
 const PORT = 3000;
 const app = express();
 
+connectDB()
+
 app.use(express.json());
 
-app.use('/booking', bookingRouter);
-//app.use("/room", roomsRouter);
+//app.use('/booking', bookingRouter);
+app.use("/room", roomsRouter);
 //app.use("/user", usersRouter);
 
 app.listen(PORT, () => {
