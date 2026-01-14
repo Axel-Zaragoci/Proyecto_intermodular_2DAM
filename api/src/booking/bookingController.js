@@ -1,4 +1,5 @@
 import { bookingDatabaseModel, BookingEntryData } from "./bookingModel";
+import { roomDatabaseModel } from "../rooms/roomsModel"
 
 /**
  * @type import("express").RequestHandler 
@@ -68,6 +69,14 @@ async function getBookingsByClientId(req, res) {
     }
 }
 
+/**
+ * @type import("express").RequestHandler
+ *  
+ * @response {200} - Devuelve las reservas de una habitación
+ * @response {400} - ID de la habitación inexistente
+ * @response {404} - Reservas no encontradas
+ * @response {500} - Error del servidor
+ */
 async function getBookingsByRoomId(req, res) {
     try {
         const { roomID } = req.body;
