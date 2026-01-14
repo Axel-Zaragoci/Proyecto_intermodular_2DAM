@@ -1,5 +1,6 @@
 import { bookingDatabaseModel, BookingEntryData } from "./bookingModel";
 import { roomDatabaseModel } from "../rooms/roomsModel"
+import mongoose from "mongoose";
 
 /**
  * @type import("express").RequestHandler 
@@ -98,7 +99,9 @@ async function getBookingsByRoomId(req, res) {
  * @param {import("types").AuthenticatedRequest} req
  * @param {import("express").Response} res
  *  
- * 
+ * @response {400} - Error de datos
+ * @response {404} - Habitación no encontrada
+ * @response {200} - Reserva creada correctamente
  */
 async function createBooking(req, res) {
     try {
@@ -124,6 +127,34 @@ async function createBooking(req, res) {
     }
     catch (error) {
         console.error('Error al crear la reserva:', error);
+        return res.status(500).json({ error: 'Error del servidor' });
+    }
+}
+
+/**
+ * 
+ * @param {import("types").AuthenticatedRequest} req
+ * @param {import("express").Response} res
+ * 
+ * @response {400} - Error de datos
+ * @response {404} - Reserva no encontrada
+ * @response {200} - Reserva actualizada
+ * @response {500} - Error del servidor
+ */
+async function cancelBooking(req, res) {
+    try {
+        const { bookingID } = req.params;
+
+        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        const booking = await bookingDatabaseModel.findById(bookingID);
+        if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
+        if (booking.status != 'Abierta') return res.status(400).json({ error: 'La reserva no está abierta' })
+
+        const bookingUpdated = await bookingDatabaseModel.updateOne({_id: bookingID}, {status: "Cancelada"});
+        return res.status(200).json(bookingUpdated);
+    }
+    catch (error) {
+        console.error('Error al cancelar la reserva: ', error);
         return res.status(500).json({ error: 'Error del servidor' });
     }
 }
