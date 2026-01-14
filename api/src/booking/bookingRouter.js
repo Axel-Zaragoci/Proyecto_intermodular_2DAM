@@ -6,7 +6,7 @@ import { getOneBookingById,
     createBooking,
     cancelBooking,
     updateBooking,
-    deleteBooking} from "./bookingController";
+    deleteBooking} from "./bookingController.js";
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import { Schema, Types, model } from 'mongoose';
-import { formatDate } from 'src/commons/date';
+import { formatDate } from '../commons/date.js';
 
 /**
  * @typedef bookingSchema
