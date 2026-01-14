@@ -120,6 +120,7 @@ export class BookingEntryData {
         if (!isString(this.clientID)) errors.push("El ID del usuario es inválido");
         if (!isDate(this.checkInDate)) errors.push("La fecha de check-in es inválida");
         if (!isDate(this.checkOutDate)) errors.push("La fecha de check-out es inválida");
+        if (this.checkOutDate.getMilliseconds() > this.checkInDate.getMilliseconds()) errors.push("La fecha de fin no puede ser anterior a la de inicio")
         if (!isNumeric(this.guests)) errors.push("La cantidad de huéspedes debe ser un número mayor que 0");
         if (!isNumericOr0(this.offer)) errors.push("La oferta debe ser un número equivalente a 0 o más");
         if (!isNumeric(this.totalNights)) errors.push("La cantidad de noches debe ser un número");

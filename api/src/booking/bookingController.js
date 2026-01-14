@@ -122,7 +122,7 @@ async function createBooking(req, res) {
         catch(err) {
             return res.status(400).json({ error: err.message });
         }
-        bookingDatabaseModel.insertOne(booking);
+        await bookingDatabaseModel.insertOne(booking);
         return res.status(200).json({ status: 'Reserva creada correctamente'})
     }
     catch (error) {
@@ -156,5 +156,45 @@ async function cancelBooking(req, res) {
     catch (error) {
         console.error('Error al cancelar la reserva: ', error);
         return res.status(500).json({ error: 'Error del servidor' });
+    }
+}
+
+/**
+ * 
+ * @param {import("types").AuthenticatedRequest} req
+ * @param {import("express").Response} res
+ * 
+ * @response {400} - Error de datos
+ * @response {404} - Reserva no encontrada
+ * @response {200} - Reserva actualizada
+ * @response {500} - Error del servidor
+ */
+async function updateBooking(req, res) {
+    try {
+        const { bookingID } = req.params;
+        const userID = req.session.userId;
+        const { checkInDate, checkOutDate, guests } = req.body;
+
+        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        const booking = await bookingDatabaseModel.findById(bookingID);
+        if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
+
+        const bookingData = new BookingEntryData(booking.room, userID, checkInDate, checkOutDate, guests);
+        const room = await roomDatabaseModel.findById(booking.room);
+        bookingData.completeBookingData(room.pricePerNight, room.offer);
+        
+        try {
+            bookingData.validate()
+        }
+        catch(err) {
+            return res.status(400).json({ error: err.message });
+        }
+
+        const updatedBooking = await bookingDatabaseModel.updateOne({ _id: bookingID }, bookingData);
+        return res.status(200).json(updatedBooking)
+    }
+    catch (error) {
+        console.error('Error al actualizar la reserva:', error);
+        return res.status(500).json({ error: 'Error del servidor' })
     }
 }
