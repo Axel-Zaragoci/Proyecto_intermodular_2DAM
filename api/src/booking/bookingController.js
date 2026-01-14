@@ -198,3 +198,30 @@ async function updateBooking(req, res) {
         return res.status(500).json({ error: 'Error del servidor' })
     }
 }
+
+/**
+ * @param {import("types").AuthenticatedRequest} req
+ * @param {import("express").Response} res
+ * 
+ * @response {400} - Error de datos
+ * @response {404} - Reserva no encontrada
+ * @response {200} - Reserva actualizada
+ * @response {500} - Error del servidor 
+ */
+async function deleteBooking(req, res) {
+    try {
+        const { bookingID } = req.params;
+
+        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        const booking = await bookingDatabaseModel.findById(bookingID);
+        if (!booking) return res.status(404).json({ error: 'No hay reserva con ese ID' })
+        if (booking.status != 'Cancelada') return res.status(400).json({ error: 'Solo se pueden eliminar reservas canceladas' });
+        await bookingDatabaseModel.findByIdAndDelete(bookingID);
+
+        return res.status(200).json({ status: 'Reserva eliminada correctamente' });
+    }
+    catch (error) {
+        console.error('Error al actualizar la reserva:', error);
+        return res.status(500).json({ error: 'Error del servidor' });
+    }
+}
