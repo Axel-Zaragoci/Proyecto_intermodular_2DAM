@@ -3,14 +3,28 @@ import { roomDatabaseModel } from "../rooms/roomsModel"
 import mongoose from "mongoose";
 
 /**
- * @type import("express").RequestHandler 
+ * Obtener una reserva específica a partir de su ID
  * 
- * @response {200} - Devuelve la reserva encontrada
- * @response {400} - Falta el ID de la reserva
- * @response {404} - No se encontró la reserva
- * @response {500} - Error del servidor
+ * @async
+ * @function getOneBookingById
+ * 
+ * @description
+ * Recibe un ID de reserva en el cuerpo de la petición
+ * Busca la reserva correspondiente y la devuelve en formato JSON
+ * Maneja errores de validación, no encontrar la reserva y errores del servidor
+ * 
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express
+ * 
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * 
+ * @returns {Promise} Respuesta HTTP con:
+ * - Código 200 y el objeto de la reserva si se encuentra
+ * - Código 400 si no se proporciona el ID
+ * - Código 404 si no se encuentra la reserva
+ * - Código 500 si ocurre un error inesperado
  */
-async function getOneBookingById(req, res) {
+export async function getOneBookingById(req, res) {
     try {
         const { bookingId } = req.body;
         if (!bookingId) return res.status(400).json({ error: 'Se requiere ID de la reserva' });
@@ -26,14 +40,28 @@ async function getOneBookingById(req, res) {
     }
 }
 
+
 /**
- * @type import("express").RequestHandler
+ *  Obtener todas las reservas
  * 
- * @response {200} - Devuelve todas las reservas
- * @response {404} - No se encontraron reservas
- * @response {500} - Error del servidor 
+ * @async
+ * @function getBookings
+ * 
+ * @description
+ * Busca todas las reservas y las devuelve en formato JSON
+ * Maneja errores de no encontrar la reserva y errores del servidor
+ * 
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express
+ * 
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * 
+ * @returns {Promise} Respuesta HTTP con:
+ * - Código 200 y el las reservas si las encuentra
+ * - Código 404 si no se encuentra reservas
+ * - Código 500 si ocurre un error inesperado
  */
-async function getBookings(req, res) {
+export async function getBookings(req, res) {
     try {
         const bookings = await bookingDatabaseModel.find();
         if (!bookings) return res.status(404).json({ error: 'No se encontraron reservas' });
@@ -46,13 +74,27 @@ async function getBookings(req, res) {
     }
 }
 
+
 /**
- * @type import("express").RequestHandler
+ * Obtener las reservas de un cliente
  * 
- * @response {200} - Devuelve las reservas del cliente
- * @response {400} - Falta el ID del cliente
- * @response {404} - No se encontraron reservas para el cliente
- * @response {500} - Error del servidor
+ * @async
+ * @function getBookingsByClientId
+ * 
+ * @description
+ * Recibe el ID del cliente por el cuerpo de la petición
+ * Busca las reservas del cliente y las devuelve en formato JSON
+ * Maneja errores de validación, no encontrar reservas y errores del servidor
+ * 
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express
+ * 
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} Respuesta HTTP con:
+ * - Código 200 con las reservas del cliente
+ * - Código 400 si no consigue el ID del cliente
+ * - Código 404 si no encuentra reservas
+ * - Código 500 si ocurre un error inesperado 
  */
 async function getBookingsByClientId(req, res) {
     try {
@@ -70,13 +112,27 @@ async function getBookingsByClientId(req, res) {
     }
 }
 
+
 /**
- * @type import("express").RequestHandler
- *  
- * @response {200} - Devuelve las reservas de una habitación
- * @response {400} - ID de la habitación inexistente
- * @response {404} - Reservas no encontradas
- * @response {500} - Error del servidor
+ * Obtener las reservas de una habitación
+ * 
+ * @async
+ * @function getBookingsByRoomId
+ * 
+ * @description
+ * Recibe el ID de la habitación por el cuerpo de la petición
+ * Busca las reservas de la habitación y las devuelve en formato JSON
+ * Maneja errores de validación, no encontrar reservas y errores del servidor
+ * 
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express
+ * 
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} Respuesta HTTP con:
+ * - Código 200 con las reservas de la habitación
+ * - Código 400 si no consigue el ID de la habitación
+ * - Código 404 si no encuentra reservas
+ * - Código 500 si ocurre un error inesperado
  */
 async function getBookingsByRoomId(req, res) {
     try {
@@ -96,25 +152,40 @@ async function getBookingsByRoomId(req, res) {
 
 
 /**
- * @param {import("types").AuthenticatedRequest} req
- * @param {import("express").Response} res
- *  
- * @response {400} - Error de datos
- * @response {404} - Habitación no encontrada
- * @response {200} - Reserva creada correctamente
+ * Crea una nueva reserva para una habitación.
+ *
+ * @async
+ * @function createBooking
+ *
+ * @description
+ * Recibe los datos del cuerpo de la solicitud y la sesión actual
+ * Crea una nueva reserva y la devuelve en formato JSON
+ * Valida la existencia y validez de datos y los errores de servidor
+ *
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express.
+ * @param {import('express').Response} res - Objeto de respuesta de Express.
+ *
+ * @returns {Promise} Respuesta HTTP con:
+ * - 200 y el objeto de la reserva si se crea correctamente
+ * - 400 si faltan datos obligatorios o la validación falla
+ * - 404 si la habitación no existe
+ * - 500 si ocurre un error interno del servidor
  */
 async function createBooking(req, res) {
     try {
         const { roomID, checkInDate, checkOutDate, guests } = req.body;
         const userID = req.session.userId;
+
         if (!roomID) return res.status(400).json({ error: 'Se requiere ID de habitación'});
         if (!checkInDate) return res.status(400).json({ error: 'Se requiere fecha de check in' });
         if (!checkOutDate) return res.status(400).json({ error: 'Se requiere fecha de check out'});
         if (!guests) return res.status(400).json({ error: 'Se requiere cantidad de huéspedes' });
 
         const booking = new BookingEntryData(roomID, userID, checkInDate, checkOutDate, guests);
+
         const room = await roomDatabaseModel.findById(roomID);
         if (!room) return res.status(404).json({ error: 'No se encuentra habitación con ese ID' });
+
         booking.completeBookingData(room.pricePerNight, room.offer);
         try {
             booking.validate()
@@ -122,8 +193,9 @@ async function createBooking(req, res) {
         catch(err) {
             return res.status(400).json({ error: err.message });
         }
-        await bookingDatabaseModel.insertOne(booking);
-        return res.status(200).json({ status: 'Reserva creada correctamente'})
+
+        const bdBooking = await bookingDatabaseModel.insertOne(booking);
+        return res.status(200).json(bdBooking)
     }
     catch (error) {
         console.error('Error al crear la reserva:', error);
@@ -131,21 +203,33 @@ async function createBooking(req, res) {
     }
 }
 
+
 /**
- * 
- * @param {import("types").AuthenticatedRequest} req
- * @param {import("express").Response} res
- * 
- * @response {400} - Error de datos
- * @response {404} - Reserva no encontrada
- * @response {200} - Reserva actualizada
- * @response {500} - Error del servidor
+ * Cancela una reserva
+ *
+ * @async
+ * @function cancelBooking
+ *
+ * @description
+ * Obtiene el ID de la reserva de los parámetros
+ * Cancela la reserva si su estado es Abierta y devuelve la reserva cerrada
+ * Verifica la validez del ID, la existencia y el estado de la reserva 
+ *
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express.
+ * @param {import('express').Response} res - Objeto de respuesta de Express.
+ *
+ * @returns {Promise} Respuesta HTTP con:
+ * - 200 y el objeto de la reserva si se cancela
+ * - 400 si falta el ID o la validación falla
+ * - 404 si la reserva no existe
+ * - 500 si ocurre un error interno del servidor
  */
 async function cancelBooking(req, res) {
     try {
         const { bookingID } = req.params;
-
+        if (!bookingID) return res.status(400).json({ error: 'No hay ID de la reserva' })
         if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        
         const booking = await bookingDatabaseModel.findById(bookingID);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
         if (booking.status != 'Abierta') return res.status(400).json({ error: 'La reserva no está abierta' })
@@ -159,28 +243,42 @@ async function cancelBooking(req, res) {
     }
 }
 
+
 /**
- * 
- * @param {import("types").AuthenticatedRequest} req
- * @param {import("express").Response} res
- * 
- * @response {400} - Error de datos
- * @response {404} - Reserva no encontrada
- * @response {200} - Reserva actualizada
- * @response {500} - Error del servidor
+ * Actualiza una reserva
+ *
+ * @async
+ * @function updateBooking
+ *
+ * @description
+ * Obtiene el ID de la reserva de los parámetros, el ID del cliente de la sesión y los datos nuevos del cuerpo de la solicitud
+ * Actualiza la reserva
+ * Verifica la existencia y validez de los datos y errores de servidor
+ *
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express.
+ * @param {import('express').Response} res - Objeto de respuesta de Express.
+ *
+ * @returns {Promise} Respuesta HTTP con:
+ * - 200 y el objeto de la reserva si se modifica
+ * - 400 si faltan datos obligatorios o la validación falla
+ * - 404 si la reserva no existe
+ * - 500 si ocurre un error interno del servidor
  */
 async function updateBooking(req, res) {
     try {
         const { bookingID } = req.params;
         const userID = req.session.userId;
         const { checkInDate, checkOutDate, guests } = req.body;
-
+        if (!checkInDate || !checkOutDate || !guests) return res.status(400).json({ error: 'Faltan datos necesarios' })
         if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        
         const booking = await bookingDatabaseModel.findById(bookingID);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
 
         const bookingData = new BookingEntryData(booking.room, userID, checkInDate, checkOutDate, guests);
+
         const room = await roomDatabaseModel.findById(booking.room);
+
         bookingData.completeBookingData(room.pricePerNight, room.offer);
         
         try {
@@ -199,25 +297,37 @@ async function updateBooking(req, res) {
     }
 }
 
+
 /**
- * @param {import("types").AuthenticatedRequest} req
- * @param {import("express").Response} res
- * 
- * @response {400} - Error de datos
- * @response {404} - Reserva no encontrada
- * @response {200} - Reserva actualizada
- * @response {500} - Error del servidor 
+ * Elimina una reserva
+ *
+ * @async
+ * @function deleteBooking
+ *
+ * @description
+ * Obtiene el ID de la reserva de los parámetros
+ * Elimina la reserva si está cancelada
+ * Verifica la validez del ID, la existencia y el estado de la reserva 
+ *
+ * @param {import('types').AuthenticatedRequest} req - Objeto de petición de Express.
+ * @param {import('express').Response} res - Objeto de respuesta de Express.
+ *
+ * @returns {Promise} Respuesta HTTP con:
+ * - 200 y un texto de confirmación si se elimina
+ * - 400 si falta el ID o no está cancelada
+ * - 404 si la reserva no existe
+ * - 500 si ocurre un error interno del servidor 
  */
 async function deleteBooking(req, res) {
     try {
         const { bookingID } = req.params;
-
         if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        
         const booking = await bookingDatabaseModel.findById(bookingID);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con ese ID' })
         if (booking.status != 'Cancelada') return res.status(400).json({ error: 'Solo se pueden eliminar reservas canceladas' });
-        await bookingDatabaseModel.findByIdAndDelete(bookingID);
 
+        await bookingDatabaseModel.findByIdAndDelete(bookingID);
         return res.status(200).json({ status: 'Reserva eliminada correctamente' });
     }
     catch (error) {
