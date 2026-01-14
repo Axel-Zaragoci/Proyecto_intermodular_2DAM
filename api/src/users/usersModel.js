@@ -83,5 +83,31 @@ class UserEntryData {
         this.rol = rol || "Usuario"
         this.vipStatus = vipStatus || false
         
+        this.ready = false
+    }
+
+    validate() {
+        //Validar que esten el nombre/apellido
+        //Validar contraseña
+        //Validar DNI
+        //Validar fecha nacimiento
+        //Validar genero
+        this.ready = true
+    }
+
+    toDocument() {
+        if(!this.ready) throw new Error("Completa la creacción de usuario correctamente.")
+        return new userDatabaseModel({
+            firstName: this.firstName,
+            secondName: this.secondName,
+            password: this.password,
+            dni: this.dni,
+            bornDate: this.bornDate,
+            cityname: this.cityName,
+            gender: this.gender,
+            imageRoute: this.imageRoute,
+            rol: this.rol,
+            vipStatus: this.vipStatus
+        });
     }
 }
