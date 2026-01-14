@@ -26,10 +26,11 @@ import mongoose from "mongoose";
  */
 export async function getOneBookingById(req, res) {
     try {
-        const { bookingId } = req.body;
-        if (!bookingId) return res.status(400).json({ error: 'Se requiere ID de la reserva' });
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ error: 'Se requiere ID de la reserva' });
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
 
-        const booking = await bookingDatabaseModel.findById(bookingId);
+        const booking = await bookingDatabaseModel.findById(id);
         if (!booking) return res.status(404).json({ error: 'Reserva no encontrada' });
         
         return res.status(200).json(booking);
@@ -96,12 +97,13 @@ export async function getBookings(req, res) {
  * - Código 404 si no encuentra reservas
  * - Código 500 si ocurre un error inesperado 
  */
-async function getBookingsByClientId(req, res) {
+export async function getBookingsByClientId(req, res) {
     try {
-        const { clientId } = req.body;
-        if (!clientId) return res.status(400).json({ error: 'Se requiere ID del cliente' });
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ error: 'Se requiere ID del cliente' });
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
 
-        const bookings = await bookingDatabaseModel.find({ client: clientId });
+        const bookings = await bookingDatabaseModel.find({ client: id });
         if (!bookings) return res.status(404).json({ error: 'No se encontraron reservas para el cliente' });
 
         return res.status(200).json(bookings);
@@ -134,12 +136,13 @@ async function getBookingsByClientId(req, res) {
  * - Código 404 si no encuentra reservas
  * - Código 500 si ocurre un error inesperado
  */
-async function getBookingsByRoomId(req, res) {
+export async function getBookingsByRoomId(req, res) {
     try {
-        const { roomID } = req.body;
-        if (!roomID) return res.status(400).json({error: 'Se requiere ID de la habitación'});
+        const { id } = req.params;
+        if (!id) return res.status(400).json({error: 'Se requiere ID de la habitación'});
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
 
-        const bookings = await bookingDatabaseModel.find({ room: roomID});
+        const bookings = await bookingDatabaseModel.find({ room: id});
         if (!bookings) return res.status(404).json({ error: 'No se ha encontrado reservas para la habitación' });
 
         return res.status(200).json(bookings);
@@ -171,7 +174,7 @@ async function getBookingsByRoomId(req, res) {
  * - 404 si la habitación no existe
  * - 500 si ocurre un error interno del servidor
  */
-async function createBooking(req, res) {
+export async function createBooking(req, res) {
     try {
         const { roomID, checkInDate, checkOutDate, guests } = req.body;
         const userID = req.session.userId;
@@ -224,17 +227,17 @@ async function createBooking(req, res) {
  * - 404 si la reserva no existe
  * - 500 si ocurre un error interno del servidor
  */
-async function cancelBooking(req, res) {
+export async function cancelBooking(req, res) {
     try {
-        const { bookingID } = req.params;
-        if (!bookingID) return res.status(400).json({ error: 'No hay ID de la reserva' })
-        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        const { id } = req.params;
+        if (!id) return res.status(400).json({ error: 'No hay ID de la reserva' })
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
         
-        const booking = await bookingDatabaseModel.findById(bookingID);
+        const booking = await bookingDatabaseModel.findById(id);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
         if (booking.status != 'Abierta') return res.status(400).json({ error: 'La reserva no está abierta' })
 
-        const bookingUpdated = await bookingDatabaseModel.updateOne({_id: bookingID}, {status: "Cancelada"});
+        const bookingUpdated = await bookingDatabaseModel.updateOne({_id: id}, {status: "Cancelada"});
         return res.status(200).json(bookingUpdated);
     }
     catch (error) {
@@ -264,15 +267,15 @@ async function cancelBooking(req, res) {
  * - 404 si la reserva no existe
  * - 500 si ocurre un error interno del servidor
  */
-async function updateBooking(req, res) {
+export async function updateBooking(req, res) {
     try {
-        const { bookingID } = req.params;
+        const { id } = req.params;
         const userID = req.session.userId;
         const { checkInDate, checkOutDate, guests } = req.body;
         if (!checkInDate || !checkOutDate || !guests) return res.status(400).json({ error: 'Faltan datos necesarios' })
-        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
         
-        const booking = await bookingDatabaseModel.findById(bookingID);
+        const booking = await bookingDatabaseModel.findById(id);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
 
         const bookingData = new BookingEntryData(booking.room, userID, checkInDate, checkOutDate, guests);
@@ -288,7 +291,7 @@ async function updateBooking(req, res) {
             return res.status(400).json({ error: err.message });
         }
 
-        const updatedBooking = await bookingDatabaseModel.updateOne({ _id: bookingID }, bookingData);
+        const updatedBooking = await bookingDatabaseModel.updateOne({ _id: id }, bookingData);
         return res.status(200).json(updatedBooking)
     }
     catch (error) {
@@ -318,16 +321,16 @@ async function updateBooking(req, res) {
  * - 404 si la reserva no existe
  * - 500 si ocurre un error interno del servidor 
  */
-async function deleteBooking(req, res) {
+export async function deleteBooking(req, res) {
     try {
-        const { bookingID } = req.params;
-        if (!mongoose.isValidObjectId(bookingID)) return res.status(400).json({ error: 'No es un ID' })
+        const { id } = req.params;
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
         
-        const booking = await bookingDatabaseModel.findById(bookingID);
+        const booking = await bookingDatabaseModel.findById(id);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con ese ID' })
         if (booking.status != 'Cancelada') return res.status(400).json({ error: 'Solo se pueden eliminar reservas canceladas' });
 
-        await bookingDatabaseModel.findByIdAndDelete(bookingID);
+        await bookingDatabaseModel.findByIdAndDelete(id);
         return res.status(200).json({ status: 'Reserva eliminada correctamente' });
     }
     catch (error) {
