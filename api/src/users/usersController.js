@@ -38,3 +38,26 @@ export async function getOneUserByIdOrDni(req, res) {
         return res.status(500).json({ error: 'Error del servidor' })
     }
 }
+
+export async function createUser(req, res) {
+    try {
+        const { firstName, lastName, password, dni, birthDate, cityName, gender, rol, vipStatus} = req.body;
+        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDate, cityName, gender, null, rol, vipStatus);
+        userEntry.validate();
+        const userDB = userEntry.toDocument();
+        await userDB.save();
+
+        return res.status(201).json({message: 'Usuario creado, Rol adquirido: ' + rol});
+    } catch (error) {
+        return res.status(400).json({ error: error.message });
+
+    }
+}
+
+export async function updateUser(req, res) {
+    try {
+        //Utilizar condicional para distintas posibilidades o crear otro (En Revision.)
+    } catch (error) {
+        return res.status(400).json({error: error.message})
+    }
+}
