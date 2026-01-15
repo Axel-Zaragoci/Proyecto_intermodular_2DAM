@@ -70,7 +70,7 @@ const userDatabaseSchema = new Schema({
 
 export const userDatabaseModel = model('user', userDatabaseSchema)
 
-class UserEntryData {
+export class UserEntryData {
     constructor(firstName, lastName, password, dni, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
         this.firstName = firstName
         this.lastName = lastName
