@@ -131,27 +131,41 @@ export const updateRoom = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const {
+      type,
+      roomNumber,
+      maxGuests,
+      description,
+      mainImage,
+      pricePerNight,
+      extraBed,
+      crib,
+      offer,
+      extras,
+      extraImages,
+    } = req.body;
+
     // Busca la room actual para usar valores por defecto si no vienen en el body
     const room = await roomDatabaseModel.findById(id);
     if (!room) return res.status(404).json({ message: "Room no encontrada" });
 
     // Construye un objeto de entrada con fallback a valores actuales
     const data = new RoomEntryData(
-      req.body.type ?? room.type,
-      req.body.roomNumber ?? room.roomNumber,
-      req.body.maxGuests ?? room.maxGuests,
-      req.body.description ?? room.description,
-      req.body.mainImage ?? room.mainImage,
-      req.body.pricePerNight ?? room.pricePerNight
+      type ?? room.type,
+      roomNumber ?? room.roomNumber,
+      maxGuests ?? room.maxGuests,
+      description ?? room.description,
+      mainImage ?? room.mainImage,
+      pricePerNight ?? room.pricePerNight
     );
 
     // Completa campos opcionales con recuerdo a valores actuales
     data.completeRoomData(
-      req.body.extraBed ?? room.extraBed,
-      req.body.crib ?? room.crib,
-      req.body.offer ?? room.offer,
-      req.body.extras ?? room.extras,
-      req.body.extraImages ?? room.extraImages
+      extraBed ?? room.extraBed,
+      crib ?? room.crib,
+      offer ?? room.offer,
+      extras ?? room.extras,
+      extraImages ?? room.extraImages
     );
 
     // Valida el objeto antes de actualizar
