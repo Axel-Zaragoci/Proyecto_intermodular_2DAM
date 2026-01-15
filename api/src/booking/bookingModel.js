@@ -1,10 +1,9 @@
-import { Schema, Types, model } from 'mongoose';
-import { formatDate } from '../commons/date.js';
+import { Schema, Types, model, isValidObjectId } from 'mongoose';
+import { formatDate, parseDate } from '../commons/date.js';
 
 /**
- * @typedef bookingSchema
+ * @typedef {Object} bookingSchema
  * 
- * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
  * @property {import('mongoose').Types.ObjectId} room - Identificador de la habitación
  * @property {import('mongoose').Types.ObjectId} client - Identificador del cliente
  * @property {Date} checkInDate - Fecha de inicio de la reserva
@@ -65,6 +64,20 @@ const bookingDatabaseSchema = new Schema({
         type: Number,
         required: true
     }
+}, {
+    toJSON: {
+        /**
+         * @param {{[x: string] : unknown}} _doc 
+         * @param {Record<String, any>} ret 
+         * @returns 
+         */
+        transform(_doc, ret) {
+            ret.checkInDate = formatDate(ret.checkInDate);
+            ret.checkOutDate = formatDate(ret.checkOutDate);
+            ret.payDate = formatDate(ret.payDate);
+            return ret;
+        }
+    }
 });
 
 export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
@@ -75,15 +88,15 @@ export class BookingEntryData {
      * Crea una nueva entrada de datos
      * @param {import('mongoose').Types.ObjectId | string} roomID 
      * @param {import('mongoose').Types.ObjectId | string} clientID 
-     * @param {Date} checkInDate 
-     * @param {Date} checkOutDate 
+     * @param {string|Date} checkInDate 
+     * @param {string|Date} checkOutDate 
      * @param {number} guests 
      */
     constructor(roomID, clientID, checkInDate, checkOutDate, guests) {
         this.roomID = roomID
         this.clientID = clientID
-        this.checkInDate = checkInDate
-        this.checkOutDate = checkOutDate
+        this.checkInDate = typeof(checkInDate) === 'string' ? parseDate(checkInDate) : checkInDate
+        this.checkOutDate = typeof(checkOutDate) === 'string' ? parseDate(checkOutDate) : checkOutDate
         this.guests = guests
         this.ready = false
     }
@@ -101,32 +114,36 @@ export class BookingEntryData {
         this.ready = true
     }
 
-    validate() {
-        function isString(o) {
-            return typeof(o) === 'string' && o.trim().length != 0;
-        }
+    /**
+     * Añadir un ID existente
+     * @param {string} id 
+     */
+    setID(id) {
+        this._id = id;
+    }
+
+    async validate() {
         function isNumeric(o) {
             return typeof(o) === 'number' && o > 0
         }
-        function isNumericOr0(o) {
-            return typeof(o) === 'number' && o >= 0
-        }
         function isDate(o) {
-            return formatDate(o) != null;
+            return o != null
         }
+        
 
         const errors = [];
-        if (!isString(this.roomID)) errors.push("El ID de la habitación es inválido");
-        if (!isString(this.clientID)) errors.push("El ID del usuario es inválido");
-        if (!isDate(this.checkInDate)) errors.push("La fecha de check-in es inválida");
-        if (!isDate(this.checkOutDate)) errors.push("La fecha de check-out es inválida");
-        if (this.checkOutDate.getMilliseconds() > this.checkInDate.getMilliseconds()) errors.push("La fecha de fin no puede ser anterior a la de inicio")
-        if (!isNumeric(this.guests)) errors.push("La cantidad de huéspedes debe ser un número mayor que 0");
-        if (!isNumericOr0(this.offer)) errors.push("La oferta debe ser un número equivalente a 0 o más");
-        if (!isNumeric(this.totalNights)) errors.push("La cantidad de noches debe ser un número");
-        if (!isNumeric(this.pricePerNight)) errors.push("El precio por noche debe ser un número mayor a 0");
-        if (!isNumeric(this.totalPrice)) errors.push("El precio total debe ser un número mayor a 0");
+        if (!isValidObjectId(this.roomID)) errors.push("El ID de la habitación es inválido");
+        if (!isValidObjectId(this.clientID)) errors.push("El ID del usuario es inválido");
+
+        if (!isDate(this.checkInDate)) errors.push("La fecha de check-in no es válida");
+        if (!isDate(this.checkOutDate)) errors.push("La fehca de check-out es inválida");
+        if (isDate(this.checkOutDate) && isDate(this.checkInDate) && this.checkOutDate.getTime() < this.checkInDate.getTime()) errors.push("La fecha de fin no puede ser anterior a la de inicio")
+        const now = new Date(Date.now()).setHours(0, 0, 0, 0);
+        if (new Date(now).getTime() > this.checkInDate.getTime()) errors.push("No se puede hacer una reserva en el pasado")
+        if (await dateOverlap(this._id, this.roomID, this.checkInDate, this.checkOutDate)) errors.push("Ya hay reserva en esas fechas")
         
+        if (!isNumeric(this.guests)) errors.push("La cantidad de huéspedes debe ser un número mayor que 0");
+
         if (errors.length != 0) {
             throw new Error(errors.join(", "));
         }
@@ -134,18 +151,34 @@ export class BookingEntryData {
 
     /**
      * 
-     * @returns {import('mongoose').Document}
+     * @returns {Promise}
      */
-    toDocument() {
-        if (!this.ready) throw new Error("Reserva no lista. Completa la información")
-        return new bookingDatabaseModel({room: this.roomID, 
-                                        client: this.clientID, 
-                                        checkInDate: this.checkInDate, 
-                                        checkOutDate: this.checkOutDate, 
-                                        totalPrice: this.totalPrice, 
-                                        pricePerNight: this.pricePerNight, 
-                                        offer: this.offer, 
-                                        guests: this.guests, 
-                                        totalNights: this.totalNights})
+    save() {
+        if (!this.ready) throw new Error("Reserva no lista. Completa la información");
+        const doc = this.doc ?? new bookingDatabaseModel();
+        const data = {room: this.roomID, 
+                        client: this.clientID, 
+                        checkInDate: this.checkInDate, 
+                        checkOutDate: this.checkOutDate, 
+                        totalPrice: this.totalPrice, 
+                        pricePerNight: this.pricePerNight, 
+                        offer: this.offer, 
+                        guests: this.guests, 
+                        totalNights: this.totalNights};
+        
+        return doc.set(data).save();
     }
+
+    async fromDocument(booking) {
+        this.doc = booking;
+    }
+}
+
+async function dateOverlap(id, roomID, checkInDate, checkOutDate) {
+    const exists = await bookingDatabaseModel.exists({
+        room: roomID,
+        checkInDate: { $lt: checkOutDate },
+        checkOutDate: { $gt: checkInDate }
+    })
+    return exists && exists._id != id
 }
