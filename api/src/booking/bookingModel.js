@@ -165,7 +165,7 @@ export class BookingEntryData {
                         offer: this.offer, 
                         guests: this.guests, 
                         totalNights: this.totalNights};
-        
+        console.log(data)
         return doc.set(data).save();
     }
 
