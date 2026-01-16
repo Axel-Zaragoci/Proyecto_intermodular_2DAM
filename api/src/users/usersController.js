@@ -1,4 +1,4 @@
-import { userDatabaseModel, UserEntryData } from "./usersModel";
+import { userDatabaseModel, UserEntryData } from "./usersModel.js";
 import mongoose from "mongoose";
 
 /**
@@ -26,7 +26,8 @@ import mongoose from "mongoose";
 export async function registerUser(req, res) {
     try {
         const { firstName, lastName, password, dni, birthDate, cityName, gender} = req.body;
-        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDate, cityName, gender, null, "Usuario", false);
+        const birthDateObj = new Date(birthDate);
+        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDateObj, cityName, gender, null, "Usuario", false);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();

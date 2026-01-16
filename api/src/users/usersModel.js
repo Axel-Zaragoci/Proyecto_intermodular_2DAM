@@ -112,7 +112,7 @@ export class UserEntryData {
         if (!this.firstName || !this.lastName) throw new Error("Nombre y Apellido no pueden estar vacíos.");
         if(/\d/.test(this.firstName) || /\d/.test(this.lastName)) throw new Error("Nombre y Apellido no pueden contener números.");
         if(this.password.length < 8) throw new Error("La contraseña tiene que contener al menos de 8 caracteres.");
-        if(this.birthDate.getTime() < Date.now() - 504921600000) throw new Error("Tienes que ser mayor de 16 años.")
+        if(this.birthDate.getTime() > Date.now() - 504921600000) throw new Error("Tienes que ser mayor de 16 años.")
         if(!["Hombre", "Mujer"].includes(this.gender)) throw new Error("Seleccione un Genero");
         if(!/^\d{8}[a-zA-Z]$/.test(this.dni)) throw new Error("DNI Incorrecto.");
         
@@ -135,7 +135,7 @@ export class UserEntryData {
             password: this.password,
             dni: this.dni,
             birthDate: this.birthDate,
-            cityname: this.cityName,
+            cityName: this.cityName,
             gender: this.gender,
             imageRoute: this.imageRoute,
             rol: this.rol,
