@@ -5,7 +5,7 @@ const usersRouter = Router();
 
 usersRouter.get('/', getAllUsers);
 usersRouter.get('/rol/:rol', getUsersByRol);
-usersRouter.get('/:identifier', getOneUserByIdOrDni);
+usersRouter.get('/getOne', getOneUserByIdOrDni);
 
 usersRouter.post('/register', registerUser);
 usersRouter.post('/', createUser);
