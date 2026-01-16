@@ -11,7 +11,6 @@ const router = Router();
 
 router.post("/", createRoom);
 router.get("/", getRoomsFiltered);
-router.get("/filter", getRoomsFiltered);
 router.get("/:roomID", getRoomById);
 router.patch("/:roomID", updateRoom);
 router.delete("/:roomID", deleteRoom);
