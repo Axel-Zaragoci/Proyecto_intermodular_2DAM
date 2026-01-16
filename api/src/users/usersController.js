@@ -1,6 +1,28 @@
 import { userDatabaseModel, UserEntryData } from "./usersModel";
 import mongoose from "mongoose";
 
+/**
+ * Controlador para el registro de un nuevo usuario
+ * 
+ * @async
+ * @function registerUser
+ * 
+ * @description
+ * Recibe los datos del nuevo usuario desde el cuerpo de la solicitud
+ * Crea una instancia de UserEntryData con los datos recibidos
+ * Valida los datos del usuario
+ * Convierte los datos validados en un documento de Mongoose
+ * Guarda el nuevo usuario en la base de datos
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 201 y mensaje de éxito si el usuario se crea correctamente
+ * - Código de estado 400 y mensaje de error si hay un problema con los datos proporcionados
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ * 
+ */
 export async function registerUser(req, res) {
     try {
         const { firstName, lastName, password, dni, birthDate, cityName, gender} = req.body;
@@ -16,6 +38,29 @@ export async function registerUser(req, res) {
     }
 }
 
+/**
+ * Controlador para obtener un usuario por su ID o DNI
+ * 
+ * @async
+ * @function getOneUserByIdOrDni
+ * 
+ * @description
+ * Recibe el ID o DNI del usuario desde el cuerpo de la solicitud
+ * Verifica si el parámetro de búsqueda está presente
+ * Si el parámetro de búsqueda es un ID, valida su formato y busca el usuario por ID
+ * Si el parámetro de búsqueda es un DNI, busca el usuario por DNI
+ * Devuelve el usuario encontrado o un mensaje de error si no se encuentra
+ * Maneja errores del servidor y devuelve un mensaje de error adecuado
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 200 y el usuario si se encuentra correctamente
+ * - Código de estado 400 y mensaje de error si el ID proporcionado no es válido o falta el parámetro de búsqueda
+ * - Código de estado 404 y mensaje de error si el usuario no se encuentra
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ */
 export async function getOneUserByIdOrDni(req, res) {
     try {
         const { id, data} = req.body;
@@ -39,6 +84,26 @@ export async function getOneUserByIdOrDni(req, res) {
     }
 }
 
+/**
+ * Controlador para la creación de un nuevo usuario con rol y estado VIP opcionales
+ *
+ * @async
+ * @function createUser
+ *
+ * @description
+ * Recibe los datos del nuevo usuario desde el cuerpo de la solicitud
+ * Crea una instancia de UserEntryData con los datos recibidos
+ * Valida los datos del usuario
+ * Convierte los datos validados en un documento de Mongoose
+ * Guarda el nuevo usuario en la base de datos
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 201 y mensaje de éxito si el usuario se crea correctamente
+ * - Código de estado 400 y mensaje de error si hay un problema con los datos proporcionados
+ */
 export async function createUser(req, res) {
     try {
         const { firstName, lastName, password, dni, birthDate, cityName, gender, rol, vipStatus} = req.body;
@@ -54,6 +119,13 @@ export async function createUser(req, res) {
     }
 }
 
+/**
+ * Controlador para actualizar un usuario existente
+ * @async
+ * @function updateUser
+ *
+ * @description In development
+ */
 export async function updateUser(req, res) {
     try {
         //Utilizar condicional para distintas posibilidades o crear otro (En Revision.)

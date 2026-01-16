@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 
 /**
- * @typedef userSchema
+ * @typedef {Object} User
  * 
  * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
  * @property {string} firstName - Nombre propio del usuario
@@ -16,7 +16,12 @@ import { Schema, model } from 'mongoose';
  * @property {Boolean} vipStatus - Estado membresia VIP del usuario, "true" cuenta con membresia acctiva, "false" no cuenta con membresia
  * 
  * @description Documento correspondiente a los datos en MongoDB sobre el usuario
-*/
+ */
+
+/**
+ * Schema de MongoDB para usuarios
+ * @type {import('mongoose').Schema<User>}
+ */
 const userDatabaseSchema = new Schema({
     firstName: {
         type: String,
@@ -68,8 +73,15 @@ const userDatabaseSchema = new Schema({
     }
 });
 
+/**
+ * Modelo de Mongoose para usuarios
+ * @type {import('mongoose').Model<User>}
+ */
 export const userDatabaseModel = model('user', userDatabaseSchema)
 
+/**
+ * Clase para la creación y validación de nuevos usuarios
+ */
 export class UserEntryData {
     constructor(firstName, lastName, password, dni, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
         this.firstName = firstName
@@ -86,6 +98,16 @@ export class UserEntryData {
         this.ready = false
     }
 
+    /**
+     * Valida los datos del usuario
+     * @throws {Error} Si algún dato no cumple con las condiciones establecidas
+     * @description
+     * - El nombre y apellido no pueden estar vacíos ni contener números
+     * - La contraseña debe tener al menos 8 caracteres
+     * - El usuario debe ser mayor de 16 años
+     * - El DNI debe tener un formato correcto y una letra válida
+     * - Establece la propiedad `ready` a `true` si todos los datos son válidos
+     */
     validate() {
         if (!this.firstName || !this.lastName) throw new Error("Nombre y Apellido no pueden estar vacíos.");
         if(/\d/.test(this.firstName) || /\d/.test(this.lastName)) throw new Error("Nombre y Apellido no pueden contener números.");
@@ -101,7 +123,10 @@ export class UserEntryData {
         this.ready = true
     }
 
-
+    /**     
+     * Convierte los datos validados en un documento de Mongoose
+     * @returns {import('mongoose').Document} Documento de Mongoose listo para ser guardado
+     */
     toDocument() {
         if(!this.ready) throw new Error("Completa la creación de usuario correctamente.")
         return new userDatabaseModel({
