@@ -1,7 +1,6 @@
 import { bookingDatabaseModel, BookingEntryData } from "./bookingModel.js";
 import { roomDatabaseModel } from "../rooms/roomsModel.js"
 import mongoose from "mongoose";
-import { parseDate } from "../commons/date.js";
 
 /**
  * Obtener una reserva específica a partir de su ID
@@ -177,19 +176,18 @@ export async function getBookingsByRoomId(req, res) {
  */
 export async function createBooking(req, res) {
     try {
-        const { userID, roomID, checkInDate, checkOutDate, guests } = req.body;
-        //const userID = req.session.userId;
+        const { client, room, checkInDate, checkOutDate, guests } = req.body;
+        //const client = req.session.userId;
 
-        if (!roomID) return res.status(400).json({ error: 'Se requiere ID de habitación'});
+        if (!room) return res.status(400).json({ error: 'Se requiere ID de habitación'});
         if (!checkInDate) return res.status(400).json({ error: 'Se requiere fecha de check in' });
         if (!checkOutDate) return res.status(400).json({ error: 'Se requiere fecha de check out'});
         if (!guests) return res.status(400).json({ error: 'Se requiere cantidad de huéspedes' });
 
+        const dbRoom = await roomDatabaseModel.findById(room);
+        if (!dbRoom) return res.status(404).json({ error: 'No se encuentra habitación con ese ID' });
         
-        const room = await roomDatabaseModel.findById(roomID);
-        if (!room) return res.status(404).json({ error: 'No se encuentra habitación con ese ID' });
-        
-        const booking = new BookingEntryData(roomID, userID, checkInDate, checkOutDate, guests);
+        const booking = new BookingEntryData(room, client, checkInDate, checkOutDate, guests);
         
         try {
             await booking.validate()
@@ -197,8 +195,8 @@ export async function createBooking(req, res) {
         catch(err) {
             return res.status(400).json({ error: err.message });
         }
-        if (guests > room.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
-        booking.completeBookingData(room.pricePerNight, room.offer);
+        if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
+        booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
         
         const bdBooking = await booking.save()
         return res.status(201).json(bdBooking)
@@ -273,16 +271,15 @@ export async function cancelBooking(req, res) {
 export async function updateBooking(req, res) {
     try {
         const { id } = req.params;
-        //const userID = req.session.userId;
-        const { userID, checkInDate, checkOutDate, guests } = req.body;
+        const { checkInDate, checkOutDate, guests } = req.body;
         if (!checkInDate || !checkOutDate || !guests) return res.status(400).json({ error: 'Faltan datos necesarios' })
         if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' })
         
         const booking = await bookingDatabaseModel.findById(id);
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
 
-        const bookingData = new BookingEntryData(booking.room, userID, checkInDate, checkOutDate, guests);
-        bookingData.setID(id);
+        const bookingData = new BookingEntryData(booking.room, booking.client, checkInDate, checkOutDate, guests);
+        bookingData.fromDocument(booking);
 
         const room = await roomDatabaseModel.findById(booking.room);
 
@@ -290,7 +287,6 @@ export async function updateBooking(req, res) {
             await bookingData.validate()
         }
         catch(err) {
-            console.error(err)
             return res.status(400).json({ error: err.message });
         }
 
@@ -301,10 +297,10 @@ export async function updateBooking(req, res) {
             bookingData.completeBookingData(booking.pricePerNight, booking.offer);
         }
 
-        bookingData.fromDocument(booking);
         const updatedBooking = await bookingData.save();
         return res.status(200).json(updatedBooking)
     }
+    
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
         return res.status(500).json({ error: 'Error del servidor' })

@@ -1,7 +1,7 @@
 import express from 'express';
 import connectDB from './config/db.js';
 import dotenv from "dotenv"
-
+console.clear();
 dotenv.config()
 import bookingRouter from './booking/bookingRouter.js';
 import roomsRouter from './rooms/roomsRouter.js';
