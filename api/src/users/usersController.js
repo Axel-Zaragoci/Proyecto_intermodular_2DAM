@@ -85,6 +85,67 @@ export async function getOneUserByIdOrDni(req, res) {
 }
 
 /**
+ * Controlador para obtener todos los usuarios
+ * 
+ * @async
+ * @function getAllUsers
+ * 
+ * @description
+ * Busca todos los usuarios en la base de datos
+ * Devuelve los usuarios encontrados o un mensaje de error si hay un problema
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 200 y los usuarios si se encuentran correctamente
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ */
+export async function getAllUsers(req, res) {
+    try {
+        const users =  await userDatabaseModel.find();
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+        return res.status(500).json({ error: 'Error del servidor' })
+    }
+}
+
+/**
+ * Controlador para obtener usuarios por su rol
+ * 
+ * @async
+ * @function getUsersByRol
+ * 
+ * @description
+ * Recibe el rol desde los parámetros de la solicitud
+ * Verifica si el rol es válido
+ * Busca los usuarios con el rol especificado en la base de datos
+ * Devuelve los usuarios encontrados o un mensaje de error si hay un problema
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 200 y los usuarios si se encuentran correctamente
+ * - Código de estado 400 y mensaje de error si el rol proporcionado no es válido
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ */
+export async function getUsersByRol(req, res) {
+    try {
+        const { rol } = req.params;
+
+        if(!["Admin", "Trabajador", "Usuario"].includes(rol)) {return res.status(400).json({ error: 'Rol no válido' });}
+
+        const users = await userDatabaseModel.find({ rol });
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error('Error al obtener los usuarios por rol:', error);
+        return res.status(500).json({ error: 'Error del servidor' })
+    }
+}
+
+/**
  * Controlador para la creación de un nuevo usuario con rol y estado VIP opcionales
  *
  * @async
