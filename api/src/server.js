@@ -17,6 +17,6 @@ app.use(express.json());
 //app.use('/booking', bookingRouter);
 app.use("/room", roomsRouter);
 //app.use("/user", usersRouter);
-zzapp.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Servidor en el puerto ${PORT}`);
 })
