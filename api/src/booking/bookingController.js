@@ -279,7 +279,7 @@ export async function updateBooking(req, res) {
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
 
         const bookingData = new BookingEntryData(booking.room, booking.client, checkInDate, checkOutDate, guests);
-        bookingData.setID(id);
+        bookingData.fromDocument(booking);
 
         const room = await roomDatabaseModel.findById(booking.room);
 
@@ -287,7 +287,6 @@ export async function updateBooking(req, res) {
             await bookingData.validate()
         }
         catch(err) {
-            console.error(err)
             return res.status(400).json({ error: err.message });
         }
 
@@ -298,10 +297,10 @@ export async function updateBooking(req, res) {
             bookingData.completeBookingData(booking.pricePerNight, booking.offer);
         }
 
-        bookingData.fromDocument(booking);
         const updatedBooking = await bookingData.save();
         return res.status(200).json(updatedBooking)
     }
+    
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
         return res.status(500).json({ error: 'Error del servidor' })
