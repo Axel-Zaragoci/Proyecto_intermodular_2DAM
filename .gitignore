@@ -1,4 +1,5 @@
 *.env
+api/package-lock.json
 
 .vs/
 .idea/

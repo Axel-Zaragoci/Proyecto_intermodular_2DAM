@@ -1,9 +1,9 @@
-import { Schema, Types, model } from 'mongoose';
+import { Schema, Types, model, isValidObjectId } from 'mongoose';
+import { formatDate, parseDate } from '../commons/date.js';
 
 /**
- * @typedef bookingSchema
+ * @typedef {Object} bookingSchema
  * 
- * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
  * @property {import('mongoose').Types.ObjectId} room - Identificador de la habitación
  * @property {import('mongoose').Types.ObjectId} client - Identificador del cliente
  * @property {Date} checkInDate - Fecha de inicio de la reserva
@@ -64,26 +64,41 @@ const bookingDatabaseSchema = new Schema({
         type: Number,
         required: true
     }
+}, {
+    toJSON: {
+        /**
+         * @param {{[x: string] : unknown}} _doc 
+         * @param {Record<String, any>} ret 
+         * @returns 
+         */
+        transform(_doc, ret) {
+            ret.checkInDate = formatDate(ret.checkInDate);
+            ret.checkOutDate = formatDate(ret.checkOutDate);
+            ret.payDate = formatDate(ret.payDate);
+            return ret;
+        }
+    }
 });
 
 export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 
 /** Clase que obtiene los datos para la reserva */
-class BookingEntryData {
+export class BookingEntryData {
     /**
      * Crea una nueva entrada de datos
-     * @param {string} roomID 
-     * @param {string} clientID 
-     * @param {Date} checkInDate 
-     * @param {Date} checkOutDate 
+     * @param {import('mongoose').Types.ObjectId} roomID 
+     * @param {import('mongoose').Types.ObjectId} clientID 
+     * @param {string|Date} checkInDate 
+     * @param {string|Date} checkOutDate 
      * @param {number} guests 
      */
     constructor(roomID, clientID, checkInDate, checkOutDate, guests) {
         this.roomID = roomID
         this.clientID = clientID
-        this.checkInDate = checkInDate
-        this.checkOutDate = checkOutDate
+        this.checkInDate = typeof(checkInDate) === 'string' ? parseDate(checkInDate) : checkInDate
+        this.checkOutDate = typeof(checkOutDate) === 'string' ? parseDate(checkOutDate) : checkOutDate
         this.guests = guests
+        this.doc = null
         this.ready = false
     }
 
@@ -101,19 +116,79 @@ class BookingEntryData {
     }
 
     /**
-     * 
-     * @returns {import('mongoose').Document}
+     * Método que valida los datos para evitar errores en la base de datos
+     * @throws {Error} Ha ocurrido 1 o más errores de validación. El mensaje contiene los errores
      */
-    toDocument() {
-        if (!this.ready) throw new Error("Reserva no lista. Completa la información")
-        return new bookingDatabaseModel({room: this.roomID, 
-                                        client: this.clientID, 
-                                        checkInDate: this.checkInDate, 
-                                        checkOutDate: this.checkOutDate, 
-                                        totalPrice: this.totalPrice, 
-                                        pricePerNight: this.pricePerNight, 
-                                        offer: this.offer, 
-                                        guests: this.guests, 
-                                        totalNights: this.totalNights})
+    async validate() {
+        function isNumeric(o) {
+            return typeof(o) === 'number' && o > 0
+        }
+        function isDate(o) {
+            return o != null
+        }
+        
+
+        const errors = [];
+        if (!isValidObjectId(this.roomID)) errors.push("El ID de la habitación es inválido");
+        if (!isValidObjectId(this.clientID)) errors.push("El ID del usuario es inválido");
+
+        if (!isDate(this.checkInDate)) errors.push("La fecha de check-in no es válida");
+        if (!isDate(this.checkOutDate)) errors.push("La fehca de check-out es inválida");
+        if (isDate(this.checkOutDate) && isDate(this.checkInDate) && this.checkOutDate.getTime() < this.checkInDate.getTime()) errors.push("La fecha de fin no puede ser anterior a la de inicio")
+        const now = new Date(Date.now()).setHours(0, 0, 0, 0);
+        if (new Date(now).getTime() > this.checkInDate.getTime()) errors.push("No se puede hacer una reserva en el pasado")
+        if (await dateOverlap(this.roomID, this.checkInDate, this.checkOutDate, this.doc?._id ?? null )) errors.push("Ya hay reserva en esas fechas")
+        
+        if (!isNumeric(this.guests)) errors.push("La cantidad de huéspedes debe ser un número mayor que 0");
+
+        if (errors.length != 0) {
+            throw new Error(errors.join(", "));
+        }
     }
+
+    /**
+     * Método para guardar o actualizar un elemento en la base de datos
+     * @returns {Promise}
+     */
+    save() {
+        if (!this.ready) throw new Error("Reserva no lista. Completa la información");
+        const doc = this.doc ?? new bookingDatabaseModel();
+        const data = {room: this.roomID, 
+                        client: this.clientID, 
+                        checkInDate: this.checkInDate, 
+                        checkOutDate: this.checkOutDate, 
+                        totalPrice: this.totalPrice, 
+                        pricePerNight: this.pricePerNight, 
+                        offer: this.offer, 
+                        guests: this.guests, 
+                        totalNights: this.totalNights};
+        return doc.set(data).save();
+    }
+
+    /**
+     * Método para almacenar un documento base para las actualizaciones
+     * @param {import("mongoose").Document} booking 
+     */
+    async fromDocument(booking) {
+        this.doc = booking;
+    }
+}
+
+/**
+ * Método para saber si hay solapamiento de fechas de reservas de una habitación
+ * @param {import("mongoose").Types.ObjectId} roomID 
+ * @param {Date} checkInDate 
+ * @param {Date} checkOutDate 
+ * @param {import("mongoose").Types.ObjectId|null} id 
+ * 
+ * @returns {Promise|null} Devuelve una promesa de un documento o null. Si se encuentra un documento (hay solapamiento de fechas) y si no se encuentra se devuelve null
+ */
+async function dateOverlap(roomID, checkInDate, checkOutDate, id = null) {
+    const query = {
+        room: roomID,
+        checkInDate: { $lt: checkOutDate },
+        checkOutDate: { $gt: checkInDate }
+    };
+    if (id) query._id = { $ne: id }
+    return await bookingDatabaseModel.exists(query)
 }
