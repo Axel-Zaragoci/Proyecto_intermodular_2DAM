@@ -21,11 +21,19 @@ import mongoose from "mongoose";
  * - Código de estado 201 y mensaje de éxito si el usuario se crea correctamente
  * - Código de estado 400 y mensaje de error si hay un problema con los datos proporcionados
  * - Código de estado 500 y mensaje de error si hay un problema del servidor
- * 
  */
 export async function registerUser(req, res) {
     try {
         const { firstName, lastName, password, dni, birthDate, cityName, gender} = req.body;
+
+        if(!firstName) return res.status(400).json({error: "El nombre no puede estar vacio."});
+        if(!lastName) return res.status(400).json({error: "El apellido no puede estar vacio."});
+        if(!password) return res.status(400).json({error: "La contraseña no puede estar vacia."});
+        if(!dni) return res.status(400).json({error: "El dni no puede estar vacio."});
+        if(!birthDate) return res.status(400).json({error: "La fecha no puede estar vacia."});
+        if(!cityName) return res.status(400).json({error: "La ciudad no puede estar vacia."});
+        if(!gender) return res.status(400).json({error: "Tienes que seleccionar un genero."});
+
         const birthDateObj = new Date(birthDate);
         const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDateObj, cityName, gender, null, "Usuario", false);
         userEntry.validate();
@@ -34,8 +42,8 @@ export async function registerUser(req, res) {
 
         res.status(201).json({message: 'Usuario creado'});
     } catch (error) {
-        return res.status(400).json({ error: error.message });
-
+        console.error('Error al obtener el usuario:', error);
+        return res.status(500).json({ error: ' Error del servidor ' });
     }
 }
 
@@ -64,16 +72,16 @@ export async function registerUser(req, res) {
  */
 export async function getOneUserByIdOrDni(req, res) {
     try {
-        const { id, data} = req.body;
-        if(!id) return res.status(400).json({ error: 'Se requiere el parametro de busqueda del usuario' });
+        const { searchData, searchProperty} = req.body;
+        if(!searchData) return res.status(400).json({ error: 'Se requiere el parametro de busqueda del usuario' });
 
         let user;
 
-        if(data.includes("id")) {
-            if(!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un Id' });
-            user = await userDatabaseModel.findById(id);
+        if(searchProperty.includes("id")) {
+            if(!mongoose.isValidObjectId(searchData)) return res.status(400).json({ error: 'No es un Id' });
+            user = await userDatabaseModel.findById(searchData);
         } else {
-            user = await userDatabaseModel.findOne({"dni": id});
+            user = await userDatabaseModel.findOne({"dni": searchData});
         }
 
         if(!user) return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -165,33 +173,30 @@ export async function getUsersByRol(req, res) {
  * @returns {Promise} - Respuesta HTTP con:
  * - Código de estado 201 y mensaje de éxito si el usuario se crea correctamente
  * - Código de estado 400 y mensaje de error si hay un problema con los datos proporcionados
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
  */
 export async function createUser(req, res) {
     try {
         const { firstName, lastName, password, dni, birthDate, cityName, gender, rol, vipStatus} = req.body;
-        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDate, cityName, gender, null, rol, vipStatus);
+
+        if(!firstName) return res.status(400).json({error: "El nombre no puede estar vacio."});
+        if(!lastName) return res.status(400).json({error: "El apellido no puede estar vacio."});
+        if(!password) return res.status(400).json({error: "La contraseña no puede estar vacia."});
+        if(!dni) return res.status(400).json({error: "El dni no puede estar vacio."});
+        if(!birthDate) return res.status(400).json({error: "La fecha no puede estar vacia."});
+        if(!cityName) return res.status(400).json({error: "La ciudad no puede estar vacia."});
+        if(!gender) return res.status(400).json({error: "Tienes que seleccionar un genero."});
+        
+        const birthDateObj = new Date(birthDate);
+        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDateObj, cityName, gender, null, rol, vipStatus);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();
 
         return res.status(201).json({message: 'Usuario creado, Rol adquirido: ' + rol});
     } catch (error) {
-        return res.status(400).json({ error: error.message });
+        console.error('Error al crear un Usuario:', error);
+        return res.status(500).json({ error:  'Error del servidor'});
 
-    }
-}
-
-/**
- * Controlador para actualizar un usuario existente
- * @async
- * @function updateUser
- *
- * @description In development
- */
-export async function updateUser(req, res) {
-    try {
-        //Utilizar condicional para distintas posibilidades o crear otro (En Revision.)
-    } catch (error) {
-        return res.status(400).json({error: error.message})
     }
 }
