@@ -1,6 +1,6 @@
 import { userDatabaseModel, UserEntryData } from "./usersModel.js";
 import mongoose from "mongoose";
-
+import { hashPassword } from "../services/password.service.js";
 /**
  * Controlador para el registro de un nuevo usuario
  * 
@@ -35,7 +35,8 @@ export async function registerUser(req, res) {
         if(!gender) return res.status(400).json({error: "Tienes que seleccionar un genero."});
 
         const birthDateObj = new Date(birthDate);
-        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDateObj, cityName, gender, null, "Usuario", false);
+        const hashedPassword = await hashPassword(password);
+        const userEntry = new UserEntryData(firstName, lastName, hashedPassword, dni, birthDateObj, cityName, gender);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();
@@ -188,7 +189,8 @@ export async function createUser(req, res) {
         if(!gender) return res.status(400).json({error: "Tienes que seleccionar un genero."});
         
         const birthDateObj = new Date(birthDate);
-        const userEntry = new UserEntryData(firstName, lastName, password, dni, birthDateObj, cityName, gender, null, rol, vipStatus);
+        const hashedPassword = await hashPassword(password);
+        const userEntry = new UserEntryData(firstName, lastName, hashedPassword, dni, birthDateObj, cityName, gender, null, rol, vipStatus);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();

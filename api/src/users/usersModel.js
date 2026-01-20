@@ -1,5 +1,4 @@
 import { Schema, model } from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 /**
  * @typedef {Object} User
@@ -61,7 +60,8 @@ const userDatabaseSchema = new Schema({
     },
     imageRoute: {
         type: String,
-        required: false
+        required: false,
+        default: null
     },
     rol: {
         type: String,
@@ -72,27 +72,6 @@ const userDatabaseSchema = new Schema({
         type: Boolean,
         default: false
     }
-});
-
-/**
- * Middleware de Mongoose para hashear la contraseña antes de guardar el usuario
- * 
- * @async
- * @function preSave
- * 
- * @description
- * ts-ignore Se utiliza para ignorar errores de TypeScript en este bloque de código ya que Mongoose no proporciona tipos completos para `this`
- * Antes de guardar un documento de usuario, verifica si la contraseña ha sido modificada
- * Si ha sido modificada, genera una sal y hashea la contraseña usando bcrypt
- * Reemplaza la contraseña en el documento con la versión hasheada
- * Si no ha sido modificada, continúa sin cambios
- */
-userDatabaseSchema.pre('save', async function () {
-    // @ts-ignore
-    if (!this.isModified('password')) return;
-
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
 });
 
 /**
