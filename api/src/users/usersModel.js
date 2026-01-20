@@ -6,6 +6,7 @@ import { Schema, model } from 'mongoose';
  * @property {import('mongoose').Types.ObjectId} _id - Identificador único creado por MongoDB
  * @property {string} firstName - Nombre propio del usuario
  * @property {string} lastName - Apellido/s del usuario
+ * @property {string} email - Correo del usuario
  * @property {string} password - Contraseña del usuario
  * @property {string} dni - Documento de identidad del usuario
  * @property {Date} birthDate - Fecha de nacimiento del usuario
@@ -32,6 +33,12 @@ const userDatabaseSchema = new Schema({
         type: String,
         required: true,
         trim: true
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true
     },
     password: {
         type: String,
@@ -84,9 +91,10 @@ export const userDatabaseModel = model('user', userDatabaseSchema)
  * Clase para la creación y validación de nuevos usuarios
  */
 export class UserEntryData {
-    constructor(firstName, lastName, password, dni, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
+    constructor(firstName, lastName, email, password, dni, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
         this.firstName = firstName
         this.lastName = lastName
+        this.email = email;
         this.password = password
         this.dni = dni
         this.birthDate = birthDate
@@ -112,6 +120,7 @@ export class UserEntryData {
     validate() {
         if (!this.firstName || !this.lastName) throw new Error("Nombre y Apellido no pueden estar vacíos.");
         if(/\d/.test(this.firstName) || /\d/.test(this.lastName)) throw new Error("Nombre y Apellido no pueden contener números.");
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.email)) throw new Error("El correo tiene que tener un formato correcto.")
         if(this.password.length < 8) throw new Error("La contraseña tiene que contener al menos de 8 caracteres.");
         if(this.birthDate.getTime() > Date.now() - 504921600000) throw new Error("Tienes que ser mayor de 16 años.")
         if(!["Hombre", "Mujer"].includes(this.gender)) throw new Error("Seleccione un Genero");
@@ -133,6 +142,7 @@ export class UserEntryData {
         return new userDatabaseModel({
             firstName: this.firstName,
             lastName: this.lastName,
+            email: this.email,
             password: this.password,
             dni: this.dni,
             birthDate: this.birthDate,

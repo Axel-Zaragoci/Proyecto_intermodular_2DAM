@@ -24,10 +24,11 @@ import { hashPassword } from "../services/password.service.js";
  */
 export async function registerUser(req, res) {
     try {
-        const { firstName, lastName, password, dni, birthDate, cityName, gender} = req.body;
+        const { firstName, lastName, email,password, dni, birthDate, cityName, gender} = req.body;
 
         if(!firstName) return res.status(400).json({error: "El nombre no puede estar vacio."});
         if(!lastName) return res.status(400).json({error: "El apellido no puede estar vacio."});
+        if(!email) return res.status(400).json({error: "El email no puede estar vacio."});
         if(!password) return res.status(400).json({error: "La contraseña no puede estar vacia."});
         if(!dni) return res.status(400).json({error: "El dni no puede estar vacio."});
         if(!birthDate) return res.status(400).json({error: "La fecha no puede estar vacia."});
@@ -36,7 +37,7 @@ export async function registerUser(req, res) {
 
         const birthDateObj = new Date(birthDate);
         const hashedPassword = await hashPassword(password);
-        const userEntry = new UserEntryData(firstName, lastName, hashedPassword, dni, birthDateObj, cityName, gender);
+        const userEntry = new UserEntryData(firstName, lastName, email, hashedPassword, dni, birthDateObj, cityName, gender);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();
@@ -178,10 +179,11 @@ export async function getUsersByRol(req, res) {
  */
 export async function createUser(req, res) {
     try {
-        const { firstName, lastName, password, dni, birthDate, cityName, gender, rol, vipStatus} = req.body;
+        const { firstName, lastName, email, password, dni, birthDate, cityName, gender, rol, vipStatus} = req.body;
 
         if(!firstName) return res.status(400).json({error: "El nombre no puede estar vacio."});
         if(!lastName) return res.status(400).json({error: "El apellido no puede estar vacio."});
+        if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.email)) throw new Error("El correo tiene que tener un formato correcto.")
         if(!password) return res.status(400).json({error: "La contraseña no puede estar vacia."});
         if(!dni) return res.status(400).json({error: "El dni no puede estar vacio."});
         if(!birthDate) return res.status(400).json({error: "La fecha no puede estar vacia."});
@@ -190,7 +192,7 @@ export async function createUser(req, res) {
         
         const birthDateObj = new Date(birthDate);
         const hashedPassword = await hashPassword(password);
-        const userEntry = new UserEntryData(firstName, lastName, hashedPassword, dni, birthDateObj, cityName, gender, null, rol, vipStatus);
+        const userEntry = new UserEntryData(firstName, lastName, email,hashedPassword, dni, birthDateObj, cityName, gender, null, rol, vipStatus);
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();
