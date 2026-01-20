@@ -3,10 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:desktop_app.ViewModels"
+        xmlns:services="clr-namespace:desktop_app.Services"
         xmlns:local="clr-namespace:desktop_app"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+    <Window.DataContext>
+        <viewModels:MainViewModel/>
+    </Window.DataContext>
+    
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.25*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Orientation="Vertical">
+            <Button Style="{StaticResource Menu_btn}" Content="Usuarios" Command="{Binding ShowUsersCommand}"/>
+            <Button Content="Reservas" Command="{Binding ShowBookingsCommand}"/>
+            <Button Content="Habitaciones" Command="{Binding ShowRoomsCommand}"/>
+        </StackPanel>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView, Source={x:Static services:NavigationService.Instance}}"/>
     </Grid>
 </Window>

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:desktop_app.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+    <Grid Background="Violet">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="26" FontWeight="Bold">Ventana de Habitaciones</TextBlock>
     </Grid>
 </UserControl>
