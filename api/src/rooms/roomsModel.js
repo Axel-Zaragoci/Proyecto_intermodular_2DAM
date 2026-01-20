@@ -20,16 +20,38 @@ import { Schema, model } from "mongoose";
  * @property {boolean} isAvailable - Default true
  * @property {number} rate - Default 0
  */
-const roomDatabaseSchema = new Schema({
-  type: { type: String, required: true, trim: true },
 
-  roomNumber: { type: String, required: true, trim: true, unique: true },
+const VALID_TYPES = ["suite", "double", "triple", "family"];
+
+const IMG_PATH_REGEX = /^img\/[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp|gif|svg)$/;
+
+const roomDatabaseSchema = new Schema({
+  type: { 
+    type: String, 
+    required: true, 
+    trim: true,
+    enum: VALID_TYPES,
+  },
+
+  roomNumber: { 
+    type: String, 
+    required: true, 
+    trim: true, 
+    unique: true, 
+    match: /^[0-9]{3}$/,  // 3 dígitos, por ejemplo "101"
+  },
 
   maxGuests: { type: Number, required: true, min: 1 },
 
   description: { type: String, required: true, trim: true },
 
-  mainImage: { type: String, required: true, trim: true },
+  // Ruta a la imagen dentro de la carpeta img
+  mainImage: { 
+    type: String, 
+    required: true, 
+    trim: true,
+    match: IMG_PATH_REGEX,
+  },
 
   pricePerNight: { type: Number, required: true, min: 0 },
 
@@ -37,12 +59,20 @@ const roomDatabaseSchema = new Schema({
   extraBed: { type: Boolean, default: false }, 
   crib: { type: Boolean, default: false },     
 
-  
   offer: { type: Number, default: 0, min: 0, max: 100 },
 
-  
   extras: { type: [String], default: [] },
-  extraImages: { type: [String], default: [] },
+
+  // Imágenes adicionales dentro de img/
+  extraImages: { 
+    type: [
+      {
+        type: String,
+        match: IMG_PATH_REGEX,
+      },
+    ],
+    default: [],
+  },
 
   // ---- Defaults ----
   isAvailable: { type: Boolean, default: true },
@@ -104,24 +134,43 @@ class RoomEntryData {
     const isEmptyString = (v) => typeof v !== "string" || v.trim().length === 0;
 
     if (isEmptyString(this.type)) throw new Error("type vacío");
-    if (isEmptyString(this.roomNumber)) throw new Error("roomNumber vacío");
+    if (!VALID_TYPES.includes(this.type)) {
+      throw new Error(`type inválido. Valores permitidos: ${VALID_TYPES.join(", ")}`);
+    }
+
+    const roomNumberRegex = /^[0-9]{3}$/;
+    if (!roomNumberRegex.test(this.roomNumber)) {
+      throw new Error("roomNumber inválido (debe ser un número de 3 cifras, por ejemplo '101')");
+    }
+
     if (typeof this.maxGuests !== "number" || this.maxGuests < 1)
       throw new Error("maxGuests inválido");
+
     if (isEmptyString(this.description)) throw new Error("description vacía");
+
     if (isEmptyString(this.mainImage)) throw new Error("mainImage vacía");
+    if (!IMG_PATH_REGEX.test(this.mainImage)) {
+      throw new Error("mainImage inválida (debe ser una ruta tipo 'img/nombre.ext')");
+    }
+
     if (typeof this.pricePerNight !== "number" || this.pricePerNight < 0)
       throw new Error("pricePerNight inválido");
 
     if (!Array.isArray(this.extras)) this.extras = [];
-    this.extras = this.extras.map(s => String(s).trim()).filter(Boolean);
+    this.extras = this.extras.map((s) => String(s).trim()).filter(Boolean);
 
     if (!Array.isArray(this.extraImages)) this.extraImages = [];
-    this.extraImages = this.extraImages.map(s => String(s).trim()).filter(Boolean);
+    this.extraImages = this.extraImages
+      .map((s) => String(s).trim())
+      .filter((s) => s && IMG_PATH_REGEX.test(s));
 
     if (typeof this.offer !== "number") this.offer = 0;
     this.offer = Math.max(0, Math.min(this.offer, 100));
-  }
 
+    if (typeof this.rate !== "number" || this.rate < 0 || this.rate > 5) {
+      this.rate = 0;
+    }
+  }
 
   /**
    * @returns {import("mongoose").Document}
