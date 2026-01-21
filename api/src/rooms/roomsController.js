@@ -129,7 +129,7 @@ export const getRoomById = async (req, res) => {
  */
 export const updateRoom = async (req, res) => {
   try {
-    const { roomID } = req.params;
+    const { id } = req.params;
 
     const {
       type,
@@ -146,7 +146,7 @@ export const updateRoom = async (req, res) => {
     } = req.body;
 
     // Busca la room actual para usar valores por defecto si no vienen en el body
-    const room = await roomDatabaseModel.findById(roomID);
+    const room = await roomDatabaseModel.findById(id);
     if (!room) return res.status(404).json({ message: "Room no encontrada" });
 
     // Construye un objeto de entrada con fallback a valores actuales
@@ -173,7 +173,7 @@ export const updateRoom = async (req, res) => {
 
     // Actualiza en BD
     const updated = await roomDatabaseModel.findByIdAndUpdate(
-      roomID,
+      id,
       { $set: data },
       { new: true, runValidators: true }
     );
@@ -204,9 +204,9 @@ export const updateRoom = async (req, res) => {
  */
 export const deleteRoom = async (req, res) => {
   try {
-    const { roomID } = req.params;
+    const { id } = req.params;
 
-    const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
+    const deleted = await roomDatabaseModel.findByIdAndDelete(id);
 
     if (!deleted) return res.status(404).json({ message: "Room no encontrada" });
 

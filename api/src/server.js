@@ -19,6 +19,6 @@ app.use(morgan("dev"))
 app.use('/booking', bookingRouter);
 app.use("/room", roomsRouter);
 //app.use("/user", usersRouter);
-app.listen(PORT, () => {
+zzapp.listen(PORT, () => {
     console.log(`Servidor en el puerto ${PORT}`);
 })
