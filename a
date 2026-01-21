@@ -1,0 +1,45 @@
+[33m9607158[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/gitignore[m[33m, [m[1;31morigin/fix/gitignore[m[33m)[m improving room model
+[33me4b8126[m Merge branch 'develop' into fix/gitignore
+[33m191dc84[m Cambio del gitignore para ignorar el archivo package-lock.json de la api
+[33m73ce394[m Eliminación package-lock.json
+[33mbb0f1c5[m Merge pull request #8 from Axel-Zaragoci/freature/room-api-crud
+[33m9593e58[m[33m ([m[1;31morigin/freature/room-api-crud[m[33m)[m Merge branch 'develop' into freature/room-api-crud
+[33md10c4c8[m delete routes
+[33mea8b82c[m Merge pull request #6 from Axel-Zaragoci/feature/booking-api-crud
+[33m3bd074b[m fix crud and testing
+[33m38bd583[m filtro y routas
+[33mbb47f22[m Conexión a Mongo y uso de archivo .env
+[33mc3fccbb[m[33m ([m[1;31morigin/feature/booking-api-crud[m[33m)[m Añado tests para probar el crud
+[33m69eb804[m Resolución de errores encontrados al probar la API
+[33m0fae64f[m Merge remote-tracking branch 'origin/develop' into feature/booking-api-crud
+[33m6d4858b[m Soluciono errores en imports
+[33m44e26b7[m Creo el router para las reservas
+[33mb978bf7[m Modifico los comentarios JSDoc y añado espaciado para mejorar la legibilidad del controlador
+[33ma60795c[m Creo la función del controlador de reservas para eliminar reservas
+[33m40d6a57[m Creo la función del controlador de reservas para actualizar reservas
+[33m5abb386[m Creación de función del controlador de reservas para cancelar reservas
+[33m5996f72[m Creo función del controlador de reservas para crear reservas
+[33m6ef06a1[m Comento con JSDoc la función para obtener reservas por ID de habitación
+[33m4539094[m Merge pull request #5 from Axel-Zaragoci/config/dotenv
+[33m4d0ecb7[m[33m ([m[1;31morigin/config/dotenv[m[33m)[m Conexión a Mongo y uso de archivo .env
+[33m7324380[m change id to roomID
+[33mcbb502d[m Merge branch 'develop' into feature/booking-api-crud
+[33mf4d174c[m Merge pull request #3 from Axel-Zaragoci/freature/room-api-crud
+[33mc421771[m improve update room
+[33m7b2a1e8[m Creación función del controlador para obtener todas las reservas por ID de la habitación
+[33m581e026[m develop model/controller/routes
+[33mc8781cf[m Creación función del controlador para obtener las reservas de un cliente
+[33md1d150c[m Creación función del controlador para obtener todas las reservas
+[33med82bd1[m Creación función del controlador para obtener una reserva por su ID
+[33m1bf4760[m[33m ([m[1;32mdevelop[m[33m)[m Merge pull request #2 from Axel-Zaragoci/feature/booking-api-crud
+[33m25f32c4[m Creo archivo jsconfig.json
+[33m891d3dd[m Modificaciones al Schema de la base de datos y cambio del Schema de entrada de datos a una clase
+[33mf853974[m Documento los Schema usando JSDoc
+[33m82462e5[m Creo un Schema para los datos que tiene que entrar por requests
+[33m4175227[m Completo el Schema de reservas en la base de datos
+[33m886ae3b[m Creación de modelo de reservas
+[33m6a17990[m Creación de la estructura básica del servidor para la API
+[33ma69a6a5[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Añador archivos .gitkeep para que aparezca la estructura completa en GitHub
+[33m357f27d[m Merge branch 'main' of https://github.com/Axel-Zaragoci/Proyecto_intermodular_2DAM
+[33m560f703[m Primer commit
+[33m1b51dc6[m Initial commit
