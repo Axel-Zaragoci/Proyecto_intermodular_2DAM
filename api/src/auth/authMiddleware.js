@@ -39,4 +39,30 @@ export async function verifyToken(req, res, next) {
   }
 }
 
+/**
+ * Middleware para autorizar roles específicos
+ * 
+ * @function authorizeRoles
+ * 
+ * @description
+ * Autoriza el acceso a rutas específicas según los roles proporcionados
+ * Si el rol del usuario no está en la lista de roles permitidos, devuelve un error 403
+ * Si el usuario no está autenticado, devuelve un error 401
+ * @param  {string[]} roles 
+ * @returns http response con:
+  * - Código de estado 403 y mensaje de error si el rol del usuario no está autorizado
+  * - Código de estado 401 y mensaje de error si el usuario no está autenticado
+  * - Llama a next() para continuar si el rol está autorizado y entra en la ruta protegida
+ */
+export function authorizeRoles(roles) {
+  return (req, res, next) => {
+    /** @type {import('express').Request & { user?: any }} */
+    const r = (req);
 
+    if (!r.user.rol) return res.status(401).json({ error: "No autenticado" });
+
+    if (!roles.includes(r.user.rol)) return res.status(403).json({ error: "Acceso denegado" });
+
+    return next();
+  };
+}
