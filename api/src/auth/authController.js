@@ -9,8 +9,8 @@ dotenv.config();
  * @function login
  * @async
  * @description
- * Recibe el DNI y la contraseña desde el cuerpo de la solicitud
- * Busca el usuario en la base de datos por su DNI
+ * Recibe el Email y la contraseña desde el cuerpo de la solicitud
+ * Busca el usuario en la base de datos por su Email
  * Compara la contraseña proporcionada con la almacenada en la base de datos
  * Si las credenciales son válidas, genera un token JWT con la información del usuario (id, rol, vipStatus)
  * Devuelve el token al cliente
@@ -18,16 +18,16 @@ dotenv.config();
  * @param {import('express').Response} res
  * @returns {Promise} - Respuesta HTTP con:
  * - Código de estado 200 y el token si las credenciales son válidas
- * - Código de estado 400 y mensaje de error si faltan DNI o contraseña
+ * - Código de estado 400 y mensaje de error si faltan Email o contraseña
  * - Código de estado 401 y mensaje de error si las credenciales son inválidas
  * - Código de estado 500 y mensaje de error si hay un problema del servidor
  */
 export async function login(req, res) {
     try {
-        const { dni, password } = req.body;
-        if (!dni || !password) return res.status(400).json({ error: 'DNI y contraseña son requeridos' });
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ error: 'Email y contraseña son requeridos' });
 
-        const user = await userDatabaseModel.findOne({ dni }).select("+password");
+        const user = await userDatabaseModel.findOne({ email }).select("+password");
         if (!user) return res.status(401).json({ error: 'Credenciales inválidas' });
 
         const ok = await comparePassword(password, user.password);
