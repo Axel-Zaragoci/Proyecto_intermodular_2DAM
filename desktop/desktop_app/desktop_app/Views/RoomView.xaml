@@ -3,11 +3,130 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:desktop_app.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             Style="{StaticResource UserControlBase}">
-    <Grid Background="Transparent">
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="26" FontWeight="Bold">Ventana de Habitaciones</TextBlock>
+             d:DesignHeight="450" d:DesignWidth="900">
+
+    <Grid Background="Violet" Margin="10">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Grid.Row="0"
+                   Text="Ventana de Habitaciones"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,10"
+                   FontSize="26"
+                   FontWeight="Bold"/>
+
+        <!-- ================== FILTROS ================== -->
+        <Border Grid.Row="1" Background="#30FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Fila 1: type, guests, available -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <TextBlock Text="Type:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+
+                    <!-- En MVVM: lo normal es usar TextBox o ComboBox con SelectedItem.
+                         Para no complicarlo con SelectedItem, usamos TextBox para Type.
+                         (Si quieres ComboBox real, te lo monto también.) -->
+                    <TextBox Width="140"
+                             Margin="0,0,12,0"
+                             Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Ej: single, double, suite (vacío = cualquiera)"/>
+
+                    <TextBlock Text="Guests:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Width="60"
+                             Margin="0,0,12,0"
+                             Text="{Binding GuestsText, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <CheckBox Content="Solo disponibles"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding OnlyAvailable}" />
+                </StackPanel>
+
+                <!-- Fila 2: min/max price -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <TextBlock Text="Min €:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Width="70" Margin="0,0,12,0"
+                             Text="{Binding MinPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="Max €:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Width="70" Margin="0,0,12,0"
+                             Text="{Binding MaxPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <CheckBox Content="Extra bed" VerticalAlignment="Center" Margin="0,0,10,0"
+                              IsChecked="{Binding HasExtraBed}"/>
+                    <CheckBox Content="Crib" VerticalAlignment="Center" Margin="0,0,10,0"
+                              IsChecked="{Binding HasCrib}"/>
+                    <CheckBox Content="Con oferta" VerticalAlignment="Center"
+                              IsChecked="{Binding HasOffer}"/>
+                </StackPanel>
+
+                <!-- Fila 3: extras -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+                    <TextBlock Text="Extras (coma):" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Width="220" Margin="0,0,12,0"
+                             ToolTip="Ej: wifi,parking,pool"
+                             Text="{Binding ExtrasText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <TextBlock Text="Sort:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBox Width="140" Margin="0,0,6,0"
+                             Text="{Binding SortBy, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Ej: roomNumber, pricePerNight, rate, type, maxGuests"/>
+
+                    <TextBox Width="90" Margin="0,0,12,0"
+                             Text="{Binding SortOrder, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="asc o desc"/>
+                </StackPanel>
+
+                <!-- Fila 4: botones -->
+                <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- En MVVM no hay Click: hay Command -->
+                    <Button Content="Buscar" Width="100" Margin="0,0,8,0"
+                            Command="{Binding SearchCommand}"/>
+                    <Button Content="Quitar filtros" Width="120" Margin="0,0,8,0"
+                            Command="{Binding ClearFiltersCommand}"/>
+                    <Button Content="Refrescar" Width="100"
+                            Command="{Binding RefreshCommand}"/>
+                </StackPanel>
+
+                <!-- Estado -->
+                <TextBlock Grid.Row="3"
+                           Margin="340,6,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding StatusText}"/>
+            </Grid>
+        </Border>
+
+        <!-- ================== GRID ================== -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Rooms}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  IsReadOnly="True">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Room #" Binding="{Binding RoomNumber}" Width="*" />
+                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
+                <DataGridTextColumn Header="Max Guests" Binding="{Binding MaxGuests}" Width="*" />
+                <DataGridTextColumn Header="Price/Night" Binding="{Binding PricePerNight}" Width="*" />
+                <DataGridCheckBoxColumn Header="Available" Binding="{Binding IsAvailable}" Width="*" />
+                <DataGridCheckBoxColumn Header="Extra bed" Binding="{Binding ExtraBed}" Width="*" />
+                <DataGridCheckBoxColumn Header="Crib" Binding="{Binding Crib}" Width="*" />
+                <DataGridTextColumn Header="Offer" Binding="{Binding Offer}" Width="*" />
+                <DataGridTextColumn Header="Rate" Binding="{Binding Rate}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
     </Grid>
 </UserControl>

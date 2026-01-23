@@ -15,3 +15,21 @@ export async function hashPassword(password) {
     if (typeof password !== 'string' || password.trim().length === 0) throw new Error('Contraseña no puede estar vacia.');
     return await bcrypt.hash(password, SALT_ROUNDS);
 }
+
+/**
+ * Comparación de contraseñas
+ * 
+ * @function comparePassword
+ * @async
+ * 
+ * @description
+ * Recibe una contraseña en texto plano y un hash
+ * Compara la contraseña con el hash y devuelve true si coinciden o false si no
+ * 
+ * @param {string} plain 
+ * @param {string} hash 
+ * @returns 
+ */
+export async function comparePassword(plain, hash) {
+  return bcrypt.compare(plain, hash);
+}
