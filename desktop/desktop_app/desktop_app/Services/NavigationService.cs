@@ -29,7 +29,7 @@ namespace desktop_app.Services
         /// Pila de vistas visitadas por el usuario
         /// Para indicar que UserView es la primera vista, la añado de base al stack
         /// </summary>
-        private List<UserControl> _stackViews = [new UserView()];
+        private List<UserControl> _stackViews = [new BookingView()];
 
 
         /// <summary>
