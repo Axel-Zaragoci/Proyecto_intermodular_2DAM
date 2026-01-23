@@ -7,7 +7,10 @@
         xmlns:services="clr-namespace:desktop_app.Services"
         xmlns:local="clr-namespace:desktop_app"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="MainWindow" 
+        Height="600" 
+        Width="1000" 
+        WindowState="Maximized">
     <Window.DataContext>
         <viewModels:MainViewModel/>
     </Window.DataContext>
@@ -18,10 +21,27 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Vertical">
-            <Button Style="{StaticResource Menu_btn}" Content="Usuarios" Command="{Binding ShowUsersCommand}"/>
-            <Button Content="Reservas" Command="{Binding ShowBookingsCommand}"/>
-            <Button Content="Habitaciones" Command="{Binding ShowRoomsCommand}"/>
+        <StackPanel Orientation="Vertical" Style="{StaticResource SideBar}">
+            <Image Source="/Resources/Images/hotelLogo.png" Margin="0, 0, 0, -40"/>
+
+            <Button Command="{Binding ShowUsersCommand}" Style="{StaticResource SideBarButton}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Resources/Images/bookingIcon.png" Style="{StaticResource SideBarIcon}"/>
+                    <TextBlock>Clientes</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding ShowBookingsCommand}" Style="{StaticResource SideBarButton}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Resources/Images/userIcon.png" Style="{StaticResource SideBarIcon}"/>
+                    <TextBlock>Reservas</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding ShowRoomsCommand}" Style="{StaticResource SideBarButton}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Resources/Images/roomIcon.png" Style="{StaticResource SideBarIcon}"/>
+                    <TextBlock>Habitaciones</TextBlock>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <ContentControl Grid.Column="1" Content="{Binding CurrentView, Source={x:Static services:NavigationService.Instance}}"/>
