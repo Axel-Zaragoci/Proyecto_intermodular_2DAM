@@ -41,7 +41,7 @@ namespace desktop_app.ViewModels
         public string Type
         {
             get => _type;
-            set => SetProperty(ref _type, value);
+            set => SetProperty(ref _type, value == "Todos" ? "" : value);
         }
 
         private bool _onlyAvailable;
@@ -123,6 +123,19 @@ namespace desktop_app.ViewModels
         public AsyncRelayCommand SearchCommand { get; }
         public AsyncRelayCommand RefreshCommand { get; }
         public RelayCommand ClearFiltersCommand { get; }
+        public RelayCommand OpenCreateRoomCommand { get; }
+        public RelayCommand OpenUpdateRoomCommand { get; }
+        public RelayCommand DeleteRoomCommand { get; }
+
+        // si tu UI permite seleccionar una habitación:
+        private RoomModel? _selectedRoom;
+        public RoomModel? SelectedRoom
+        {
+            get => _selectedRoom;
+            set => SetProperty(ref _selectedRoom, value);
+        }
+
+
 
         // Guardamos el último filtro real usado para "Refrescar"
         private RoomsFilter _lastFilter = new RoomsFilter();
@@ -141,6 +154,11 @@ namespace desktop_app.ViewModels
                 _ => true // aquí tu condición
             );
             ClearFiltersCommand = new RelayCommand(_ => ClearFilters());
+            OpenCreateRoomCommand = new RelayCommand(_ => OpenCreateRoom());
+            OpenUpdateRoomCommand = new RelayCommand(param => OpenUpdateRoom(param as RoomModel));
+            DeleteRoomCommand = new RelayCommand(param => DeleteRoom(param as RoomModel));
+
+            _ = LoadInitialAsync();
 
 
             // Carga inicial (equivalente a Loaded en code-behind)
@@ -280,6 +298,208 @@ namespace desktop_app.ViewModels
                 f.SortOrder = SortOrder;
 
             return f;
+        }
+        private void OpenCreateRoom()
+        {
+            var win = new desktop_app.Views.CreateRoomWindow
+            {
+                Owner = Application.Current.MainWindow
+            };
+
+            var ok = win.ShowDialog();
+            if (ok == true)
+                _ = RefreshAsync(); // recarga con el último filtro
+        }
+
+        private void OpenUpdateRoom(RoomModel? room)
+        {
+            if (room == null) return;
+
+            // Si quieres asegurarte de tener la última versión desde API:
+            // (opcional) podrías llamar GetRoomByIdAsync aquí y abrir con esa respuesta.
+
+            var win = new desktop_app.Views.UpdateRoomWindow(room)
+            {
+                Owner = Application.Current.MainWindow
+            };
+
+            var ok = win.ShowDialog();
+            if (ok == true)
+                _ = RefreshAsync();
+        }
+
+        private async void DeleteRoom(RoomModel? room)
+        {
+            if (room == null) return;
+
+            var confirm = MessageBox.Show(
+                $"¿Eliminar la habitación {room.RoomNumber}?",
+                "Confirmar eliminación",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+            var ok = await RoomService.DeleteRoomAsync(room.Id);
+
+            if (!ok)
+            {
+                MessageBox.Show("No se pudo eliminar la habitación (API).");
+                return;
+            }
+
+            Rooms.Remove(room);
+            StatusText = $"Resultados: {Rooms.Count}";
+        }
+
+
+    }
+
+    public class CreateRoomViewModel : ViewModelBase
+    {
+        // Para cerrar la ventana desde el VM (sin code-behind “de lógica”)
+        public event Action<bool>? RequestClose;
+
+        private RoomModel _room = new RoomModel
+        {
+            IsAvailable = true,
+            Rate = 0
+        };
+
+        public RoomModel Room
+        {
+            get => _room;
+            set => SetProperty(ref _room, value);
+        }
+
+        // Extras en UI como texto (csv)
+        private string _extrasText = "";
+        public string ExtrasText
+        {
+            get => _extrasText;
+            set => SetProperty(ref _extrasText, value);
+        }
+
+        private string _extraImagesText = "";
+        public string ExtraImagesText
+        {
+            get => _extraImagesText;
+            set => SetProperty(ref _extraImagesText, value);
+        }
+
+        public AsyncRelayCommand SaveCommand { get; }
+        public RelayCommand CancelCommand { get; }
+
+        public CreateRoomViewModel()
+        {
+            SaveCommand = new AsyncRelayCommand(SaveAsync);
+            CancelCommand = new RelayCommand(_ => RequestClose?.Invoke(false));
+        }
+
+        private async Task SaveAsync()
+        {
+            // validación mínima
+            if (string.IsNullOrWhiteSpace(Room.RoomNumber))
+                throw new Exception("RoomNumber es obligatorio.");
+
+            if (string.IsNullOrWhiteSpace(Room.Type))
+                throw new Exception("Type es obligatorio.");
+
+            if (Room.MaxGuests <= 0)
+                throw new Exception("MaxGuests debe ser mayor que 0.");
+
+            // parse extras csv
+            Room.Extras = (ExtrasText ?? "")
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            Room.ExtraImages = (ExtraImagesText ?? "")
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            var created = await RoomService.CreateRoomAsync(Room);
+            if (created == null)
+                throw new Exception("No se pudo crear la habitación (API).");
+
+            RequestClose?.Invoke(true);
+        }
+    }
+
+    public class UpdateRoomViewModel : ViewModelBase
+    {
+        public event Action<bool>? RequestClose;
+
+        private RoomModel _room;
+        public RoomModel Room
+        {
+            get => _room;
+            set => SetProperty(ref _room, value);
+        }
+
+        private string _extrasText = "";
+        public string ExtrasText
+        {
+            get => _extrasText;
+            set => SetProperty(ref _extrasText, value);
+        }
+
+        private string _extraImagesText = "";
+        public string ExtraImagesText
+        {
+            get => _extraImagesText;
+            set => SetProperty(ref _extraImagesText, value);
+        }
+
+        public AsyncRelayCommand SaveCommand { get; }
+        public RelayCommand CancelCommand { get; }
+
+        public UpdateRoomViewModel(RoomModel room)
+        {
+            Room = room;
+
+            ExtrasText = string.Join(", ", room.Extras ?? new());
+            ExtraImagesText = string.Join(", ", room.ExtraImages ?? new());
+
+            SaveCommand = new AsyncRelayCommand(SaveAsync);
+            CancelCommand = new RelayCommand(_ => RequestClose?.Invoke(false));
+        }
+
+        private async Task SaveAsync()
+        {
+            if (string.IsNullOrWhiteSpace(Room.Id))
+                throw new Exception("No hay Id de habitación.");
+
+            if (string.IsNullOrWhiteSpace(Room.RoomNumber))
+                throw new Exception("RoomNumber es obligatorio.");
+
+            if (string.IsNullOrWhiteSpace(Room.Type))
+                throw new Exception("Type es obligatorio.");
+
+            if (Room.MaxGuests <= 0)
+                throw new Exception("MaxGuests debe ser mayor que 0.");
+
+            Room.Extras = (ExtrasText ?? "")
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            Room.ExtraImages = (ExtraImagesText ?? "")
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+            var ok = await RoomService.UpdateRoomAsync(Room.Id, Room);
+            if (!ok)
+                throw new Exception("No se pudo actualizar la habitación (API).");
+
+            RequestClose?.Invoke(true);
         }
     }
 }

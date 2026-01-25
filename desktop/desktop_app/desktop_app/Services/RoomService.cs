@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;         // UrlEncode
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -109,6 +110,86 @@ namespace desktop_app.Services
             }
 
             return sb.ToString();
+        }
+
+        private static readonly JsonSerializerOptions _jsonOptions =
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        public static async Task<RoomModel?> GetRoomByIdAsync(string roomId)
+        {
+            try
+            {
+                var url = ApiService.BaseUrl + $"room/{Uri.EscapeDataString(roomId)}";
+                var resp = await ApiService._httpClient.GetAsync(url);
+
+                if (!resp.IsSuccessStatusCode) return null;
+
+                var json = await resp.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<RoomModel>(json, _jsonOptions);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // CREATE  (ajusta si tu endpoint no es POST /room)
+        public static async Task<RoomModel?> CreateRoomAsync(RoomModel room)
+        {
+            try
+            {
+                var url = ApiService.BaseUrl + "room";
+                var json = JsonSerializer.Serialize(room, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var resp = await ApiService._httpClient.PostAsync(url, content);
+                if (!resp.IsSuccessStatusCode) return null;
+
+                var body = await resp.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<RoomModel>(body, _jsonOptions);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // UPDATE (PATCH /room/:roomID)
+        public static async Task<bool> UpdateRoomAsync(string roomId, RoomModel room)
+        {
+            try
+            {
+                var url = ApiService.BaseUrl + $"room/{Uri.EscapeDataString(roomId)}";
+                var json = JsonSerializer.Serialize(room, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var req = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+                {
+                    Content = content
+                };
+
+                var resp = await ApiService._httpClient.SendAsync(req);
+                return resp.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // DELETE (DELETE /room/:roomID)
+        public static async Task<bool> DeleteRoomAsync(string roomId)
+        {
+            try
+            {
+                var url = ApiService.BaseUrl + $"room/{Uri.EscapeDataString(roomId)}";
+                var resp = await ApiService._httpClient.DeleteAsync(url);
+                return resp.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

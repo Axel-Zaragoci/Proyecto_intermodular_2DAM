@@ -46,4 +46,404 @@
         <Setter Property="Width" Value="25"/>
         <Setter Property="Margin" Value="0, 0, 15, 0"/>
     </Style>
+
+
+    <Style x:Key="BgColor" TargetType="Border">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#1e6fae" Offset="0"/>
+                    <GradientStop Color="#0f4c75" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- ===== Base ===== -->
+        <SolidColorBrush x:Key="PageBgBrush" Color="#F5F7FB"/>
+        <SolidColorBrush x:Key="SoftBorder" Color="#E6E8EF"/>
+        <SolidColorBrush x:Key="MutedText" Color="#6B7280"/>
+
+        <!-- ===== Brand ===== -->
+        <SolidColorBrush x:Key="HeaderBlue" Color="#3C7896"/>
+        <SolidColorBrush x:Key="BrandBlue" Color="#3C7896"/>
+        <SolidColorBrush x:Key="BrandBlueHover" Color="#4A89A7"/>
+        <SolidColorBrush x:Key="BrandBluePressed" Color="#2E6784"/>
+
+        <!-- ===== Inputs compactos tipo “foto” ===== -->
+        <Style x:Key="CompactLabel" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+
+        <Style x:Key="CompactTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#F3F5F8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SoftBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="10"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CompactComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#F3F5F8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SoftBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="CompactCheckBox" TargetType="CheckBox">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,14,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <!-- ===== Botones ===== -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource BrandBlue}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrandBluePressed}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                            CornerRadius="10"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrandBlueHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrandBluePressed}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GhostButton" TargetType="Button">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource SoftBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                            CornerRadius="10"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#EEF3F7"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E3ECF3"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    <Style x:Key="CreateButton" TargetType="Button">
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="#3C7896"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="White"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" CornerRadius="10"
+                        Background="{TemplateBinding Background}">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="+" FontSize="16" Margin="0,0,10,0"/>
+                            <ContentPresenter/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#F1F7FB"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#E5F0F8"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <!-- ===== Cards habitaciones ===== -->
+        <SolidColorBrush x:Key="DangerRed" Color="#E11D48"/>
+        <SolidColorBrush x:Key="DangerRedHover" Color="#BE123C"/>
+        <SolidColorBrush x:Key="BadgeBlue" Color="#1E5C8A"/>
+        <SolidColorBrush x:Key="BadgeGray" Color="#E5E7EB"/>
+
+        <Style x:Key="DangerIconButton" TargetType="Button">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource DangerRed}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="10" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource DangerRedHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#9F1239"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    <DataTemplate x:Key="RoomCardTemplate">
+        <Border Background="White"
+            BorderBrush="{StaticResource SoftBorder}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="16"
+            Margin="0,0,18,18"
+            SnapsToDevicePixels="True">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Cabecera -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Tipo -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Separador -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Max huéspedes -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Precio -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Separador -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Extras -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Spacer para empujar botones abajo -->
+                    <RowDefinition Height="*"/>
+
+                    <!-- Botones -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- ===== Cabecera: Habitación + Badge ===== -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock FontSize="20"
+                           FontWeight="Bold"
+                           Text="{Binding RoomNumber, StringFormat=Habitación {0}}"/>
+
+                    <Border Grid.Column="1"
+                        CornerRadius="999"
+                        Padding="12,6"
+                        VerticalAlignment="Top"
+                        Margin="12,0,0,0">
+
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource BadgeBlue}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                        <Setter Property="Background" Value="{StaticResource BadgeGray}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <TextBlock FontWeight="SemiBold" FontSize="12">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Text" Value="Disponible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                            <Setter Property="Foreground" Value="#111827"/>
+                                            <Setter Property="Text" Value="No disponible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+
+                <!-- ===== Tipo ===== -->
+                <TextBlock Grid.Row="1"
+                       Margin="0,6,0,0"
+                       Foreground="{StaticResource MutedText}"
+                       Text="{Binding Type}"/>
+
+                <!-- ===== Separador 1 ===== -->
+                <Separator Grid.Row="2"
+                       Margin="0,12,0,12"
+                       Background="{StaticResource SoftBorder}"/>
+
+                <!-- ===== Max huéspedes (label izquierda, valor derecha) ===== -->
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Foreground="{StaticResource MutedText}"
+                           Text="Máx. huéspedes:"/>
+
+                    <TextBlock Grid.Column="1"
+                           FontWeight="Bold"
+                           Text="{Binding MaxGuests}"/>
+                </Grid>
+
+                <!-- ===== Precio (label izquierda, valor derecha) ===== -->
+                <Grid Grid.Row="4" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Foreground="{StaticResource MutedText}"
+                           Text="Precio/noche:"/>
+
+                    <TextBlock Grid.Column="1"
+                           FontWeight="Bold"
+                           Text="{Binding PricePerNight, StringFormat={}{0}€}"/>
+                </Grid>
+
+                <!-- ===== Separador 2 ===== -->
+                <Separator Grid.Row="5"
+                       Margin="0,12,0,12"
+                       Background="{StaticResource SoftBorder}"/>
+
+                <!-- ===== Extras ===== -->
+                <StackPanel Grid.Row="6">
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Text" Value="✓ Cama extra"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ExtraBed}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock Margin="0,6,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Text" Value="✓ Cuna disponible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Crib}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- ===== Botones (abajo del todo) ===== -->
+                <Grid Grid.Row="8" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Editar: botón ancho -->
+                    <Button Grid.Column="0"
+                        Style="{StaticResource GhostButton}"
+                        Content="Editar"
+                        Height="34"
+                        Padding="16,0"
+                        Command="{Binding DataContext.OpenUpdateRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"/>
+
+                    <!-- Papelera -->
+                    <Button Grid.Column="2"
+                        Style="{StaticResource DangerIconButton}"
+                        Content="🗑"
+                        Height="34"
+                        Width="44"
+                        Command="{Binding DataContext.DeleteRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
+
+
 </ResourceDictionary>
+

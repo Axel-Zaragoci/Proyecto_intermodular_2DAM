@@ -23,7 +23,7 @@ namespace desktop_app.Models
         public string MainImage { get; set; } = "";
 
         [JsonPropertyName("pricePerNight")]
-        public decimal PricePerNight { get; set; }
+        public decimal? PricePerNight { get; set; }
 
         [JsonPropertyName("extraBed")]
         public bool ExtraBed { get; set; }
@@ -32,7 +32,7 @@ namespace desktop_app.Models
         public bool Crib { get; set; }
 
         [JsonPropertyName("offer")]
-        public int Offer { get; set; }
+        public decimal? Offer { get; set; }
 
         [JsonPropertyName("extras")]
         public List<string> Extras { get; set; } = new();

@@ -1,132 +1,224 @@
 ﻿<UserControl x:Class="desktop_app.Views.RoomView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="900">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="650" d:DesignWidth="1200">
 
-    <Grid Background="Violet" Margin="10">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Título -->
-        <TextBlock Grid.Row="0"
-                   Text="Ventana de Habitaciones"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,10"
-                   FontSize="26"
-                   FontWeight="Bold"/>
-
-        <!-- ================== FILTROS ================== -->
-        <Border Grid.Row="1" Background="#30FFFFFF" CornerRadius="8" Padding="10" Margin="0,0,0,10">
-            <Grid>
+    <Grid Background="{StaticResource PageBgBrush}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="22">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Fila 1: type, guests, available -->
-                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
-                    <TextBlock Text="Type:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <!-- ================= HEADER ================= -->
+                <Border Grid.Row="0"
+                        Style="{StaticResource BgColor}"
+                        CornerRadius="18"
+                        Padding="18"
+                        Margin="0,0,0,16">
 
-                    <!-- En MVVM: lo normal es usar TextBox o ComboBox con SelectedItem.
-                         Para no complicarlo con SelectedItem, usamos TextBox para Type.
-                         (Si quieres ComboBox real, te lo monto también.) -->
-                    <TextBox Width="140"
-                             Margin="0,0,12,0"
-                             Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
-                             ToolTip="Ej: single, double, suite (vacío = cualquiera)"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Text="Guests:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox Width="60"
-                             Margin="0,0,12,0"
-                             Text="{Binding GuestsText, UpdateSourceTrigger=PropertyChanged}" />
+                        <!-- Título + botón crear (en la misma fila) -->
+                        <DockPanel Grid.Row="0">
 
-                    <CheckBox Content="Solo disponibles"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding OnlyAvailable}" />
-                </StackPanel>
+                            <TextBlock DockPanel.Dock="Left"
+                                       Text="Ventana de Habitaciones"
+                                       FontSize="26"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       VerticalAlignment="Center"/>
 
-                <!-- Fila 2: min/max price -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
-                    <TextBlock Text="Min €:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox Width="70" Margin="0,0,12,0"
-                             Text="{Binding MinPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- Botón crear (pequeño, como en la foto) -->
+                            <Button DockPanel.Dock="Right"
+                                    Content="Crear habitación"
+                                    Style="{StaticResource CreateButton}"
+                                    Height="34"
+                                    Padding="14,0"
+                                    FontSize="13"
+                                    Margin="0,0,0,2" Width="150" HorizontalAlignment="Right"
+                                     Command="{Binding OpenCreateRoomCommand}"/>
+                        </DockPanel>
 
-                    <TextBlock Text="Max €:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox Width="70" Margin="0,0,12,0"
-                             Text="{Binding MaxPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+                        <!-- Card blanca de filtros -->
+                        <Border Grid.Row="1"
+                                Background="#F7FAFD"
+                                CornerRadius="14"
+                                Padding="12"
+                                Margin="0,14,0,0">
 
-                    <CheckBox Content="Extra bed" VerticalAlignment="Center" Margin="0,0,10,0"
-                              IsChecked="{Binding HasExtraBed}"/>
-                    <CheckBox Content="Crib" VerticalAlignment="Center" Margin="0,0,10,0"
-                              IsChecked="{Binding HasCrib}"/>
-                    <CheckBox Content="Con oferta" VerticalAlignment="Center"
-                              IsChecked="{Binding HasOffer}"/>
-                </StackPanel>
+                            <!--
+                               WrapPanel: intenta todo en 1 fila.
+                               Si no cabe, baja automáticamente a 2ª fila (o más si tu ventana es muy estrecha).
+                               Con tamaños compactos normalmente quedará en 2 filas máximo.
+                            -->
+                            <DockPanel LastChildFill="True">
 
-                <!-- Fila 3: extras -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
-                    <TextBlock Text="Extras (coma):" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox Width="220" Margin="0,0,12,0"
-                             ToolTip="Ej: wifi,parking,pool"
-                             Text="{Binding ExtrasText, UpdateSourceTrigger=PropertyChanged}"/>
+                                <!-- Botones a la derecha (siempre visibles) -->
+                                <StackPanel DockPanel.Dock="Right"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Bottom"
+                                            Margin="12,0,0,0">
+                                    <Button Style="{StaticResource GhostButton}"
+                                            Content="Quitar filtros"
+                                            Command="{Binding ClearFiltersCommand}"
+                                            Height="32"
+                                            Padding="14,0"
+                                            FontSize="13"
+                                            Margin="0,0,20,0" Width="85"/>
+                                    <Button Style="{StaticResource PrimaryButton}"
+                                            Content="Buscar"
+                                            Command="{Binding SearchCommand}"
+                                            Height="32"
+                                            Padding="16,0"
+                                            FontSize="13" Width="60"/>
+                                </StackPanel>
 
-                    <TextBlock Text="Sort:" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                    <TextBox Width="140" Margin="0,0,6,0"
-                             Text="{Binding SortBy, UpdateSourceTrigger=PropertyChanged}"
-                             ToolTip="Ej: roomNumber, pricePerNight, rate, type, maxGuests"/>
+                                <!-- CONTENIDO FILTRO (se rompe en 2 filas si no cabe) -->
+                                <WrapPanel Orientation="Horizontal"
+                                           VerticalAlignment="Bottom"
+                                           ItemHeight="56">
 
-                    <TextBox Width="90" Margin="0,0,12,0"
-                             Text="{Binding SortOrder, UpdateSourceTrigger=PropertyChanged}"
-                             ToolTip="asc o desc"/>
-                </StackPanel>
+                                    <!-- Tipo -->
+                                    <StackPanel Width="100" Margin="0,0,14,8">
+                                        <TextBlock Text="Tipo:" FontWeight="SemiBold" FontSize="12" Margin="2,0,0,6"/>
+                                        <ComboBox Height="20"
+                                                  Padding="10,0"
+                                                  Background="#F3F5F8"
+                                                  BorderBrush="{StaticResource SoftBorder}"
+                                                  BorderThickness="1"
+                                                  SelectedValue="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Content">
+                                            <ComboBoxItem Content="Todos"/>
+                                            <ComboBoxItem Content="Individual"/>
+                                            <ComboBoxItem Content="Doble"/>
+                                            <ComboBoxItem Content="Suite"/>
+                                            <ComboBoxItem Content="Familiar"/>
+                                        </ComboBox>
+                                    </StackPanel>
 
-                <!-- Fila 4: botones -->
-                <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- En MVVM no hay Click: hay Command -->
-                    <Button Content="Buscar" Width="100" Margin="0,0,8,0"
-                            Command="{Binding SearchCommand}"/>
-                    <Button Content="Quitar filtros" Width="120" Margin="0,0,8,0"
-                            Command="{Binding ClearFiltersCommand}"/>
-                    <Button Content="Refrescar" Width="100"
-                            Command="{Binding RefreshCommand}"/>
-                </StackPanel>
+                                    <!-- Huéspedes -->
+                                    <StackPanel Width="100" Margin="0,0,14,8">
+                                        <TextBlock Text="Huéspedes:" FontWeight="SemiBold" FontSize="12" Margin="2,0,0,6"/>
+                                        <TextBox Height="20"
+                                                 Padding="10,0"
+                                                 Background="#F3F5F8"
+                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderThickness="1"
+                                                 Text="{Binding GuestsText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
 
-                <!-- Estado -->
-                <TextBlock Grid.Row="3"
-                           Margin="340,6,0,0"
-                           VerticalAlignment="Center"
-                           Text="{Binding StatusText}"/>
+                                    <!-- Min -->
+                                    <StackPanel Width="100" Margin="0,0,14,8">
+                                        <TextBlock Text="Min €:" FontWeight="SemiBold" FontSize="12" Margin="2,0,0,6"/>
+                                        <TextBox Height="20"
+                                                 Padding="10,0"
+                                                 Background="#F3F5F8"
+                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderThickness="1"
+                                                 Text="{Binding MinPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
+
+                                    <!-- Max -->
+                                    <StackPanel Width="100" Margin="0,0,18,8">
+                                        <TextBlock Text="Max €:" FontWeight="SemiBold" FontSize="12" Margin="2,0,0,6"/>
+                                        <TextBox Height="20"
+                                                 Padding="10,0"
+                                                 Background="#F3F5F8"
+                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderThickness="1"
+                                                 Text="{Binding MaxPriceText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </StackPanel>
+
+                                    <!-- Checks (en bloque, se adaptan) -->
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Bottom"
+                                                Margin="0,0,25,17">
+                                        <CheckBox Content="Solo disponibles"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Margin="0,0,14,0"
+                                                  IsChecked="{Binding OnlyAvailable}"/>
+                                        <CheckBox Content="Cama extra"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Margin="0,0,14,0"
+                                                  IsChecked="{Binding HasExtraBed}"/>
+                                        <CheckBox Content="Con cuna"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Margin="0,0,14,0"
+                                                  IsChecked="{Binding HasCrib}"/>
+                                        <CheckBox Content="Con oferta"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Margin="0,0,0,0"
+                                                  IsChecked="{Binding HasOffer}"/>
+                                    </StackPanel>
+
+                                    <!-- Buscar habitación (campo largo) -->
+                                    <StackPanel Width="200" Margin="0,0,0,8">
+                                        <TextBlock Text="Extras:"  FontSize="12" FontWeight="SemiBold" Margin="2,0,0,6"/>
+                                        <TextBox Height="20"
+                                             Padding="10,0"
+                                             Background="#F3F5F8"
+                                             BorderBrush="{StaticResource SoftBorder}"
+                                             BorderThickness="1"
+                                             Text="{Binding ExtrasText, UpdateSourceTrigger=PropertyChanged}"
+                                             ToolTip="Buscar habitación..."/>
+                                    </StackPanel>
+
+                                </WrapPanel>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- ===== Resultados + refrescar ===== -->
+                <Grid Grid.Row="1" Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding StatusText}"
+                               Foreground="{StaticResource MutedText}"
+                               VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Style="{StaticResource GhostButton}"
+                            Content="Refrescar"
+                            Command="{Binding RefreshCommand}"
+                            Height="32"
+                            Padding="14,0"
+                            FontSize="13"/>
+                </Grid>
+
+                <!-- ===== Cards habitaciones ===== -->
+                <Grid Grid.Row="2">
+                    <ItemsControl ItemsSource="{Binding Rooms}"
+                                  ItemTemplate="{StaticResource RoomCardTemplate}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"
+                                           ItemWidth="320"
+                                           ItemHeight="320"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+
             </Grid>
-        </Border>
-
-        <!-- ================== GRID ================== -->
-        <DataGrid Grid.Row="2"
-                  ItemsSource="{Binding Rooms}"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  IsReadOnly="True">
-
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Room #" Binding="{Binding RoomNumber}" Width="*" />
-                <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="*" />
-                <DataGridTextColumn Header="Max Guests" Binding="{Binding MaxGuests}" Width="*" />
-                <DataGridTextColumn Header="Price/Night" Binding="{Binding PricePerNight}" Width="*" />
-                <DataGridCheckBoxColumn Header="Available" Binding="{Binding IsAvailable}" Width="*" />
-                <DataGridCheckBoxColumn Header="Extra bed" Binding="{Binding ExtraBed}" Width="*" />
-                <DataGridCheckBoxColumn Header="Crib" Binding="{Binding Crib}" Width="*" />
-                <DataGridTextColumn Header="Offer" Binding="{Binding Offer}" Width="*" />
-                <DataGridTextColumn Header="Rate" Binding="{Binding Rate}" Width="*" />
-            </DataGrid.Columns>
-        </DataGrid>
-
+        </ScrollViewer>
     </Grid>
 </UserControl>
