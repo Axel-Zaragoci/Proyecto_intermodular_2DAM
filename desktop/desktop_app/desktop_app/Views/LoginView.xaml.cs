@@ -1,22 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using desktop_app.Services;
 
 namespace desktop_app.Views
 {
-    /// <summary>
-    /// Lógica de interacción para LoginView.xaml
-    /// </summary>
     public partial class LoginView : Window
     {
         public LoginView()
@@ -24,9 +13,39 @@ namespace desktop_app.Views
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Login_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            LoginButton.IsEnabled = false;
+            StatusText.Text = "";
 
+            try
+            {
+                var email = EmailTextBox.Text?.Trim();
+                var password = PasswordBox.Password;
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    StatusText.Text = "Email y Password son obligatorios.";
+                    return;
+                }
+
+                await AuthService.LoginAsync(email, password);
+
+                new MainWindow().Show();
+                this.Close();
+            }
+            catch (HttpRequestException ex)
+            {
+                StatusText.Text = $"Error de red: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = ex.Message;
+            }
+            finally
+            {
+                LoginButton.IsEnabled = true;
+            }
         }
     }
 }
