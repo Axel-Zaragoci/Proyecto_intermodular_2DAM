@@ -12,7 +12,7 @@ import { formatDate, parseDate } from '../commons/date.js';
  * @property {number} totalPrice - Precio total de la reserva
  * @property {number} pricePerNight - Precio por noche de la reserva (Se guarda para facilitar el mostrar información en las aplicaciones correspondientes)
  * @property {number} offer - Porcentaje de descuento (Se guarda para facilitar el mostrar información en las aplicaciones correspondientes)
- * @property {"Finalizada"|"Cancelada"|"Abierta"} status - Estado de la reserva, "Finalizada" para las que ya han pasado el checkOutDate, "Cancelada" para las reservas canceladas por el usuario o empleados y "Abierta" para el resto
+ * @property {"Cancelada"|"Abierta"} status - Estado de la reserva, "Finalizada" para las que ya han pasado el checkOutDate, "Cancelada" para las reservas canceladas por el usuario o empleados y "Abierta" para el resto
  * @property {number} guests - Cantidad de huéspedes en la habitación reservada
  * @property {number} totalNights - Cantidad total de noches
  * 
@@ -53,7 +53,7 @@ const bookingDatabaseSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["Finalizada", "Cancelada", "Abierta"],
+        enum: ["Cancelada", "Abierta"],
         default: "Abierta"
     },
     guests: {

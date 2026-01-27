@@ -7,7 +7,99 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Style="{StaticResource UserControlBase}">
-    <Grid Background="Transparent">
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="26" FontWeight="Bold">Ventana de Reservas</TextBlock>
+    
+    <Grid Background="Transparent"  Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Border Style="{StaticResource HeaderWrapper}">
+                <DockPanel LastChildFill="False" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource HeaderMainTitle}" DockPanel.Dock="Left" Text="Reservas"/>
+                    
+                    <Button Style="{StaticResource HeaderNavigateButton}" Content="+  Crear reserva" DockPanel.Dock="Right"/>
+                </DockPanel>
+        </Border>
+        
+        <ListView Grid.Row="1" ItemsSource="{Binding Bookings}" SizeChanged="ListView_SizeChanged" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingListViewItemStyle}" Margin="10 3" BorderThickness="0.5">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Habitación" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                    <TextBlock Text="{Binding RoomNumber}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Cliente" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                    <TextBlock Text="{Binding ClientName}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Fecha de inicio" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CheckInDate, StringFormat='dd/MM/yyyy'}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Fecha de fin" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CheckOutDate, StringFormat='dd/MM/yyyy'}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Fecha de pago" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding PayDate, StringFormat='dd/MM/yyyy'}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Total de noches" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalNights}" Style="{StaticResource GridViewCellText}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Estado" HeaderContainerStyle="{StaticResource TableHeader}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource StatusTextStyle}">
+                                    <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Style="{StaticResource GridViewCellText}"/>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="65">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource UpdateBookingBtn}" Content="Editar"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="85">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource DeleteBookingBtn}" Content="Eliminar"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>

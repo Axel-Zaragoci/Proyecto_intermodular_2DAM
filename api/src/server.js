@@ -19,15 +19,12 @@ connectDB()
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"))
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
 
 app.use('/booking', bookingRouter);
 app.use("/room", roomsRouter);
 app.use("/user", usersRouter);
 app.use("/auth", authRouter);
+
 app.listen(PORT, () => {
     console.log(`Servidor en el puerto ${PORT}`);
 })

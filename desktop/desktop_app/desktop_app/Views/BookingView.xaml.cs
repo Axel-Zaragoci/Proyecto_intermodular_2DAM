@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using desktop_app.Models;
+using desktop_app.Services;
+using desktop_app.ViewModels;
 
 namespace desktop_app.Views
 {
@@ -23,6 +14,25 @@ namespace desktop_app.Views
         public BookingView()
         {
             InitializeComponent();
+            DataContext = new BookingViewModel();
         }
+        
+        private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender is not ListView listView || listView.View is not GridView gridView)
+                return;
+
+            int fixedColumns = 2;
+            double fixedWidth = gridView.Columns[^1].Width + gridView.Columns[^2].Width;
+
+            double availableWidth = listView.ActualWidth - fixedWidth - 10;
+            double autoWidth = availableWidth / (gridView.Columns.Count - fixedColumns);
+
+            for (int i = 0; i < gridView.Columns.Count - fixedColumns; i++)
+            {
+                gridView.Columns[i].Width = autoWidth;
+            }
+        }
+
     }
 }
