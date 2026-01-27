@@ -94,7 +94,7 @@
                     <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="85">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource DeleteBookingBtn}" Content="Eliminar"/>
+                                <Button Style="{StaticResource DeleteBookingBtn}" Content="Eliminar" Command="{Binding DataContext.DeleteBookingCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

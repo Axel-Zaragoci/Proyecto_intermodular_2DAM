@@ -1,18 +1,23 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
+using desktop_app.Commands;
 using desktop_app.Models;
 using desktop_app.Services;
 
 namespace desktop_app.ViewModels
 {
-    public class BookingViewModel
+    public class BookingViewModel : ViewModelBase
     {
         public ObservableCollection<BookingModel> Bookings { get; }
 
+        public ICommand DeleteBookingCommand { get; }
+        
         public BookingViewModel()
         {
             Bookings = new ObservableCollection<BookingModel>();
             _ = LoadBookingsAsync();
+            DeleteBookingCommand = new AsyncRelayCommand<BookingModel>(DeleteBookingAsync);
         }
 
         private async Task LoadBookingsAsync()
@@ -34,6 +39,25 @@ namespace desktop_app.ViewModels
                 Console.WriteLine($"Error cargando reservas: {ex.Message}");
             }
         }
-    }
+        
+        private async Task DeleteBookingAsync(BookingModel booking)
+        {
+            var result = MessageBox.Show(
+                "¿Seguro que quieres eliminar esta reserva?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            bool deleted = await BookingService.DeleteBooking(booking.Id);
+
+            if (deleted)
+            {
+                Bookings.Remove(booking);
+            }
+            else
+            {
+                MessageBox.Show("No se pudo eliminar la reserva", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
 }

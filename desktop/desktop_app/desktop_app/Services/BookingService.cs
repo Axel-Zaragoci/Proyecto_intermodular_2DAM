@@ -13,5 +13,19 @@ namespace desktop_app.Services
 
             return bookings ?? new List<BookingModel>();
         }
+
+        public static async Task<bool> DeleteBooking(string bookingId)
+        {
+            string url = $"{ApiService.BaseUrl}booking/{bookingId}";
+            
+            var delete = await ApiService._httpClient.DeleteAsync(url);
+
+            if (delete.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
