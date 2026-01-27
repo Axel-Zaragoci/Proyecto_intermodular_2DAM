@@ -13,7 +13,7 @@ namespace desktop_app.Views
             InitializeComponent();
         }
 
-        private async void Login_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void Login_Click(object sender, RoutedEventArgs e)
         {
             LoginButton.IsEnabled = false;
             StatusText.Text = "";
@@ -25,7 +25,7 @@ namespace desktop_app.Views
 
                 if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 {
-                    StatusText.Text = "Email y Password son obligatorios.";
+                    StatusText.Text = "Email y Contraseña son obligatorios.";
                     return;
                 }
 
