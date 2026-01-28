@@ -1,6 +1,7 @@
-import { userDatabaseModel, UserEntryData } from "./usersModel.js";
+import { userDatabaseModel, UserEntryData, UserUpdateData, UserAdminUpdateData } from "./usersModel.js";
 import mongoose from "mongoose";
 import { hashPassword } from "../services/password.service.js";
+import e from "express";
 
 /**
  *  Controlador para el registro de un nuevo usuario
@@ -22,7 +23,7 @@ import { hashPassword } from "../services/password.service.js";
 export async function register(req, res) {
     try {
         const isPublic = !req.user;
-        const { firstName, lastName, email, password, dni, birthDate, cityName, gender } = req.body;
+        const { firstName, lastName, email, password, dni, phoneNumber, birthDate, cityName, gender } = req.body;
         const birthDateObj = new Date(birthDate);
 
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
@@ -36,13 +37,13 @@ export async function register(req, res) {
 
         const passHash = await hashPassword(password);
         
-        const baseData = { firstName, lastName, email, password: passHash, dni, birthDate: birthDateObj, cityName, gender };
+        const baseData = { firstName, lastName, email, password: passHash, dni, phoneNumber, birthDate: birthDateObj, cityName, gender };
 
         let userEntry;
 
         
         if (isPublic) {
-            userEntry = new UserEntryData(baseData.firstName, baseData.lastName, email, baseData.password, baseData.dni, baseData.birthDate, baseData.cityName, baseData.gender, null);
+            userEntry = new UserEntryData(baseData.firstName, baseData.lastName, baseData.email, baseData.password, baseData.dni, baseData.phoneNumber, baseData.birthDate, baseData.cityName, baseData.gender, null);
         } else{
             const { rol, vipStatus } = req.body;
             userEntry = createBy(req, baseData, { rol, vipStatus });
@@ -51,7 +52,7 @@ export async function register(req, res) {
         userEntry.validate();
         const userDB = userEntry.toDocument();
         await userDB.save();
-
+        return res.status(200).json({massage: 'Usuario creado.'})
     } catch(error) {
         console.error('Error al registrar al usuario:', error);
         return res.status(500).json({ error: 'Error del servidor' })
@@ -83,7 +84,7 @@ function createBy(req, baseData, { rol, vipStatus }) {
     } else {
         throw new Error("No tienes permisos para crear usuarios con rol y estado VIP.");
 }
-    return new UserEntryData(baseData.firstName, baseData.lastName, baseData.password, baseData.dni, baseData.birthDate, baseData.cityName, baseData.gender, null, rol, vipStatus);
+    return new UserEntryData(baseData.firstName, baseData.lastName, baseData.email, baseData.password, baseData.dni, baseData.birthDate, baseData.cityName, baseData.gender, null, rol, vipStatus);
 }
 
 /**
@@ -190,5 +191,50 @@ export async function getUsersByRol(req, res) {
     } catch (error) {
         console.error('Error al obtener los usuarios por rol:', error);
         return res.status(500).json({ error: 'Error del servidor' })
+    }
+}
+
+export async function updateUser(req, res) {
+    try {
+        const { id, firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender, imageRoute } = req.body;
+        const changerRol = req.user.rol;
+
+        const birthDateObj = new Date(birthDate);
+
+        if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
+        if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
+        if (!email) return res.status(400).json({errors: "El correo no puede estar vacio"});
+        if (!dni) return res.status(400).json({ error: "El dni no puede estar vacio." });
+        if (Number.isNaN(birthDateObj.getTime())) return res.status(400).json({ error: "La fecha no puede estar vacia." });
+        if (!cityName) return res.status(400).json({ error: "La ciudad no puede estar vacia." });
+        if (!gender) return res.status(400).json({ error: "Tienes que seleccionar un genero." });
+
+        if (!mongoose.isValidObjectId(id)) return res.status(400).json({ error: 'No es un ID' });
+
+        const findedUser = await userDatabaseModel.findById(id);
+        if (!findedUser) return res.status(404).json({ error: 'No existe ningun usuario con ese id.' });
+
+        /** @type {UserUpdateData | UserAdminUpdateData} */
+        let updateEntry;
+
+        if (changerRol === "Usuario" || req.user.id === id) {
+            updateEntry = new UserUpdateData(firstName, lastName, email, dni, phoneNumber, birthDateObj, cityName, gender, imageRoute);
+        } else {
+            const { rol, vipStatus } = req.body;
+
+            if (changerRol === "Trabajador" && rol !== "Usuario") return res.status(400).json({ error: 'Solamente puedes editar a Usuarios.' });
+            updateEntry = new UserAdminUpdateData( firstName, lastName, email, dni, phoneNumber, birthDateObj, cityName, gender, imageRoute, rol, vipStatus);
+        }
+
+        updateEntry.validate();
+        const updateObject = updateEntry.toUpdateObject();
+
+        const updated = await userDatabaseModel.findByIdAndUpdate(id, updateObject,{ new: true });
+
+        return res.status(200).json({ message: 'Usuario actualizado.', user: updated });
+    } catch (error) {
+        if (error?.code === 11000) return res.status(400).json({ error: 'Ya existe un usuario con ese email o dni.' });
+        console.error("Error al actualizar el usuario:", error);
+        return res.status(500).json({ error: 'Error del servidor' });
     }
 }

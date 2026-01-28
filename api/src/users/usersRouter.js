@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register } from './usersController.js';
+import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser } from './usersController.js';
 import { verifyToken ,authorizeRoles } from '../auth/authMiddleware.js';    
 const usersRouter = Router();
 
@@ -9,5 +9,7 @@ usersRouter.get('/getOne', verifyToken, authorizeRoles(["Admin", "Trabajador"]),
 
 usersRouter.post('/registerApp', register);
 usersRouter.post('/registerEsc', verifyToken, authorizeRoles(["Admin", "Trabajador"]), register);
+
+usersRouter.post('/update', verifyToken, updateUser);
 
 export default usersRouter;

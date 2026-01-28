@@ -9,6 +9,7 @@ import { Schema, model } from 'mongoose';
  * @property {string} email - Correo del usuario
  * @property {string} password - Contraseña del usuario
  * @property {string} dni - Documento de identidad del usuario
+ * @property {number} phoneNumber - Numero de telefono del usuario
  * @property {Date} birthDate - Fecha de nacimiento del usuario
  * @property {string} cityName - Ciudad de vivienda fiscal
  * @property {"Hombre" | "Mujer"} gender - Genero del usuario
@@ -51,6 +52,10 @@ const userDatabaseSchema = new Schema({
         unique: true,
         trim: true
     },
+    phoneNumber: {
+        type: Number,
+        trim: true
+    },
     birthDate: {
         type: Date,
         required: true
@@ -91,12 +96,13 @@ export const userDatabaseModel = model('user', userDatabaseSchema)
  * Clase para la creación y validación de nuevos usuarios
  */
 export class UserEntryData {
-    constructor(firstName, lastName, email, password, dni, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
+    constructor(firstName, lastName, email, password, dni, phoneNumber, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
         this.firstName = firstName
         this.lastName = lastName
-        this.email = email;
+        this.email = email
         this.password = password
         this.dni = dni
+        this.phoneNumber = phoneNumber
         this.birthDate = birthDate
         this.cityName = cityName
         this.gender = gender
@@ -145,6 +151,7 @@ export class UserEntryData {
             email: this.email,
             password: this.password,
             dni: this.dni,
+            phoneNumber: this.phoneNumber,
             birthDate: this.birthDate,
             cityName: this.cityName,
             gender: this.gender,
@@ -152,5 +159,66 @@ export class UserEntryData {
             rol: this.rol,
             vipStatus: this.vipStatus
         });
+    }
+}
+
+export class UserUpdateData {
+    constructor(firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender, imageRoute) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.dni = dni;
+        this.phoneNumber = phoneNumber;
+        this.birthDate = birthDate;
+        this.cityName = cityName;
+        this.gender = gender;
+        this.imageRoute = imageRoute;
+    
+        this.ready = false;
+    }
+
+    validate() {
+        if (!this.firstName || !this.lastName) throw new Error("Nombre y Apellido no pueden estar vacíos.");
+        if (/\d/.test(this.firstName) || /\d/.test(this.lastName)) throw new Error("Nombre y Apellido no pueden contener números.");
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.email)) throw new Error("El correo tiene que tener un formato correcto.");
+
+        if (!(this.birthDate instanceof Date) || Number.isNaN(this.birthDate.getTime())) throw new Error("Fecha de nacimiento inválida.");
+        if (this.birthDate.getTime() > Date.now() - 504921600000) throw new Error("Tienes que ser mayor de 16 años.");
+        if (!["Hombre", "Mujer"].includes(this.gender)) throw new Error("Seleccione un Genero");
+        if (!/^\d{8}[a-zA-Z]$/.test(this.dni)) throw new Error("DNI Incorrecto.");
+
+        const letterNum = parseInt(this.dni.slice(0, 8), 10);
+        const letterDni = ["T","R","W","A","G","M","Y","F","P","D","X","B","N","J","Z","S","Q","V","H","L","C","K","E"];
+        if (this.dni[8].toUpperCase() !== letterDni[letterNum % 23]) throw new Error("DNI Incorrecto");
+
+        this.ready = true;
+    }
+
+    toUpdateObject() {
+        if (!this.ready) throw new Error("Completa la actualización correctamente.");
+        return {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+            dni: this.dni,
+            phoneNumber: this.phoneNumber,
+            birthDate: this.birthDate,
+            cityName: this.cityName,
+            gender: this.gender,
+            imageRoute: this.imageRoute,
+        };
+    }
+}
+
+export class UserAdminUpdateData extends UserUpdateData {
+    constructor(firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender, imageRoute, rol, vipStatus) {
+        super(firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender, imageRoute);
+        this.rol = rol;
+        this.vipStatus = vipStatus;
+    }
+
+    toUpdateObject() {
+        const base = super.toUpdateObject();
+        return { ...base, rol: this.rol, vipStatus: this.vipStatus };
     }
 }
