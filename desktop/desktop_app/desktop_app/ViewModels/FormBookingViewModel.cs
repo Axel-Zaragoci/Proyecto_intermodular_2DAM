@@ -62,10 +62,18 @@ namespace desktop_app.ViewModels
 
         private async Task Cancel()
         {
-            var update = await BookingService.CancelBookingAsync(Booking.Id);
-            if (update == null)
+            try
             {
-                MessageBox.Show("Error al actualizar la reserva");
+                var update = await BookingService.CancelBookingAsync(Booking.Id);
+                if (update == null)
+                {
+                    MessageBox.Show("No se ha podido leer la respuesta del servidor");
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             
@@ -95,20 +103,31 @@ namespace desktop_app.ViewModels
                     return;
                 }
                 Booking.Room = roomId;
-                
-                var create = await BookingService.CreateBookingAsync(Booking);
-                if (create == null)
+
+                try
                 {
-                    MessageBox.Show("Ha ocurrido un error al crear la reserva");
+                    var create = await BookingService.CreateBookingAsync(Booking);
+                    if (create == null)
+                    {
+                        MessageBox.Show("Ha ocurrido un error al crear la reserva");
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
             else
             {
-                var update = await BookingService.UpdateBookingAsync(Booking);
-                if (update == null)
+                try
                 {
-                    MessageBox.Show("Error al actualizar la reserva");
+                    await BookingService.UpdateBookingAsync(Booking);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }

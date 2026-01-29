@@ -203,7 +203,7 @@ export async function createBooking(req, res) {
     }
     catch (error) {
         console.error('Error al crear la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor al crear la reserva' });
     }
 }
 
@@ -243,7 +243,7 @@ export async function cancelBooking(req, res) {
     }
     catch (error) {
         console.error('Error al cancelar la reserva: ', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor  al cancelar la reserva' });
     }
 }
 
@@ -303,7 +303,7 @@ export async function updateBooking(req, res) {
     
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' })
+        return res.status(500).json({ error: 'Error del servidor al actualizar la reserva' })
     }
 }
 
@@ -342,6 +342,6 @@ export async function deleteBooking(req, res) {
     }
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor al eliminar la reserva' });
     }
 }

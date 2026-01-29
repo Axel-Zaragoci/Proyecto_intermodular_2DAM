@@ -43,8 +43,7 @@ namespace desktop_app.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ha ocurrido un error al cargar las reservas", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Console.WriteLine($"Error cargando reservas: {ex.Message}");
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
@@ -56,15 +55,22 @@ namespace desktop_app.ViewModels
             if (result != MessageBoxResult.Yes)
                 return;
 
-            bool deleted = await BookingService.DeleteBooking(booking.Id);
-
-            if (deleted)
+            try
             {
-                Bookings.Remove(booking);
+                bool deleted = await BookingService.DeleteBooking(booking.Id);
+                
+                if (deleted)
+                {
+                    Bookings.Remove(booking);
+                }
+                else
+                {
+                    MessageBox.Show("No se pudo eliminar la reserva", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("No se pudo eliminar la reserva", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
