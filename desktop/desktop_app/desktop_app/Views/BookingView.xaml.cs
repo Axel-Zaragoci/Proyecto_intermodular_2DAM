@@ -14,7 +14,6 @@ namespace desktop_app.Views
         public BookingView()
         {
             InitializeComponent();
-            DataContext = new BookingViewModel();
         }
         
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)

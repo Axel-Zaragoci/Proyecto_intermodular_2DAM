@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:desktop_app.Views"
+             xmlns:viewmodels="clr-namespace:desktop_app.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="450" 
+             d:DesignWidth="800"
              Style="{StaticResource UserControlBase}">
+    <UserControl.DataContext>
+        <viewmodels:BookingViewModel/>
+    </UserControl.DataContext>
     
     <Grid Background="Transparent"  Margin="22">
         <Grid.RowDefinitions>
@@ -18,7 +23,7 @@
                 <DockPanel LastChildFill="False" VerticalAlignment="Center">
                     <TextBlock Style="{StaticResource HeaderMainTitle}" DockPanel.Dock="Left" Text="Reservas"/>
                     
-                    <Button Style="{StaticResource HeaderNavigateButton}" Content="+  Crear reserva" DockPanel.Dock="Right"/>
+                    <Button Style="{StaticResource HeaderNavigateButton}" Content="+  Crear reserva" DockPanel.Dock="Right" Command="{Binding CreateBookingCommand}"/>
                 </DockPanel>
         </Border>
         
@@ -77,7 +82,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Style="{StaticResource StatusTextStyle}">
-                                    <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Style="{StaticResource GridViewCellText}"/>
+                                    <TextBlock Text="{Binding Status}" Style="{StaticResource GridViewCellText}" Foreground="#ffffff"/>
                                 </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -86,15 +91,15 @@
                     <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="65">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource UpdateBookingBtn}" Content="Editar"/>
+                                <Button Style="{StaticResource UpdateBookingBtn}" Content="edit" Command="{Binding DataContext.EditBookingCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     
-                    <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="85">
+                    <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="65">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource DeleteBookingBtn}" Content="Eliminar" Command="{Binding DataContext.DeleteBookingCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}"/>
+                                <Button Style="{StaticResource DeleteBookingBtn}" Content="delete" Command="{Binding DataContext.DeleteBookingCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

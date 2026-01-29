@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json; // UrlEncode
 using System.Text;
 using System.Text.Json;
@@ -50,6 +51,9 @@ namespace desktop_app.Services
                 if (f.HasOffer.HasValue)
                     parameters["hasOffer"] = f.HasOffer.Value.ToString().ToLowerInvariant();
 
+                if (!string.IsNullOrWhiteSpace(f.RoomNumber))
+                    parameters["roomNumber"] = f.RoomNumber;
+                
                 // ---- extras: "wifi,parking" ----
                 if (f.Extras != null && f.Extras.Count > 0)
                     parameters["extras"] = string.Join(",", f.Extras);

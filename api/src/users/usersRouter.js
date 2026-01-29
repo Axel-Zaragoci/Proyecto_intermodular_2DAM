@@ -3,9 +3,9 @@ import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, registerUser, createUs
 import { verifyToken ,authorizeRoles } from '../auth/authMiddleware.js';    
 const usersRouter = Router();
 
-usersRouter.get('/', verifyToken, authorizeRoles(["Admin", "Trabajador"]), getAllUsers);
+usersRouter.get('/', getAllUsers);
 usersRouter.get('/rol/:rol', verifyToken, authorizeRoles(["Admin", "Trabajador"]), getUsersByRol);
-usersRouter.get('/getOne', verifyToken, authorizeRoles(["Admin", "Trabajador"]), getOneUserByIdOrDni);
+usersRouter.get('/getOne', getOneUserByIdOrDni);
 
 usersRouter.post('/register', registerUser);
 usersRouter.post('/', verifyToken, authorizeRoles(["Admin", "Trabajador"]), createUser);

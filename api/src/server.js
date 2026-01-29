@@ -2,7 +2,6 @@ import express from 'express';
 import connectDB from './config/db.js';
 import dotenv from "dotenv"
 import cors from "cors";
-console.clear();
 dotenv.config()
 import bookingRouter from './booking/bookingRouter.js';
 import roomsRouter from './rooms/roomsRouter.js';

@@ -177,9 +177,9 @@ export async function getBookingsByRoomId(req, res) {
 export async function createBooking(req, res) {
     try {
         const { client, room, checkInDate, checkOutDate, guests } = req.body;
-        //const client = req.session.userId;
 
         if (!room) return res.status(400).json({ error: 'Se requiere ID de habitación'});
+        if (!client) return res.status(400).json({ error: 'Se requiere ID de cliente'});
         if (!checkInDate) return res.status(400).json({ error: 'Se requiere fecha de check in' });
         if (!checkOutDate) return res.status(400).json({ error: 'Se requiere fecha de check out'});
         if (!guests) return res.status(400).json({ error: 'Se requiere cantidad de huéspedes' });
