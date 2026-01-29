@@ -11,11 +11,37 @@ namespace desktop_app.ViewModels
 {
     public class BookingViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Colección de las reservas que se conecta a la tabla de View
+        /// </summary>
         public ObservableCollection<BookingModel> Bookings { get; }
+        
+        
+        /// <summary>
+        /// Comando para el botón de eliminar reserva
+        /// </summary>
         public ICommand DeleteBookingCommand { get; }
+        
+        
+        /// <summary>
+        /// Comando para el botón de editar reserva
+        /// </summary>
         public ICommand EditBookingCommand { get; }
+        
+        
+        /// <summary>
+        /// Comando para el botón de crear reserva
+        /// </summary>
         public ICommand CreateBookingCommand { get; }
         
+        
+        /// <summary>
+        /// Constructor del ViewModel
+        /// Se encarga de
+        ///     - Cargar las reservas en la colección
+        ///     - Crear los comandos
+        ///     - Añadir el evento para volver a cargar
+        /// </summary>
         public BookingViewModel()
         {
             Bookings = new ObservableCollection<BookingModel>();
@@ -27,6 +53,13 @@ namespace desktop_app.ViewModels
             BookingEvents.OnBookingChanged += async () => await LoadBookingsAsync();
         }
 
+        
+        /// <summary>
+        /// Método que carga las reservas
+        /// Obtiene todas las reservas y vacía la lista para evitar duplicados
+        /// Obtiene los datos necesarios para mostrar la información en la UI
+        /// Añade las reservas con los datos extra a la lista de reservas
+        /// </summary>
         private async Task LoadBookingsAsync()
         {
             try
@@ -47,10 +80,18 @@ namespace desktop_app.ViewModels
             }
         }
         
+        
+        /// <summary>
+        /// Método al que referencia el comando de eliminar
+        /// Requiere de confirmación mediante MesageBox
+        /// </summary>
+        /// 
+        /// <param name="booking">
+        /// Recibe el modelo que debe eliminar
+        /// </param>
         private async Task DeleteBookingAsync(BookingModel booking)
         {
-            var result = MessageBox.Show(
-                "¿Seguro que quieres eliminar esta reserva?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var result = MessageBox.Show("¿Seguro que quieres eliminar esta reserva?", "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result != MessageBoxResult.Yes)
                 return;
@@ -73,16 +114,30 @@ namespace desktop_app.ViewModels
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        private async void EditBooking(object? parameter)
+        
+        
+        /// <summary>
+        /// Método al que referencia el comando de editar
+        /// </summary>
+        /// 
+        /// <param name="parameter">
+        /// Parametro a editar que se revisa que debe ser una reserva
+        /// </param>
+        private void EditBooking(object? parameter)
         {
             if (parameter is not BookingModel booking) return;
             NavigationService.Instance.NavigateTo<FormBookingView>();
             FormBookingViewModel.Instance.Booking = booking;
-            string dni = await UserService.GetUserDniByIdAsync(booking.Client);
-            FormBookingViewModel.Instance.ClientDni = dni;
         }
 
+        
+        /// <summary>
+        /// Método al que hace referencia el comando de crear
+        /// </summary>
+        /// 
+        /// <param name="parameter">
+        /// Parametro necesario para los RelayCommand
+        /// </param>
         private void CreateBooking(object? parameter)
         {
             NavigationService.Instance.NavigateTo<FormBookingView>();

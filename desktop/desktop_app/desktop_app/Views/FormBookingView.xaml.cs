@@ -1,8 +1,4 @@
-﻿using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using desktop_app.ViewModels;
+﻿using System.Windows.Controls;
 
 namespace desktop_app.Views;
 

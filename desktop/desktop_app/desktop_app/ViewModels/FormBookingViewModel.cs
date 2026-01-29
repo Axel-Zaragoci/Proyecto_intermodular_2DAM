@@ -10,14 +10,27 @@ namespace desktop_app.ViewModels
 {
     public class FormBookingViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Parámetro que modifica el título de la ventana según se utilice para crear o modificar una reserva
+        /// </summary>
         public string Title => Booking.Id != "" ? "Actualizar reserva" : "Crear reserva";
         
+        
+        /// <summary>
+        /// Modo Singleton del ViewModel
+        /// </summary>
         private static FormBookingViewModel? _instance;
         public static FormBookingViewModel Instance => _instance ??= new FormBookingViewModel();
         
+        /// <summary>
+        /// Parámetros para activar o desactivar campos/botones según el modo de la ventana
+        /// </summary>
         public bool Enabled => _booking.Id == "";
         public bool Disabled => !Enabled;
         
+        /// <summary>
+        /// Propiedad para la modificación del DNI del cliente
+        /// </summary>
         public string ClientDni
         {
             get => _booking.ClientDni;
@@ -28,8 +41,12 @@ namespace desktop_app.ViewModels
             }
         }
 
+        
+        /// <summary>
+        /// Propiedad para la actualización de la reserva
+        /// Se utiliza para determinar el modo de la ventana
+        /// </summary>
         private BookingModel _booking;
-
         public BookingModel Booking
         {
             get => _booking;
@@ -44,15 +61,34 @@ namespace desktop_app.ViewModels
             }
         }
 
+        
+        /// <summary>
+        /// Comando para el botón de guardar
+        /// </summary>
         public ICommand SaveCommand { get; }
 
+        
+        /// <summary>
+        /// Comando para el botón de volver
+        /// </summary>
         public ICommand ReturnCommand { get; } = new RelayCommand(_ =>
         {
             NavigationService.Instance.NavigateTo<BookingView>();
         });
 
+        
+        
+        /// <summary>
+        /// Comando para el botón de cancelar reserva
+        /// </summary>
         public ICommand CancelCommand { get; }
         
+        
+        /// <summary>
+        /// Constructor de la clase
+        /// Crea una reserva vacía sobre la que crear
+        /// Asigna los comandos de guardar y cancelar
+        /// </summary>
         private FormBookingViewModel()
         {
             Booking = new BookingModel();
@@ -60,6 +96,11 @@ namespace desktop_app.ViewModels
             CancelCommand = new RelayCommand(async _ => await Cancel());
         }
 
+        
+        /// <summary>
+        /// Función para cancelar una reserva
+        /// Se referencia en el comando de cancelar
+        /// </summary>
         private async Task Cancel()
         {
             try
@@ -81,6 +122,11 @@ namespace desktop_app.ViewModels
             NavigationService.Instance.NavigateTo<BookingView>();
         }
         
+        
+        /// <summary>
+        /// Función para guardar una reserva
+        /// Se referencia en el comando de guardar
+        /// </summary>
         private async Task Save()
         {
             if (Booking.Id == "")
