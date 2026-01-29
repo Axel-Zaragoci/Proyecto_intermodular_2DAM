@@ -194,6 +194,33 @@ export async function getUsersByRol(req, res) {
     }
 }
 
+/**
+ * Controlador para actualizar usuarios
+ * 
+ * @async
+ * @function updateuser
+ * 
+ * @description
+ * Recibe por el body los datos del usuario desde el programa (Esten cambiados o no)
+ * Recibe y guarda el rol del usuario que esta haciendo la peticion
+ * Comprueba que los datos determinantes no esten vacios y que el id sea valido
+ * Busca el usuario y lo guarda en una varible
+ * Comprueba que ese usuario existiese
+ * Crea la variable updateEntry del tipo {UserUpdateData | UserAdminUpdateData}
+ * Comprueba que tipo de usuario es el que hace la peticion y si es el mismo que se va a editar
+ * Dependiendo de la condicion anteriror permite cambios en vipStatus o rol (Un mismo usuario nunca puede modificarse estos campos)
+ * Valida y convierte a JSON los datos
+ * Lanza el update a esa id con los datos a cambiar y guarda el nuevo usuario en una variable
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con:
+ * - Código de estado 200 y el usuario actualizado (con los nuevos datos)
+ * - Código de estado 400 en errores varios
+ * - Código de estado 409 para campo duplicado
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ */
 export async function updateUser(req, res) {
     try {
         const { id, firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender, imageRoute } = req.body;
