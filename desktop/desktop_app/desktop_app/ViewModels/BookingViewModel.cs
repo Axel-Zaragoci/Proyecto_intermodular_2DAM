@@ -36,6 +36,11 @@ namespace desktop_app.ViewModels
         
         
         /// <summary>
+        /// Comando para el botón de recargar
+        /// </summary>
+        public ICommand ReloadBookingCommand { get; }
+        
+        /// <summary>
         /// Constructor del ViewModel
         /// Se encarga de
         ///     - Cargar las reservas en la colección
@@ -49,6 +54,7 @@ namespace desktop_app.ViewModels
             DeleteBookingCommand = new AsyncRelayCommand<BookingModel>(DeleteBookingAsync);
             EditBookingCommand = new RelayCommand(EditBooking);
             CreateBookingCommand = new RelayCommand(CreateBooking);
+            ReloadBookingCommand = new AsyncRelayCommand(LoadBookingsAsync);
 
             BookingEvents.OnBookingChanged += async () => await LoadBookingsAsync();
         }

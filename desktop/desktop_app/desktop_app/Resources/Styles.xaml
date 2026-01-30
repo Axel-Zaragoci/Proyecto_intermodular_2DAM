@@ -393,9 +393,10 @@
                 <Setter Property="BorderBrush" Value="#c69500"/>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="#ffc107"/>
-                <Setter Property="BorderBrush" Value="#ffc107"/>
-                <Setter Property="Opacity" Value="0.65"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Transparent"/>
+                <Setter Property="Background" Value="Transparent"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -436,58 +437,59 @@
         </Style.Triggers>
     </Style>
     
-    <Style x:Key="DatePickerForm" TargetType="DatePicker">
-        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="BorderBrush" Value="#C5DDEE"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="White"/>
+    <Style x:Key="DatePickerForm" TargetType="{x:Type DatePicker}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="DatePicker">
-                    <Border x:Name="OuterBorder"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8"
-                            Padding="{TemplateBinding Padding}">
-                        <Grid>
-                            <DatePickerTextBox x:Name="PART_TextBox" Background="Transparent" BorderThickness="0"/>
-                            
-                            <Button x:Name="PART_Button"
-                                    Focusable="False"
-                                    HorizontalAlignment="Right"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    BorderBrush="Transparent"
-                                    Padding="0">
-                                <Path Data="M3,2 L13,2 13,12 3,12 Z M3,5 L13,5" Stroke="#1E88E5" StrokeThickness="1.5"/>
+                <ControlTemplate TargetType="{x:Type DatePicker}">
+                    <Border
+                        x:Name="OuterBorder"
+                        CornerRadius="8"
+                        Background="White"
+                        BorderBrush="#C5DDEE"
+                        BorderThickness="1"
+                        Padding="10, 6">
+                        <Grid x:Name="PART_Root">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <DatePickerTextBox x:Name="PART_TextBox"
+                                               BorderBrush="Transparent"
+                                               BorderThickness="0"
+                                               Background="Transparent"
+                                               HorizontalContentAlignment="Stretch"
+                                               Padding="{TemplateBinding Padding}"
+                                               VerticalContentAlignment="Center"
+                                               Visibility="Visible"
+                                               Grid.Column="0">
+                            </DatePickerTextBox>
+                            <Button Grid.Column="1" x:Name="PART_Button">
+                                <Button.Style>
+                                    <Style TargetType="{x:Type Button}">
+                                        <Setter Property="Focusable" Value="False"/>
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Cursor" Value="Hand"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <TextBlock FontFamily="/Resources/#Material Icons Outlined"
+                                                               FontWeight="400"
+                                                               FontSize="20"
+                                                               Text="calendar_month"
+                                                               Foreground="#1E88E5"/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
                             </Button>
-                            
-                            <Popup x:Name="PART_Popup"
-                                   Placement="Bottom"
-                                   StaysOpen="False"
-                                   AllowsTransparency="True"
-                                   Focusable="False">
-                                <Border BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="1" 
-                                        Background="{TemplateBinding Background}" 
-                                        SnapsToDevicePixels="True">
-                                    <Calendar x:Name="PART_Calendar"
-                                              IsTodayHighlighted="True"
-                                              DisplayMode="Month"/>
-                                </Border>
-                            </Popup>
+                            <Popup x:Name="PART_Popup" StaysOpen="False" AllowsTransparency="True" />
                         </Grid>
                     </Border>
-                    
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsDropDownOpen" Value="True">
-                            <Setter TargetName="PART_Popup" Property="IsOpen" Value="True"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
