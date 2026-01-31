@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using desktop_app.Services;
+using System.Text.Json.Serialization;
 
 namespace desktop_app.Models
 {
@@ -20,10 +21,25 @@ namespace desktop_app.Models
         public string Description { get; set; } = "";
 
         [JsonPropertyName("mainImage")]
-        public string MainImage { get; set; } = "";
+        public string? MainImage { get; set; } 
+
+        public string? MainImageAbs
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(MainImage)) return null;
+
+                // Si ya viene como URL completa (http...)
+                if (Uri.TryCreate(MainImage, UriKind.Absolute, out _))
+                    return MainImage;
+
+                // Si viene como "/uploads/..."
+                return ImageService.ToAbsoluteUrl(MainImage);
+            }
+        }
 
         [JsonPropertyName("pricePerNight")]
-        public decimal? PricePerNight { get; set; }
+        public Double PricePerNight { get; set; }
 
         [JsonPropertyName("extraBed")]
         public bool ExtraBed { get; set; }
@@ -69,7 +85,6 @@ namespace desktop_app.Models
         [JsonPropertyName("items")]
         public List<RoomModel> Items { get; set; } = new();
 
-        // Si no lo usas, puedes dejarlo como JsonElement para no modelarlo entero
         [JsonPropertyName("appliedFilter")]
         public System.Text.Json.JsonElement AppliedFilter { get; set; }
 

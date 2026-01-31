@@ -1,13 +1,19 @@
 import { Router } from "express";
 import { upload } from "../services/imageService.js";
-import { uploadPhoto,uploadPhotos } from "./imageController.js";
+import { uploadPhoto, uploadPhotos, deletePhoto, deletePhotos } from "./imageController.js";
 
 const router = Router();
 
-// POST /image  (multipart/form-data con key "photo")
+// Subir 1
 router.post("/", upload.single("photo"), uploadPhoto);
-// POST /image/many  (multipart/form-data con key "photos")
+
+// Subir varias
 router.post("/many", upload.array("photos", 20), uploadPhotos);
 
+// Borrar 1 por filename
+router.delete("/:filename", deletePhoto);
+
+// Borrar varias
+router.delete("/", deletePhotos);
 
 export default router;

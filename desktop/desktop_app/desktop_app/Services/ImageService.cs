@@ -94,6 +94,50 @@ namespace desktop_app.Services
                 _ => "application/octet-stream"
             };
         }
+        public static async Task<bool> DeleteImageAsync(string urlOrFilename)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(urlOrFilename))
+                    return false;
+
+                // Acepta:
+                //  - "/uploads/abc.jpg"
+                //  - "abc.jpg"
+                //  - "http://localhost:3000/uploads/abc.jpg"
+                var filename = ExtractFilename(urlOrFilename);
+                if (string.IsNullOrWhiteSpace(filename))
+                    return false;
+
+                var url = ApiService.BaseUrl.TrimEnd('/') + "/image/" + Uri.EscapeDataString(filename);
+                var resp = await ApiService._httpClient.DeleteAsync(url);
+
+                return resp.IsSuccessStatusCode;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static string ExtractFilename(string urlOrFilename)
+        {
+            // Si viene como URL completa
+            if (Uri.TryCreate(urlOrFilename, UriKind.Absolute, out var abs))
+            {
+                // abs.AbsolutePath = "/uploads/abc.jpg"
+                var path = abs.AbsolutePath;
+                return System.IO.Path.GetFileName(path);
+            }
+
+            // Si viene como "/uploads/abc.jpg" o "uploads/abc.jpg"
+            if (urlOrFilename.Contains("/"))
+                return System.IO.Path.GetFileName(urlOrFilename);
+
+            // Si viene como "abc.jpg"
+            return urlOrFilename.Trim();
+        }
+
 
     }
 }
