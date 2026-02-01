@@ -15,7 +15,7 @@ public class UserService
         return users ?? new List<UserModel>();
     }
 
-    public static async Task<String> GetClientNameByIdAsync(string id)
+    public static async Task<UserModel> GetClientByIdAsync(string id)
     {
         string url = $"{ApiService.BaseUrl}user/getOne";
 
@@ -31,12 +31,12 @@ public class UserService
         if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-            return "Error";
+            return new UserModel();
         }
 
         UserModel? content = await response.Content.ReadFromJsonAsync<UserModel>();
 
-        return content?.FirstName + " " + content?.LastName ?? "Error";
+        return content ?? new UserModel();
     }
     
     public static async Task<string> GetUserDniByIdAsync(string id)

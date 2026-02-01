@@ -40,6 +40,12 @@ namespace desktop_app.ViewModels
         /// </summary>
         public ICommand ReloadBookingCommand { get; }
         
+        
+        /// <summary>
+        /// Comando para el botón de ver detalles
+        /// </summary>
+        public ICommand ShowBookingDetailsCommand { get; }
+        
         /// <summary>
         /// Constructor del ViewModel
         /// Se encarga de
@@ -55,7 +61,7 @@ namespace desktop_app.ViewModels
             EditBookingCommand = new RelayCommand(EditBooking);
             CreateBookingCommand = new RelayCommand(CreateBooking);
             ReloadBookingCommand = new AsyncRelayCommand(LoadBookingsAsync);
-
+            ShowBookingDetailsCommand = new RelayCommand<BookingModel>(ViewBookingData);
             BookingEvents.OnBookingChanged += async () => await LoadBookingsAsync();
         }
 
@@ -74,8 +80,9 @@ namespace desktop_app.ViewModels
                 Bookings.Clear();
                 foreach (var booking in list)
                 {
-                    booking.ClientName = await UserService.GetClientNameByIdAsync(booking.Client);
-                    booking.ClientDni = await UserService.GetUserDniByIdAsync(booking.Client);
+                    UserModel u = await UserService.GetClientByIdAsync(booking.Client);
+                    booking.ClientDni = u.Dni;
+                    booking.ClientName = u.FirstName + " " + u.LastName;
                     booking.RoomNumber = await RoomService.GetRoomNumberByIdAsync(booking.Room);
                     Bookings.Add(booking);
                 }
@@ -148,6 +155,19 @@ namespace desktop_app.ViewModels
         {
             NavigationService.Instance.NavigateTo<FormBookingView>();
             FormBookingViewModel.Instance.Booking = new BookingModel();
+        }
+
+        
+        /// <summary>
+        /// Método al que hace referencia el comando de crear
+        /// </summary>
+        /// 
+        /// <param name="booking">
+        /// Reserva de la que se desea ver los detalles
+        /// </param>
+        private void ViewBookingData(BookingModel booking)
+        {
+            MessageBox.Show(booking.ToString(), "Información completa", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

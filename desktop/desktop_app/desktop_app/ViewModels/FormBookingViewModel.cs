@@ -85,6 +85,11 @@ namespace desktop_app.ViewModels
         
         
         /// <summary>
+        /// Comando para ver los detalles de la reserva
+        /// </summary>
+        public ICommand ShowCommand { get; }
+        
+        /// <summary>
         /// Constructor de la clase
         /// Crea una reserva vacía sobre la que crear
         /// Asigna los comandos de guardar y cancelar
@@ -94,6 +99,7 @@ namespace desktop_app.ViewModels
             Booking = new BookingModel();
             SaveCommand = new RelayCommand(async _ => await Save());
             CancelCommand = new RelayCommand(async _ => await Cancel());
+            ShowCommand = new RelayCommand(_ => ShowData());
         }
 
         
@@ -103,6 +109,17 @@ namespace desktop_app.ViewModels
         /// </summary>
         private async Task Cancel()
         {
+            if (Booking.Status == "Cancelada")
+            {
+                MessageBox.Show("Esta reserva ya está cancelada", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            
+            var result = MessageBox.Show("¿Seguro que quieres cancelar esta reserva?", "Confirmar cancelación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+            
             try
             {
                 var update = await BookingService.CancelBookingAsync(Booking.Id);
@@ -180,6 +197,11 @@ namespace desktop_app.ViewModels
             
             await BookingEvents.RaiseBookingChanged();
             NavigationService.Instance.NavigateTo<BookingView>();
+        }
+
+        private void ShowData()
+        {
+            MessageBox.Show(Booking.ToString(), "Información completa", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

@@ -71,5 +71,22 @@ namespace desktop_app.Models
             };
         }
 
+        public override string ToString()
+        {
+            return "ID: " + this.Id + "\n"
+                   + "ID del cliente: " + this.Client + "\n"
+                   + "\tDNI del cliente: " + this.ClientDni + "\n"
+                   + "\tNombre del cliente: " + this.ClientName + "\n"
+                   + "ID de la habitación: " + this.Room + "\n"
+                   + "\tNúmero de la habitación: " + this.RoomNumber + "\n"
+                   + "Fecha de inicio: " + this.CheckInDate.ToString("d") + "\n"
+                   + "Fecha de fin: " + this.CheckOutDate.ToString("d") + "\n"
+                   + "Fecha de reserva y pago: " + this.PayDate.ToString("d") + "\n"
+                   + "Oferta: " + this.Offer + "%\n"
+                   + "Precio total: " + this.TotalPrice + "€\n"
+                   + "Precio por noche: " + this.PricePerNight + "€\n"
+                   + "Total de noches: " + this.TotalNights + "\n"
+                   + "Cantidad de huéspedes: " + this.Guests;
+        }
     }
 }
