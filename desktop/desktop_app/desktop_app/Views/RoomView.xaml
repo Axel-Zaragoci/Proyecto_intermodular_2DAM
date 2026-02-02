@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="650" d:DesignWidth="1200">
+             d:DesignHeight="650" d:DesignWidth="1200"
+             Style="{StaticResource UserControlBase}">
 
 
-    <Grid Background="{StaticResource PageBgBrush}">
+    <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <Grid Margin="22">
                 <Grid.RowDefinitions>
@@ -18,10 +19,7 @@
 
                 <!-- ================= HEADER ================= -->
                 <Border Grid.Row="0"
-                        Style="{StaticResource BgColor}"
-                        CornerRadius="18"
-                        Padding="18"
-                        Margin="0,0,0,16">
+                        Style="{StaticResource HeaderWrapper}">
 
                     <Grid>
                         <Grid.RowDefinitions>
@@ -30,23 +28,16 @@
                         </Grid.RowDefinitions>
 
                         <!-- Título + botón crear (en la misma fila) -->
-                        <DockPanel Grid.Row="0">
+                        <DockPanel Grid.Row="0" LastChildFill="False">
 
                             <TextBlock DockPanel.Dock="Left"
                                        Text="Ventana de Habitaciones"
-                                       FontSize="26"
-                                       FontWeight="Bold"
-                                       Foreground="White"
-                                       VerticalAlignment="Center"/>
+                                       Style="{StaticResource HeaderMainTitle}"/>
 
                             <!-- Botón crear (pequeño, como en la foto) -->
                             <Button DockPanel.Dock="Right"
                                     Content=" + Crear habitación"
-                                    Style="{StaticResource CreateButton}"
-                                    Height="34"
-                                    Padding="14,0"
-                                    FontSize="13"
-                                    Margin="0,0,0,2" Width="150" HorizontalAlignment="Right"
+                                    Style="{StaticResource HeaderNavigateButton}"
                                      Command="{Binding GoCreateRoomCommand}"/>
                         </DockPanel>
 
@@ -69,19 +60,18 @@
                                             Orientation="Horizontal"
                                             VerticalAlignment="Bottom"
                                             Margin="12,0,0,0">
-                                    <Button Style="{StaticResource GhostButton}"
+                                    <Button Style="{StaticResource ClearFiltersBtn}"
                                             Content="Quitar filtros"
                                             Command="{Binding ClearFiltersCommand}"
                                             Height="32"
                                             Padding="14,0"
                                             FontSize="13"
-                                            Margin="0,0,20,0" Width="85"/>
-                                    <Button Style="{StaticResource PrimaryButton}"
+                                            Margin="0,0,20,0"/>
+                                    <Button Style="{StaticResource SaveBtn}"
                                             Content="Buscar"
                                             Command="{Binding SearchCommand}"
                                             Height="32"
-                                            Padding="16,0"
-                                            FontSize="13" Width="60"/>
+                                            Padding="16,0"/>
                                 </StackPanel>
 
                                 <!-- CONTENIDO FILTRO (se rompe en 2 filas si no cabe) -->
@@ -95,7 +85,7 @@
                                         <ComboBox Height="20"
                                                   Padding="10,0"
                                                   Background="#F3F5F8"
-                                                  BorderBrush="{StaticResource SoftBorder}"
+                                                  BorderBrush="#E6E8EF"
                                                   BorderThickness="1"
                                                   SelectedValue="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
                                                   SelectedValuePath="Content">
@@ -113,7 +103,7 @@
                                         <TextBox Height="20"
                                                  Padding="10,0"
                                                  Background="#F3F5F8"
-                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderBrush="#E6E8EF"
                                                  BorderThickness="1"
                                                  Text="{Binding GuestsText, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
@@ -124,7 +114,7 @@
                                         <TextBox Height="20"
                                                  Padding="10,0"
                                                  Background="#F3F5F8"
-                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderBrush="#E6E8EF"
                                                  BorderThickness="1"
                                                  Text="{Binding MinPriceText, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
@@ -135,7 +125,7 @@
                                         <TextBox Height="20"
                                                  Padding="10,0"
                                                  Background="#F3F5F8"
-                                                 BorderBrush="{StaticResource SoftBorder}"
+                                                 BorderBrush="#E6E8EF"
                                                  BorderThickness="1"
                                                  Text="{Binding MaxPriceText, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
@@ -172,7 +162,7 @@
                                         <TextBox Height="20"
                                              Padding="10,0"
                                              Background="#F3F5F8"
-                                             BorderBrush="{StaticResource SoftBorder}"
+                                             BorderBrush="#E6E8EF"
                                              BorderThickness="1"
                                              Text="{Binding ExtrasText, UpdateSourceTrigger=PropertyChanged}"
                                              ToolTip="Buscar habitación..."/>
@@ -192,16 +182,13 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{Binding StatusText}"
-                               Foreground="{StaticResource MutedText}"
+                               Foreground="#6B7280"
                                VerticalAlignment="Center"/>
 
                     <Button Grid.Column="1"
-                            Style="{StaticResource GhostButton}"
+                            Style="{StaticResource SaveBtn}"
                             Content="Refrescar"
-                            Command="{Binding RefreshCommand}"
-                            Height="32"
-                            Padding="14,0"
-                            FontSize="13"/>
+                            Command="{Binding RefreshCommand}"/>
                 </Grid>
 
                 <!-- ===== Cards habitaciones ===== -->
