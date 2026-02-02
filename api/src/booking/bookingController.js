@@ -177,9 +177,9 @@ export async function getBookingsByRoomId(req, res) {
 export async function createBooking(req, res) {
     try {
         const { client, room, checkInDate, checkOutDate, guests } = req.body;
-        //const client = req.session.userId;
 
         if (!room) return res.status(400).json({ error: 'Se requiere ID de habitación'});
+        if (!client) return res.status(400).json({ error: 'Se requiere ID de cliente'});
         if (!checkInDate) return res.status(400).json({ error: 'Se requiere fecha de check in' });
         if (!checkOutDate) return res.status(400).json({ error: 'Se requiere fecha de check out'});
         if (!guests) return res.status(400).json({ error: 'Se requiere cantidad de huéspedes' });
@@ -203,7 +203,7 @@ export async function createBooking(req, res) {
     }
     catch (error) {
         console.error('Error al crear la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor al crear la reserva' });
     }
 }
 
@@ -243,7 +243,7 @@ export async function cancelBooking(req, res) {
     }
     catch (error) {
         console.error('Error al cancelar la reserva: ', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor  al cancelar la reserva' });
     }
 }
 
@@ -303,7 +303,7 @@ export async function updateBooking(req, res) {
     
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' })
+        return res.status(500).json({ error: 'Error del servidor al actualizar la reserva' })
     }
 }
 
@@ -342,6 +342,6 @@ export async function deleteBooking(req, res) {
     }
     catch (error) {
         console.error('Error al actualizar la reserva:', error);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor al eliminar la reserva' });
     }
 }

@@ -12,7 +12,7 @@ namespace desktop_app.Commands
         private readonly Predicate<object> _canExecute;
 
         /// <summary>
-        /// Inicializa una nueva instancia de <see cref="RelayCommand"/> con una acción de ejecución y una condición de permiso
+        /// Inicializa una nueva instancia de RelayCommand con una acción de ejecución y una condición de permiso
         /// </summary>
         /// 
         /// <param name="execute">
@@ -83,6 +83,50 @@ namespace desktop_app.Commands
         {
             _execute(parameter);
         }
+    }
 
+    /// <summary>
+    /// Funcionalidad de RelayCommand con un parámetro
+    /// </summary>
+    /// <typeparam name="T">
+    /// Modelo o clase del objeto que se quiere pasar a la función que se ejecuta con el comando
+    /// </typeparam>
+    public class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T> _execute;
+        private readonly Predicate<T>? _canExecute;
+
+        public RelayCommand(Action<T> execute, Predicate<T>? canExecute)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public RelayCommand(Action<T> execute) : this(execute, null) { }
+        
+        public event EventHandler? CanExecuteChanged
+        {
+            add
+            {
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                CommandManager.RequerySuggested -= value;
+            }
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            if (parameter is not T param) return false;
+            return _canExecute == null || _canExecute(param);
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is not T param) return;
+
+            _execute(param);
+        }
     }
 }

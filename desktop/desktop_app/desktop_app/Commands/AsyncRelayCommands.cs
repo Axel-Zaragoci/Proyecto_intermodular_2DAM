@@ -45,4 +45,47 @@ namespace desktop_app.Commands
         public void RaiseCanExecuteChanged()
             => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
+    public class AsyncRelayCommand<T> : ICommand
+    {
+        private readonly Func<T, Task> _executeAsync;
+        private readonly Func<T, bool>? _canExecute;
+        private bool _isRunning;
+
+        public AsyncRelayCommand(Func<T, Task> executeAsync, Func<T, bool>? canExecute = null)
+        {
+            _executeAsync = executeAsync;
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
+        {
+            if (_isRunning) return false;
+            if (parameter is not T param) return false;
+
+            return _canExecute?.Invoke(param) ?? true;
+        }
+
+        public async void Execute(object? parameter)
+        {
+            if (parameter is not T param) return;
+
+            _isRunning = true;
+            RaiseCanExecuteChanged();
+
+            try
+            {
+                await _executeAsync(param);
+            }
+            finally
+            {
+                _isRunning = false;
+                RaiseCanExecuteChanged();
+            }
+        }
+
+        public void RaiseCanExecuteChanged()
+            => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

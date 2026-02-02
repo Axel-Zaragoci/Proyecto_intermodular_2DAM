@@ -58,6 +58,7 @@ namespace desktop_app.Models
             public bool? HasCrib { get; set; }
             public bool? HasOffer { get; set; }
             public List<string>? Extras { get; set; }
+            public string? RoomNumber { get; set; }
             public string? SortBy { get; set; }
             public string? SortOrder { get; set; }
         }

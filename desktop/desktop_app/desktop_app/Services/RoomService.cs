@@ -1,10 +1,11 @@
 ﻿using desktop_app.Models;
 using System;
 using System.Collections.Generic;
-using System.Net;         // UrlEncode
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json; // UrlEncode
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace desktop_app.Services
 {
@@ -50,6 +51,9 @@ namespace desktop_app.Services
                 if (f.HasOffer.HasValue)
                     parameters["hasOffer"] = f.HasOffer.Value.ToString().ToLowerInvariant();
 
+                if (!string.IsNullOrWhiteSpace(f.RoomNumber))
+                    parameters["roomNumber"] = f.RoomNumber;
+                
                 // ---- extras: "wifi,parking" ----
                 if (f.Extras != null && f.Extras.Count > 0)
                     parameters["extras"] = string.Join(",", f.Extras);
@@ -87,7 +91,7 @@ namespace desktop_app.Services
                 return null;
             }
         }
-
+        
         // Convierte diccionario => "?a=1&b=2"
         private static string BuildQuery(Dictionary<string, string?> parameters)
         {
@@ -109,6 +113,23 @@ namespace desktop_app.Services
             }
 
             return sb.ToString();
+        }
+
+        public static async Task<string> GetRoomNumberByIdAsync(string id)
+        {
+            string url = $"{ApiService.BaseUrl}room/{id}";
+
+            var respuesta = await ApiService._httpClient.GetAsync(url);
+
+            if (!respuesta.IsSuccessStatusCode)
+            {
+                Console.WriteLine(respuesta.Content.ReadAsStringAsync().Result);
+                return "Error";
+            }
+
+            RoomModel? contenido = await respuesta.Content.ReadFromJsonAsync<RoomModel>();
+
+            return contenido?.RoomNumber ?? "Error";
         }
     }
 }
