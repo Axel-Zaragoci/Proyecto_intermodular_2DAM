@@ -1,29 +1,37 @@
-import express from 'express';
-import connectDB from './config/db.js';
-import dotenv from "dotenv"
+import express from "express";
+import connectDB from "./config/db.js";
+import dotenv from "dotenv";
 import cors from "cors";
-dotenv.config()
-import bookingRouter from './booking/bookingRouter.js';
-import roomsRouter from './rooms/roomsRouter.js';
-import morgan from 'morgan';
-import usersRouter from './users/usersRouter.js';
-import authRouter from './auth/authRouter.js';
+import morgan from "morgan";
 
+import bookingRouter from "./booking/bookingRouter.js";
+import roomsRouter from "./rooms/roomsRouter.js";
+import usersRouter from "./users/usersRouter.js";
+import authRouter from "./auth/authRouter.js";
+import photoRouter from "./image/imageRouter.js";
 
-const PORT = 3000;
+console.clear();
+dotenv.config();
+
+const PORT = process.env.PORT || 3000;
 const app = express();
 
-connectDB()
+connectDB();
 
 app.use(cors());
 app.use(express.json());
-app.use(morgan("dev"))
+app.use(morgan("dev"));
 
-app.use('/booking', bookingRouter);
+
+
+app.use("/uploads", express.static("uploads"));
+
+app.use("/booking", bookingRouter);
 app.use("/room", roomsRouter);
 app.use("/user", usersRouter);
 app.use("/auth", authRouter);
+app.use("/image", photoRouter);
 
 app.listen(PORT, () => {
-    console.log(`Servidor en el puerto ${PORT}`);
-})
+  console.log(`Servidor en el puerto ${PORT}`);
+});

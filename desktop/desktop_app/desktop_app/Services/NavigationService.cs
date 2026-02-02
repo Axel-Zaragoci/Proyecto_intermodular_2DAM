@@ -90,5 +90,16 @@ namespace desktop_app.Services
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+
+        public void NavigateTo(Func<UserControl> factory)
+        {
+            var view = factory?.Invoke();
+            if (view == null) return;
+
+            CurrentView = view;
+            OnPropertyChanged(nameof(CurrentView));
+        }
+
     }
 }
