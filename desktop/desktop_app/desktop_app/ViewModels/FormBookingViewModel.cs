@@ -11,22 +11,24 @@ namespace desktop_app.ViewModels
     public class FormBookingViewModel : ViewModelBase
     {
         /// <summary>
+        /// Modo Singleton del ViewModel
+        /// </summary>
+        private static FormBookingViewModel? _instance;
+        public static FormBookingViewModel Instance => _instance ??= new FormBookingViewModel();
+
+        
+        /// <summary>
         /// Parámetro que modifica el título de la ventana según se utilice para crear o modificar una reserva
         /// </summary>
         public string Title => Booking.Id != "" ? "Actualizar reserva" : "Crear reserva";
         
         
         /// <summary>
-        /// Modo Singleton del ViewModel
-        /// </summary>
-        private static FormBookingViewModel? _instance;
-        public static FormBookingViewModel Instance => _instance ??= new FormBookingViewModel();
-        
-        /// <summary>
         /// Parámetros para activar o desactivar campos/botones según el modo de la ventana
         /// </summary>
         public bool Enabled => _booking.Id == "";
         public bool Disabled => !Enabled;
+        
         
         /// <summary>
         /// Propiedad para la modificación del DNI del cliente
