@@ -263,6 +263,7 @@ export const getRoomsFiltered = async (req, res) => {
       extras,
       sortBy,
       sortOrder,
+      roomNumber,
     } = req.query;
 
     const filter = {};
@@ -292,6 +293,11 @@ export const getRoomsFiltered = async (req, res) => {
       if (Number.isFinite(g)) filter.maxGuests = { $gte: g };
     }
 
+    if (roomNumber !== undefined) {
+      const rn = Number(roomNumber);
+      if (Number.isFinite(rn)) filter.roomNumber = rn;
+    }
+
     if (extras) {
       const extrasArr = String(extras)
         .split(",")
@@ -316,15 +322,21 @@ export const getRoomsFiltered = async (req, res) => {
     }
 
     // sorting
-    const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
+    const allowedSort = new Set([
+      "pricePerNight",
+      "rate",
+      "roomNumber",
+      "type",
+      "maxGuests",
+    ]);
     const sortField = allowedSort.has(sortBy) ? sortBy : "roomNumber";
     const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
     const sort = { [sortField]: sortDir };
 
-    // SIN PAGINACIÓN: trae todo
     const items = await roomDatabaseModel.find(filter).sort(sort);
 
-    return res.status(200).json({items,
+    return res.status(200).json({
+      items,
       appliedFilter: filter,
       sort,
     });
@@ -332,3 +344,4 @@ export const getRoomsFiltered = async (req, res) => {
     return res.status(400).json({ message: err.message });
   }
 };
+

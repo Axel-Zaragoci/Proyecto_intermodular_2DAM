@@ -1,11 +1,11 @@
 ﻿using desktop_app.Models;
 using System;
 using System.Collections.Generic;
-using System.Net;         // UrlEncode
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json; // UrlEncode
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace desktop_app.Services
 {
@@ -47,6 +47,10 @@ namespace desktop_app.Services
                 if (f.HasOffer.HasValue)
                     parameters["hasOffer"] = f.HasOffer.Value.ToString().ToLowerInvariant();
 
+                if (!string.IsNullOrWhiteSpace(f.RoomNumber))
+                    parameters["roomNumber"] = f.RoomNumber;
+                
+                // ---- extras: "wifi,parking" ----
                 if (f.Extras != null && f.Extras.Count > 0)
                     parameters["extras"] = string.Join(",", f.Extras);
 

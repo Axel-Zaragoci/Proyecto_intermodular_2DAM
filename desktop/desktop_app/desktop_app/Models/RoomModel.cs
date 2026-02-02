@@ -65,22 +65,22 @@ namespace desktop_app.Models
         public double Rate { get; set; }
     }
 
-    // Clase auxiliar para guardar los filtros que elige el usuario en la pantalla.
-    public class RoomsFilter
-    {
-        public string? Type { get; set; }
-        public bool? IsAvailable { get; set; }
-        public decimal? MinPrice { get; set; }
-        public decimal? MaxPrice { get; set; }
-        public int? Guests { get; set; }
-        public bool? HasExtraBed { get; set; }
-        public bool? HasCrib { get; set; }
-        public bool? HasOffer { get; set; }
-        public List<string>? Extras { get; set; }
-        public string? SortBy { get; set; }
-        public string? SortOrder { get; set; }
-    }
-
+        public class RoomsFilter
+        {
+            public string? Type { get; set; }
+            public bool? IsAvailable { get; set; }
+            public decimal? MinPrice { get; set; }
+            public decimal? MaxPrice { get; set; }
+            public int? Guests { get; set; }
+            public bool? HasExtraBed { get; set; }
+            public bool? HasCrib { get; set; }
+            public bool? HasOffer { get; set; }
+            public List<string>? Extras { get; set; }
+            public string? RoomNumber { get; set; }
+            public string? SortBy { get; set; }
+            public string? SortOrder { get; set; }
+        }
+    
 
 
     public class RoomsResponse
