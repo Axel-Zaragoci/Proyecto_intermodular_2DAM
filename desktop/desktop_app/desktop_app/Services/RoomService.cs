@@ -11,7 +11,7 @@ namespace desktop_app.Services
 {
     public static class RoomService
     {
-        // FILTER  (GET /room/)
+        // FILTER  (GET /room/) : Devuelve una lista envuelta en RoomsResponse
         public static async Task<RoomsResponse?> GetRoomsFilteredAsync(RoomsFilter? f = null)
         {
             try
@@ -56,15 +56,18 @@ namespace desktop_app.Services
                 if (!string.IsNullOrWhiteSpace(f.SortOrder))
                     parameters["sortOrder"] = f.SortOrder;
 
+                // BuildQuery convierte el diccionario en texto: "?type=double&minPrice=50"
                 string url = ApiService.BaseUrl + "room" + BuildQuery(parameters);
 
+                // PETICIÓN HTTP (ASÍNCRONA)
+                // 'await' espera la respuesta sin congelar la app.
                 var respuesta = await ApiService._httpClient.GetAsync(url);
 
                 if (!respuesta.IsSuccessStatusCode)
-                    return new RoomsResponse();
+                    return new RoomsResponse(); // Si falla, devuelve vacío.
 
+                // DESERIALIZACIÓN (JSON -> OBJETOS C#)
                 string contenido = await respuesta.Content.ReadAsStringAsync();
-
                 var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var data = JsonSerializer.Deserialize<RoomsResponse>(contenido, opciones);
 
@@ -76,7 +79,8 @@ namespace desktop_app.Services
             }
         }
 
-        // Convierte diccionario => "?a=1&b=2"
+        // recorre el diccionario y une con "&" y "=" ...
+        // Usa WebUtility.UrlEncode para manejar espacios y caracteres raros.
         private static string BuildQuery(Dictionary<string, string?> parameters)
         {
             var sb = new StringBuilder();
