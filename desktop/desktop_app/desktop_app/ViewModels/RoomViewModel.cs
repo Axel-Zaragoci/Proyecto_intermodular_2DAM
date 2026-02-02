@@ -1,23 +1,22 @@
 ﻿using desktop_app.Commands;
 using desktop_app.Models;
 using desktop_app.Services;
+using desktop_app.Views;
+using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace desktop_app.ViewModels
 {
     public class RoomViewModel : ViewModelBase
     {
-        // =========================
-        // 1) DATOS PARA LA VISTA
-        // =========================
-
-        // Esto es lo que el DataGrid va a mostrar.
-        // ObservableCollection notifica al UI cuando agregas/quitas items.
         private ObservableCollection<RoomModel> _rooms = new();
         public ObservableCollection<RoomModel> Rooms
         {
@@ -25,7 +24,6 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _rooms, value);
         }
 
-        // Texto para mostrar estado (opcional): "Cargando...", "0 resultados", etc.
         private string _statusText = "";
         public string StatusText
         {
@@ -33,11 +31,7 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _statusText, value);
         }
 
-        // =========================
-        // 2) PROPIEDADES DE FILTRO (bind con controles)
-        // =========================
-
-        private string _type = ""; // "" significa "cualquiera"
+        private string _type = "";
         public string Type
         {
             get => _type;
@@ -51,8 +45,6 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _onlyAvailable, value);
         }
 
-        // Para inputs de UI, muchas veces es más fácil guardar como string
-        // y luego parsear, así no petas si el usuario escribe letras.
         private string _guestsText = "";
         public string GuestsText
         {
@@ -116,18 +108,11 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _sortOrder, value);
         }
 
-        // =========================
-        // 3) COMMANDS (botones)
-        // =========================
-
         public AsyncRelayCommand SearchCommand { get; }
         public AsyncRelayCommand RefreshCommand { get; }
         public RelayCommand ClearFiltersCommand { get; }
-        public RelayCommand OpenCreateRoomCommand { get; }
-        public RelayCommand OpenUpdateRoomCommand { get; }
         public RelayCommand DeleteRoomCommand { get; }
 
-        // si tu UI permite seleccionar una habitación:
         private RoomModel? _selectedRoom;
         public RoomModel? SelectedRoom
         {
@@ -135,200 +120,35 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _selectedRoom, value);
         }
 
-
-
-        // Guardamos el último filtro real usado para "Refrescar"
         private RoomsFilter _lastFilter = new RoomsFilter();
 
-        // =========================
-        // 4) CONSTRUCTOR
-        // =========================
+        public ICommand GoCreateRoomCommand { get; }
+        public ICommand GoUpdateRoomCommand { get; }
+        public ICommand BackToRoomsCommand { get; }
 
         public RoomViewModel()
         {
-            // Conectamos botones con métodos
             SearchCommand = new AsyncRelayCommand(SearchAsync);
             RefreshCommand = new AsyncRelayCommand(RefreshAsync);
-            ClearFiltersCommand = new RelayCommand(
-                _ => ClearFilters(),
-                _ => true // aquí tu condición
-            );
+            DeleteRoomCommand = new RelayCommand(async param => await DeleteRoomAsync(param as RoomModel));
             ClearFiltersCommand = new RelayCommand(_ => ClearFilters());
-            OpenCreateRoomCommand = new RelayCommand(_ => OpenCreateRoom());
-            OpenUpdateRoomCommand = new RelayCommand(param => OpenUpdateRoom(param as RoomModel));
-            DeleteRoomCommand = new RelayCommand(param => DeleteRoom(param as RoomModel));
+
+            GoCreateRoomCommand = new RelayCommand(_ =>
+                NavigationService.Instance.NavigateTo<CreateRoomWindow>());
+
+            GoUpdateRoomCommand = new RelayCommand(param =>
+            {
+                if (param is not RoomModel room) return;
+                NavigationService.Instance.NavigateTo(() => new UpdateRoomWindow(room));
+            });
+
+            BackToRoomsCommand = new RelayCommand(_ =>
+                NavigationService.Instance.NavigateTo<RoomView>());
 
             _ = LoadInitialAsync();
-
-
-            // Carga inicial (equivalente a Loaded en code-behind)
-            _ = LoadInitialAsync();
         }
 
-        private async Task LoadInitialAsync()
-        {
-            // Empezamos sin filtros
-            _lastFilter = new RoomsFilter();
-            await LoadRoomsAsync(_lastFilter);
-        }
-
-        // =========================
-        // 5) LÓGICA PRINCIPAL
-        // =========================
-
-        private async Task SearchAsync()
-        {
-            // 1) Construimos un RoomsFilter real desde propiedades del VM
-            var filter = BuildFilterFromUi();
-
-            // 2) Guardamos como último filtro para refrescar
-            _lastFilter = filter;
-
-            // 3) Cargamos desde API
-            await LoadRoomsAsync(filter);
-        }
-
-        private async Task RefreshAsync()
-        {
-            // Refresca usando el último filtro aplicado
-            await LoadRoomsAsync(_lastFilter);
-        }
-
-        private void ClearFilters()
-        {
-            // Reseteamos propiedades (el UI se actualiza solo)
-            Type = "";
-            OnlyAvailable = false;
-            GuestsText = "";
-            MinPriceText = "";
-            MaxPriceText = "";
-            HasExtraBed = false;
-            HasCrib = false;
-            HasOffer = false;
-            ExtrasText = "";
-            SortBy = "roomNumber";
-            SortOrder = "asc";
-
-            // Y el último filtro vuelve a ser vacío
-            _lastFilter = new RoomsFilter();
-        }
-
-        // Carga desde API y actualiza el DataGrid
-        private async Task LoadRoomsAsync(RoomsFilter filter)
-        {
-            StatusText = "Cargando habitaciones...";
-
-            var response = await RoomService.GetRoomsFilteredAsync(filter);
-
-            if (response == null)
-            {
-                StatusText = "Error conectando con la API.";
-                MessageBox.Show("No se pudo conectar con la API.");
-                return;
-            }
-
-            // Convertimos la lista en ObservableCollection (o actualizamos Rooms)
-            Rooms = new ObservableCollection<RoomModel>(response.Items);
-
-            StatusText = $"Resultados: {Rooms.Count}";
-        }
-
-        // Construye el filtro EXACTO que tu backend entiende
-        private RoomsFilter BuildFilterFromUi()
-        {
-            var f = new RoomsFilter();
-
-            // type (si está vacío => no filtramos)
-            if (!string.IsNullOrWhiteSpace(Type))
-                f.Type = Type;
-
-            // available
-            if (OnlyAvailable)
-                f.IsAvailable = true;
-
-            // guests
-            if (!string.IsNullOrWhiteSpace(GuestsText))
-            {
-                if (int.TryParse(GuestsText, out var g) && g > 0)
-                    f.Guests = g;
-                else
-                    throw new Exception("Guests debe ser un entero válido.");
-            }
-
-            // prices (aceptamos coma o punto según cultura)
-            if (!string.IsNullOrWhiteSpace(MinPriceText))
-            {
-                if (decimal.TryParse(MinPriceText, NumberStyles.Number, CultureInfo.CurrentCulture, out var min))
-                    f.MinPrice = min;
-                else
-                    throw new Exception("MinPrice no es válido.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(MaxPriceText))
-            {
-                if (decimal.TryParse(MaxPriceText, NumberStyles.Number, CultureInfo.CurrentCulture, out var max))
-                    f.MaxPrice = max;
-                else
-                    throw new Exception("MaxPrice no es válido.");
-            }
-
-            // flags: si están marcadas, filtramos true
-            if (HasExtraBed) f.HasExtraBed = true;
-            if (HasCrib) f.HasCrib = true;
-            if (HasOffer) f.HasOffer = true;
-
-            // extras: "wifi,parking"
-            if (!string.IsNullOrWhiteSpace(ExtrasText))
-            {
-                var extras = ExtrasText
-                    .Split(',')
-                    .Select(x => x.Trim())
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .ToList();
-
-                if (extras.Count > 0)
-                    f.Extras = extras;
-            }
-
-            // sort
-            if (!string.IsNullOrWhiteSpace(SortBy))
-                f.SortBy = SortBy;
-
-            if (!string.IsNullOrWhiteSpace(SortOrder))
-                f.SortOrder = SortOrder;
-
-            return f;
-        }
-        private void OpenCreateRoom()
-        {
-            var win = new desktop_app.Views.CreateRoomWindow
-            {
-                Owner = Application.Current.MainWindow
-            };
-
-            var ok = win.ShowDialog();
-            if (ok == true)
-                _ = RefreshAsync(); // recarga con el último filtro
-        }
-
-        private void OpenUpdateRoom(RoomModel? room)
-        {
-            if (room == null) return;
-
-            // Si quieres asegurarte de tener la última versión desde API:
-            // (opcional) podrías llamar GetRoomByIdAsync aquí y abrir con esa respuesta.
-
-            var win = new desktop_app.Views.UpdateRoomWindow(room)
-            {
-                Owner = Application.Current.MainWindow
-            };
-
-            var ok = win.ShowDialog();
-            if (ok == true)
-                _ = RefreshAsync();
-        }
-
-        private async void DeleteRoom(RoomModel? room)
+        private async Task DeleteRoomAsync(RoomModel? room)
         {
             if (room == null) return;
 
@@ -353,27 +173,134 @@ namespace desktop_app.ViewModels
             StatusText = $"Resultados: {Rooms.Count}";
         }
 
+        private async Task LoadInitialAsync()
+        {
+            _lastFilter = new RoomsFilter();
+            await LoadRoomsAsync(_lastFilter);
+        }
 
+        private async Task SearchAsync()
+        {
+            try
+            {
+                var filter = BuildFilterFromUi();
+                _lastFilter = filter;
+                await LoadRoomsAsync(filter);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task RefreshAsync()
+        {
+            await LoadRoomsAsync(_lastFilter);
+        }
+
+        private void ClearFilters()
+        {
+            Type = "";
+            OnlyAvailable = false;
+            GuestsText = "";
+            MinPriceText = "";
+            MaxPriceText = "";
+            HasExtraBed = false;
+            HasCrib = false;
+            HasOffer = false;
+            ExtrasText = "";
+            SortBy = "roomNumber";
+            SortOrder = "asc";
+
+            _lastFilter = new RoomsFilter();
+        }
+
+        private async Task LoadRoomsAsync(RoomsFilter filter)
+        {
+            StatusText = "Cargando habitaciones...";
+
+            var response = await RoomService.GetRoomsFilteredAsync(filter);
+
+            if (response == null)
+            {
+                StatusText = "Error conectando con la API.";
+                MessageBox.Show("No se pudo conectar con la API.");
+                return;
+            }
+
+            Rooms = new ObservableCollection<RoomModel>(response.Items);
+            StatusText = $"Resultados: {Rooms.Count}";
+        }
+
+        private RoomsFilter BuildFilterFromUi()
+        {
+            var f = new RoomsFilter();
+
+            if (!string.IsNullOrWhiteSpace(Type))
+                f.Type = Type;
+
+            if (OnlyAvailable)
+                f.IsAvailable = true;
+
+            if (!string.IsNullOrWhiteSpace(GuestsText))
+            {
+                if (int.TryParse(GuestsText, out var g) && g > 0)
+                    f.Guests = g;
+                else
+                    throw new Exception("Guests debe ser un entero válido.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(MinPriceText))
+            {
+                if (decimal.TryParse(MinPriceText, NumberStyles.Number, CultureInfo.CurrentCulture, out var min))
+                    f.MinPrice = min;
+                else
+                    throw new Exception("MinPrice no es válido.");
+            }
+
+            if (!string.IsNullOrWhiteSpace(MaxPriceText))
+            {
+                if (decimal.TryParse(MaxPriceText, NumberStyles.Number, CultureInfo.CurrentCulture, out var max))
+                    f.MaxPrice = max;
+                else
+                    throw new Exception("MaxPrice no es válido.");
+            }
+
+            if (HasExtraBed) f.HasExtraBed = true;
+            if (HasCrib) f.HasCrib = true;
+            if (HasOffer) f.HasOffer = true;
+
+            if (!string.IsNullOrWhiteSpace(ExtrasText))
+            {
+                var extras = ExtrasText
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
+
+                if (extras.Count > 0)
+                    f.Extras = extras;
+            }
+
+            if (!string.IsNullOrWhiteSpace(SortBy))
+                f.SortBy = SortBy;
+
+            if (!string.IsNullOrWhiteSpace(SortOrder))
+                f.SortOrder = SortOrder;
+
+            return f;
+        }
     }
 
     public class CreateRoomViewModel : ViewModelBase
     {
-        // Para cerrar la ventana desde el VM (sin code-behind “de lógica”)
-        public event Action<bool>? RequestClose;
-
-        private RoomModel _room = new RoomModel
-        {
-            IsAvailable = true,
-            Rate = 0
-        };
-
+        private RoomModel _room = new() { IsAvailable = true, Rate = 0 };
         public RoomModel Room
         {
             get => _room;
             set => SetProperty(ref _room, value);
         }
 
-        // Extras en UI como texto (csv)
         private string _extrasText = "";
         public string ExtrasText
         {
@@ -391,50 +318,138 @@ namespace desktop_app.ViewModels
         public AsyncRelayCommand SaveCommand { get; }
         public RelayCommand CancelCommand { get; }
 
+        // Subida de fotos (paths locales)
+        private string? _mainImageLocalPath;
+        private List<string> _extraImagesLocalPaths = new();
+
+        public RelayCommand PickMainImageLocalCommand { get; }
+        public RelayCommand PickExtraImagesLocalCommand { get; }
+
+        private string _mainImageLabel = "Sin seleccionar";
+        public string MainImageLabel
+        {
+            get => _mainImageLabel;
+            set => SetProperty(ref _mainImageLabel, value);
+        }
+
+        private string _extraImagesLabel = "0 seleccionadas";
+        public string ExtraImagesLabel
+        {
+            get => _extraImagesLabel;
+            set => SetProperty(ref _extraImagesLabel, value);
+        }
+
         public CreateRoomViewModel()
         {
             SaveCommand = new AsyncRelayCommand(SaveAsync);
-            CancelCommand = new RelayCommand(_ => RequestClose?.Invoke(false));
+            CancelCommand = new RelayCommand(_ => NavigationService.Instance.NavigateTo<RoomView>());
+
+            PickMainImageLocalCommand = new RelayCommand(_ => PickMainImageLocal());
+            PickExtraImagesLocalCommand = new RelayCommand(_ => PickExtraImagesLocal());
+        }
+
+        private void PickMainImageLocal()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp;*.gif",
+                Multiselect = false
+            };
+
+            if (dlg.ShowDialog() != true) return;
+
+            _mainImageLocalPath = dlg.FileName;
+            MainImageLabel = Path.GetFileName(_mainImageLocalPath);
+        }
+
+        private void PickExtraImagesLocal()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp;*.gif",
+                Multiselect = true
+            };
+
+            if (dlg.ShowDialog() != true) return;
+
+            _extraImagesLocalPaths = dlg.FileNames.ToList();
+
+            ExtraImagesLabel = $"{_extraImagesLocalPaths.Count} seleccionadas";
+            ExtraImagesText = string.Join(", ", _extraImagesLocalPaths.Select(Path.GetFileName));
         }
 
         private async Task SaveAsync()
         {
-            // validación mínima
-            if (string.IsNullOrWhiteSpace(Room.RoomNumber))
-                throw new Exception("RoomNumber es obligatorio.");
+            try
+            {
+                // Validaciones básicas
+                if (string.IsNullOrWhiteSpace(Room.RoomNumber))
+                    throw new Exception("RoomNumber es obligatorio.");
 
-            if (string.IsNullOrWhiteSpace(Room.Type))
-                throw new Exception("Type es obligatorio.");
+                if (string.IsNullOrWhiteSpace(Room.Type))
+                    throw new Exception("Type es obligatorio.");
 
-            if (Room.MaxGuests <= 0)
-                throw new Exception("MaxGuests debe ser mayor que 0.");
+                if (Room.MaxGuests <= 0)
+                    throw new Exception("MaxGuests debe ser mayor que 0.");
 
-            // parse extras csv
-            Room.Extras = (ExtrasText ?? "")
-                .Split(',')
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
+                // Extras (csv -> list)
+                Room.Extras = (ExtrasText ?? "")
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
 
-            Room.ExtraImages = (ExtraImagesText ?? "")
-                .Split(',')
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
+                // 1) Subir MainImage si se seleccionó
+                if (!string.IsNullOrWhiteSpace(_mainImageLocalPath))
+                {
+                    var uploadedMain = await ImageService.UploadSingleAsync(_mainImageLocalPath);
+                    if (uploadedMain == null)
+                        throw new Exception("No se pudo subir la imagen principal.");
 
-            var created = await RoomService.CreateRoomAsync(Room);
-            if (created == null)
-                throw new Exception("No se pudo crear la habitación (API).");
+                    Room.MainImage = uploadedMain.Url; // "/uploads/xxx.jpg"
+                }
 
-            RequestClose?.Invoke(true);
+                // 2) Subir ExtraImages si hay seleccionadas
+                if (_extraImagesLocalPaths != null && _extraImagesLocalPaths.Count > 0)
+                {
+                    var uploadedExtras = await ImageService.UploadManyAsync(_extraImagesLocalPaths);
+                    if (uploadedExtras == null)
+                        throw new Exception("No se pudieron subir las imágenes extra.");
+
+                    Room.ExtraImages = uploadedExtras.Select(x => x.Url).ToList();
+                    ExtraImagesText = string.Join(", ", Room.ExtraImages);
+                    ExtraImagesLabel = $"{Room.ExtraImages.Count} seleccionadas";
+                }
+                else
+                {
+                    Room.ExtraImages = new List<string>();
+                    ExtraImagesText = "";
+                    ExtraImagesLabel = "0 seleccionadas";
+                }
+
+                // 3) Crear habitación (usa el CreateRoomAsync que lanza excepción si falla)
+                var created = await RoomService.CreateRoomAsync(Room);
+
+                // 4) Navegar al final
+                NavigationService.Instance.NavigateTo<RoomView>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 
     public class UpdateRoomViewModel : ViewModelBase
     {
-        public event Action<bool>? RequestClose;
-
         private RoomModel _room;
+        public class RoomImageItem
+        {
+            public string Url { get; set; } = "";          // "/uploads/xxx.jpg"
+            public string AbsoluteUrl { get; set; } = "";  // "http://localhost:3000/uploads/xxx.jpg"
+            public bool IsMain { get; set; }               // para badge Principal
+        }
+
         public RoomModel Room
         {
             get => _room;
@@ -458,48 +473,204 @@ namespace desktop_app.ViewModels
         public AsyncRelayCommand SaveCommand { get; }
         public RelayCommand CancelCommand { get; }
 
+        // imágenes
+        private string? _mainImageLocalPath;
+        private List<string> _extraImagesLocalPaths = new();
+
+        public RelayCommand PickMainImageLocalCommand { get; }
+        public RelayCommand PickExtraImagesLocalCommand { get; }
+
+        private string _mainImageLabel = "Sin seleccionar";
+        public string MainImageLabel
+        {
+            get => _mainImageLabel;
+            set => SetProperty(ref _mainImageLabel, value);
+        }
+
+        private string _extraImagesLabel = "0 seleccionadas";
+        public string ExtraImagesLabel
+        {
+            get => _extraImagesLabel;
+            set => SetProperty(ref _extraImagesLabel, value);
+        }
+
+
+        public ObservableCollection<RoomImageItem> ExistingImages { get; } = new();
+
+        public ICommand DeleteImageCommand { get; }
+
         public UpdateRoomViewModel(RoomModel room)
         {
-            Room = room;
+            _room = room;
 
             ExtrasText = string.Join(", ", room.Extras ?? new());
             ExtraImagesText = string.Join(", ", room.ExtraImages ?? new());
 
             SaveCommand = new AsyncRelayCommand(SaveAsync);
-            CancelCommand = new RelayCommand(_ => RequestClose?.Invoke(false));
+            CancelCommand = new RelayCommand(_ => NavigationService.Instance.NavigateTo<RoomView>());
+
+            PickMainImageLocalCommand = new RelayCommand(_ => PickMainImageLocal());
+            PickExtraImagesLocalCommand = new RelayCommand(_ => PickExtraImagesLocal());
+
+            DeleteImageCommand = new RelayCommand(
+                async (p) => await DeleteImageAsync(p),
+                (p) => p is RoomImageItem it && !string.IsNullOrWhiteSpace(it.Url)
+            );
+
+            
+            RefreshExistingImages();
+        }
+        // Llamar cuando cargas la habitación
+        public void RefreshExistingImages()
+        {
+            ExistingImages.Clear();
+
+            // Principal
+            if (!string.IsNullOrWhiteSpace(Room.MainImage))
+            {
+                ExistingImages.Add(new RoomImageItem
+                {
+                    Url = Room.MainImage,
+                    AbsoluteUrl = ImageService.ToAbsoluteUrl(Room.MainImage),
+                    IsMain = true
+                });
+            }
+
+            // Extras
+            if (Room.ExtraImages != null)
+            {
+                foreach (var u in Room.ExtraImages.Where(x => !string.IsNullOrWhiteSpace(x)))
+                {
+                    ExistingImages.Add(new RoomImageItem
+                    {
+                        Url = u,
+                        AbsoluteUrl = ImageService.ToAbsoluteUrl(u),
+                        IsMain = false
+                    });
+                }
+            }
+
+            OnPropertyChanged(nameof(ExistingImages));
+        }
+
+        private async Task DeleteImageAsync(object p)
+        {
+            if (p is not RoomImageItem img) return;
+
+            var confirm = MessageBox.Show(
+                "¿Seguro que quieres borrar esta imagen?\n\nSe eliminará del servidor y se quitará de la habitación.",
+                "Confirmar borrado",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (confirm != MessageBoxResult.Yes)
+                return;
+
+         
+            var ok = await ImageService.DeleteImageAsync(img.Url);
+            if (!ok)
+            {
+                MessageBox.Show("No se pudo borrar la imagen en el servidor.", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+     
+            ExistingImages.Remove(img);
+
+       
+            if (img.IsMain)
+            {
+                Room.MainImage = null;         
+                MainImageLabel = "Sin seleccionar";
+            }
+            else
+            {
+             
+                Room.ExtraImages.Remove(img.Url);
+
+        
+                ExtraImagesLabel = $"{Room.ExtraImages.Count} seleccionadas";
+                ExtraImagesText = string.Join(", ", Room.ExtraImages);
+            }
+
+            OnPropertyChanged(nameof(Room));
+
+         
+        }
+
+
+
+
+        private void PickMainImageLocal()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp;*.gif",
+                Multiselect = false
+            };
+
+            if (dlg.ShowDialog() != true) return;
+
+            _mainImageLocalPath = dlg.FileName;
+            MainImageLabel = Path.GetFileName(_mainImageLocalPath);
+        }
+
+        private void PickExtraImagesLocal()
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Imágenes|*.jpg;*.jpeg;*.png;*.webp;*.gif",
+                Multiselect = true
+            };
+
+            if (dlg.ShowDialog() != true) return;
+
+            _extraImagesLocalPaths = dlg.FileNames.ToList();
+            ExtraImagesLabel = $"{_extraImagesLocalPaths.Count} seleccionadas";
         }
 
         private async Task SaveAsync()
         {
-            if (string.IsNullOrWhiteSpace(Room.Id))
-                throw new Exception("No hay Id de habitación.");
+            try
+            {
+                // (Opcional) actualizar extras desde csv
+                Room.Extras = (ExtrasText ?? "")
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .ToList();
 
-            if (string.IsNullOrWhiteSpace(Room.RoomNumber))
-                throw new Exception("RoomNumber es obligatorio.");
+                // Main image
+                if (!string.IsNullOrWhiteSpace(_mainImageLocalPath))
+                {
+                    var up = await ImageService.UploadSingleAsync(_mainImageLocalPath);
+                    if (up == null) throw new Exception("No se pudo subir la imagen principal.");
+                    Room.MainImage = up.Url;
+                }
 
-            if (string.IsNullOrWhiteSpace(Room.Type))
-                throw new Exception("Type es obligatorio.");
+                // Extra images
+                if (_extraImagesLocalPaths.Count > 0)
+                {
+                    var ups = await ImageService.UploadManyAsync(_extraImagesLocalPaths);
+                    if (ups == null) throw new Exception("No se pudieron subir las imágenes extra.");
 
-            if (Room.MaxGuests <= 0)
-                throw new Exception("MaxGuests debe ser mayor que 0.");
+                    Room.ExtraImages ??= new List<string>();
+                    Room.ExtraImages.AddRange(ups.Select(x => x.Url));
 
-            Room.Extras = (ExtrasText ?? "")
-                .Split(',')
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
+                    ExtraImagesText = string.Join(", ", Room.ExtraImages);
+                }
 
-            Room.ExtraImages = (ExtraImagesText ?? "")
-                .Split(',')
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .ToList();
 
-            var ok = await RoomService.UpdateRoomAsync(Room.Id, Room);
-            if (!ok)
-                throw new Exception("No se pudo actualizar la habitación (API).");
+                var ok = await RoomService.UpdateRoomAsync(Room.Id, Room);
+                if (!ok) throw new Exception("No se pudo actualizar la habitación (API).");
 
-            RequestClose?.Invoke(true);
+                NavigationService.Instance.NavigateTo<RoomView>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

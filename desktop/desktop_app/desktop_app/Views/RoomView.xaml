@@ -41,13 +41,13 @@
 
                             <!-- Botón crear (pequeño, como en la foto) -->
                             <Button DockPanel.Dock="Right"
-                                    Content="Crear habitación"
+                                    Content=" + Crear habitación"
                                     Style="{StaticResource CreateButton}"
                                     Height="34"
                                     Padding="14,0"
                                     FontSize="13"
                                     Margin="0,0,0,2" Width="150" HorizontalAlignment="Right"
-                                     Command="{Binding OpenCreateRoomCommand}"/>
+                                     Command="{Binding GoCreateRoomCommand}"/>
                         </DockPanel>
 
                         <!-- Card blanca de filtros -->
@@ -100,10 +100,10 @@
                                                   SelectedValue="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
                                                   SelectedValuePath="Content">
                                             <ComboBoxItem Content="Todos"/>
-                                            <ComboBoxItem Content="Individual"/>
-                                            <ComboBoxItem Content="Doble"/>
-                                            <ComboBoxItem Content="Suite"/>
-                                            <ComboBoxItem Content="Familiar"/>
+                                            <ComboBoxItem Content="single"/>
+                                            <ComboBoxItem Content="double"/>
+                                            <ComboBoxItem Content="suite"/>
+                                            <ComboBoxItem Content="family"/>
                                         </ComboBox>
                                     </StackPanel>
 
@@ -212,7 +212,7 @@
                             <ItemsPanelTemplate>
                                 <WrapPanel Orientation="Horizontal"
                                            ItemWidth="320"
-                                           ItemHeight="320"/>
+                                           />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>

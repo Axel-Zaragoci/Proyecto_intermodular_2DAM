@@ -18,25 +18,14 @@ namespace desktop_app.Views
     /// <summary>
     /// Lógica de interacción para CreateRoomWindow.xaml
     /// </summary>
-    public partial class CreateRoomWindow : Window
+    public partial class CreateRoomWindow : UserControl
     {
         public CreateRoomWindow()
         {
             InitializeComponent();
-
             var vm = new CreateRoomViewModel();
-            vm.RequestClose += ok =>
-            {
-                DialogResult = ok;
-                Close();
-            };
-
             DataContext = vm;
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
     }
 }
