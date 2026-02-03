@@ -1,3 +1,4 @@
+
 import { roomDatabaseModel, RoomEntryData } from "./roomsModel.js";
 
 /**
@@ -218,38 +219,27 @@ export const deleteRoom = async (req, res) => {
 };
 
 /**
- * Obtiene el listado de rooms con filtros por query params.
- *
- * @function getRoomsFiltered
- * @param {import('express').Request} req - Petición HTTP.
- * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
- * @param {string} [req.query.name] - Filtro por nombre de la room.
- * @param {string} [req.query.type] - Filtro por tipo de room.
- * @param {string} [req.query.page] - Número de página para paginación.
- * @param {string} [req.query.limit] - Límite de resultados por página.
- * @param {import('express').Response} res - Respuesta HTTP.
- * @param {import('express').NextFunction} next - Siguiente middleware.
- * @returns {Promise<void>} No devuelve nada directamente, responde vía `res`.
- *//**
-* Obtiene el listado de rooms con filtros por query params (SIN PAGINACIÓN).
-*
-* @function getRoomsFiltered
-* @param {import('express').Request} req - Petición HTTP.
-* @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
-* @param {string} [req.query.type] - Filtro por tipo de room.
-* @param {string} [req.query.isAvailable] - Filtro por disponibilidad ("true"/"false").
-* @param {string} [req.query.minPrice] - Precio mínimo.
-* @param {string} [req.query.maxPrice] - Precio máximo.
-* @param {string} [req.query.guests] - Número mínimo de huéspedes.
-* @param {string} [req.query.hasExtraBed] - "true"/"false".
-* @param {string} [req.query.hasCrib] - "true"/"false".
-* @param {string} [req.query.hasOffer] - "true"/"false".
-* @param {string} [req.query.extras] - Lista separada por comas, ej: "wifi,tv".
-* @param {string} [req.query.sortBy] - Campo de orden.
-* @param {string} [req.query.sortOrder] - "asc" o "desc".
-* @param {import('express').Response} res - Respuesta HTTP.
-* @returns {Promise<void>} Responde vía `res`.
-*/
+ * @typedef {Object} RoomsQuery
+ * @property {string} [type]
+ * @property {string} [isAvailable]
+ * @property {string} [minPrice]
+ * @property {string} [maxPrice]
+ * @property {string} [guests]
+ * @property {string} [hasExtraBed]
+ * @property {string} [hasCrib]
+ * @property {string} [hasOffer]
+ * @property {string} [extras]
+ * @property {string} [sortBy]
+ * @property {string} [sortOrder]
+ * @property {string} [roomNumber]
+ */
+
+/**
+ * Obtiene el listado de rooms con filtros por query params (SIN PAGINACIÓN).
+ * @param {import("express").Request<{}, {}, {}, RoomsQuery>} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>}
+ */
 export const getRoomsFiltered = async (req, res) => {
   try {
     const {
@@ -323,26 +313,29 @@ export const getRoomsFiltered = async (req, res) => {
     }
 
     // sorting
-    const allowedSort = new Set([
-      "pricePerNight",
-      "rate",
-      "roomNumber",
-      "type",
-      "maxGuests",
-    ]);
-    const sortField = allowedSort.has(sortBy) ? sortBy : "roomNumber";
-    const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
-    const sort = { [sortField]: sortDir };
+const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
 
-    const items = await roomDatabaseModel.find(filter).sort(sort);
+/** @type {string} */
+const sortByStr = String(sortBy ?? "");
 
-    return res.status(200).json({
-      items,
-      appliedFilter: filter,
-      sort,
-    });
+/** @type {keyof any} */
+const sortField = allowedSort.has(sortByStr) ? sortByStr : "roomNumber";
+
+/** @type {1 | -1} */
+const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+
+/** @type {Record<string, 1 | -1>} */
+const sort = { [sortField]: sortDir };
+
+const items = await roomDatabaseModel.find(filter).sort(sort);
+
+
+res.status(200).json({ items, appliedFilter: filter, sort });
+return;
+
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+     res.status(400).json({ message: err.message });
+     return;
   }
 };
 
