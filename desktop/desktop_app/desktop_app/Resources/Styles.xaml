@@ -269,7 +269,7 @@
         <Setter Property="BorderBrush" Value="#dc3545"/>
         <Setter Property="Padding" Value="12 6"/>
         <Setter Property="FontSize" Value="20"/>
-        <Setter Property="FontWeight" Value="400"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontFamily" Value="/Resources/#Material Icons Outlined"/>
         
         <Setter Property="Template">
@@ -301,6 +301,41 @@
                 <Setter Property="Background" Value="#dc3545"/>
                 <Setter Property="BorderBrush" Value="#dc3545"/>
                 <Setter Property="Opacity" Value=".65"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DeleteOverlayBtn" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Background" Value="Red"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontFamily" Value="/Resources/#Material Icons Outlined"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#cc0000"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#990000"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -822,7 +857,7 @@
                         <Border CornerRadius="12">
                             <Border.Background>
                                 <ImageBrush ImageSource="{Binding MainImageAbs}"
-                            Stretch="UniformToFill"/>
+                                        Stretch="Fill"/>
                             </Border.Background>
                         </Border>
 
@@ -851,56 +886,54 @@
 
 
 
-                <!-- ===== Cabecera: Habitación + Badge ===== -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock FontSize="20"
+                <!-- ===== Cabecera: Habitación ===== -->
+                <TextBlock Grid.Row="1"
+                           FontSize="20"
                            FontWeight="Bold"
                            Text="{Binding RoomNumber, StringFormat=Habitación {0}}"/>
 
-                        <Border Grid.Column="1"
-                        CornerRadius="999"
-                        Padding="12,6"
-                        VerticalAlignment="Top"
-                        Margin="12,0,0,0">
+                <!-- ===== Tipo + Badge Disponibilidad ===== -->
+                <Grid Grid.Row="2" Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#1E5C8A"/>
+                    <TextBlock Foreground="#6B7280"
+                               Text="{Binding Type}"
+                               VerticalAlignment="Center"/>
+
+                    <Border Grid.Column="1"
+                            CornerRadius="999"
+                            Padding="10,4"
+                            VerticalAlignment="Center">
+
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#10B981"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                        <Setter Property="Background" Value="#EF4444"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <TextBlock FontWeight="SemiBold" FontSize="10">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Text" Value="Disponible"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                            <Setter Property="Background" Value="#E5E7EB"/>
+                                            <Setter Property="Text" Value="No disponible"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Border.Style>
-
-                            <TextBlock FontWeight="SemiBold" FontSize="12">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="Text" Value="Disponible"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsAvailable}" Value="False">
-                                                <Setter Property="Foreground" Value="#111827"/>
-                                                <Setter Property="Text" Value="No disponible"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Border>
-                    </Grid>
-
-                <!-- ===== Tipo ===== -->
-                <TextBlock Grid.Row="2"
-                       Margin="0,6,0,0"
-                       Foreground="#6B7280"
-                       Text="{Binding Type}"/>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </Grid>
 
                 <!-- ===== Separador 1 ===== -->
                 <Separator Grid.Row="3"

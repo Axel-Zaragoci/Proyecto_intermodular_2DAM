@@ -11,5 +11,11 @@ namespace desktop_app.Views
             InitializeComponent();
             DataContext = new UpdateRoomViewModel(room);
         }
+
+        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // Forzar el foco al título para que el ScrollViewer empiece arriba
+            HeaderMain.Focus();
+        }
     }
 }
