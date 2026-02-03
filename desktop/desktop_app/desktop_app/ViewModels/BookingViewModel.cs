@@ -83,7 +83,8 @@ namespace desktop_app.ViewModels
                     UserModel u = await UserService.GetClientByIdAsync(booking.Client);
                     booking.ClientDni = u.Dni;
                     booking.ClientName = u.FirstName + " " + u.LastName;
-                    booking.RoomNumber = await RoomService.GetRoomNumberByIdAsync(booking.Room);
+                    RoomModel? room = await RoomService.GetRoomByIdAsync(booking.Room);
+                    booking.RoomNumber = room != null ? room.RoomNumber : "Error";
                     Bookings.Add(booking);
                 }
             }
