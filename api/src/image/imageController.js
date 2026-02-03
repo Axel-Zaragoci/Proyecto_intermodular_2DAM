@@ -1,7 +1,11 @@
 import fs from "fs/promises";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const UPLOAD_DIR = path.join(__dirname, "../../uploads");
 
 export const uploadPhoto = (req, res) => {
   if (!req.file) {
@@ -54,7 +58,7 @@ export const deletePhoto = async (req, res) => {
     // Borra
     await fs.unlink(filePath);
 
-    return res.json({ ok: true, deleted: `/uploads/${safeName}` });
+    return res.json({ ok: true, deleted: `api/uploads/${safeName}` });
   } catch (err) {
     // Si no existe
     if (err?.code === "ENOENT") {

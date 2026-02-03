@@ -1,5 +1,7 @@
 import express from "express";
 import connectDB from "./config/db.js";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
@@ -24,7 +26,12 @@ app.use(morgan("dev"));
 
 
 
-app.use("/uploads", express.static("uploads"));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const UPLOADS_DIR = path.join(__dirname, "../uploads");
+
+app.use("/uploads", express.static(UPLOADS_DIR));
 
 app.use("/booking", bookingRouter);
 app.use("/room", roomsRouter);

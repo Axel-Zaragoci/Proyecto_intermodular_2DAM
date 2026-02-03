@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Json; // UrlEncode
 using System.Text;
 using System.Text.Json;
+using System.Windows;
 
 namespace desktop_app.Services
 {
@@ -108,7 +109,11 @@ namespace desktop_app.Services
         }
 
         private static readonly JsonSerializerOptions _jsonOptions =
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
 
         public static async Task<RoomModel?> GetRoomByIdAsync(string roomId)
         {
@@ -164,7 +169,6 @@ namespace desktop_app.Services
                 var url = ApiService.BaseUrl + $"room/{Uri.EscapeDataString(roomId)}";
                 var json = JsonSerializer.Serialize(room, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-
                 var req = new HttpRequestMessage(new HttpMethod("PATCH"), url)
                 {
                     Content = content

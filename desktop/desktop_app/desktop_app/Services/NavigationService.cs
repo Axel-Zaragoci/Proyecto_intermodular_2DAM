@@ -30,6 +30,11 @@ namespace desktop_app.Services
         /// </summary>
         private List<UserControl> _stackViews = [new BookingView()];
 
+        /// <summary>
+        /// Acción que se ejecuta cuando se necesita resetear el scroll al inicio
+        /// La MainWindow se suscribirá a esta acción
+        /// </summary>
+        public Action? ScrollToTopRequested;
 
         /// <summary>
         /// Propiedad para obtener o modificar la vista actual
@@ -71,6 +76,7 @@ namespace desktop_app.Services
         {
             CurrentView = StackViews.Find(e => e is T) ?? new T();
             OnPropertyChanged(nameof(CurrentView));
+            ScrollToTopRequested?.Invoke();
         }
 
         /// <summary>
@@ -99,6 +105,7 @@ namespace desktop_app.Services
 
             CurrentView = view;
             OnPropertyChanged(nameof(CurrentView));
+            ScrollToTopRequested?.Invoke();
         }
 
     }
