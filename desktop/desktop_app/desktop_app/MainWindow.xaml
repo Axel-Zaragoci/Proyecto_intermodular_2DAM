@@ -44,7 +44,7 @@
             </Button>
         </StackPanel>
 
-        <ScrollViewer Grid.Column="1">
+        <ScrollViewer x:Name="MainScrollViewer" Grid.Column="1">
             <ContentControl Content="{Binding CurrentView, Source={x:Static services:NavigationService.Instance}}"/>
         </ScrollViewer>
     </Grid>
