@@ -1,24 +1,24 @@
 import express from "express";
-import connectDB from "./config/db.js";
+import dotenv from "dotenv";
+import cors from 'cors';
+import morgan from 'morgan';
+
 import path from "path";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
-import cors from "cors";
-import morgan from "morgan";
+import { connectEmail } from './lib/mail/mailing.js';
+import connectDB from './config/db.js';
 
 import bookingRouter from "./booking/bookingRouter.js";
 import roomsRouter from "./rooms/roomsRouter.js";
 import usersRouter from "./users/usersRouter.js";
 import authRouter from "./auth/authRouter.js";
-import photoRouter from "./image/imageRouter.js";
-
-console.clear();
+import photoRouter from "./lib/image/imageRouter.js";
 dotenv.config();
+connectDB()
+connectEmail();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.APP_PORT;
 const app = express();
-
-connectDB();
 
 app.use(cors());
 app.use(express.json());
