@@ -244,7 +244,14 @@ export async function cancelBooking(req, res) {
         if (!booking) return res.status(404).json({ error: 'No hay reserva con este ID' });
         if (booking.status != 'Abierta') return res.status(400).json({ error: 'La reserva no está abierta' })
 
-        const bookingUpdated = await bookingDatabaseModel.updateOne({_id: id}, {status: "Cancelada"});
+        booking.status = 'Cancelada';
+        const bookingUpdated = await booking.save();
+
+        
+        const populated = await bookingUpdated.poblar();
+        const user = await userDatabaseModel.findById(bookingUpdated.client);
+        sendEmail(user.email, "Reserva cancelada", "cancelBooking", populated)
+
         return res.status(200).json(bookingUpdated);
     }
     catch (error) {
