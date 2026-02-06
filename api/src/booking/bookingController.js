@@ -1,6 +1,8 @@
 import { bookingDatabaseModel, BookingEntryData } from "./bookingModel.js";
 import { roomDatabaseModel } from "../rooms/roomsModel.js"
 import mongoose from "mongoose";
+import { userDatabaseModel } from "../users/usersModel.js";
+import { sendEmail } from "../lib/mail/mailing.js";
 
 /**
  * Obtener una reserva específica a partir de su ID
@@ -198,7 +200,11 @@ export async function createBooking(req, res) {
         if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
         booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
         
+        const user = await userDatabaseModel.findById(booking.clientID);
+
         const bdBooking = await booking.save()
+        const populated = await bdBooking.poblar()
+        sendEmail(user.email, "Reserva confirmada", "newBooking", populated)
         return res.status(201).json(bdBooking)
     }
     catch (error) {

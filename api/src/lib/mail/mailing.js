@@ -26,6 +26,7 @@ async function getTemplateContent(template) {
 
 async function renderTemplate(template, data) {
     let templateContent = await getTemplateContent(template);
+    console.log(data)
     return Mustache.render(templateContent, data);
 }
 

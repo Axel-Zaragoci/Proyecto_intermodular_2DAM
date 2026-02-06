@@ -10,7 +10,7 @@ import bookingRouter from "./booking/bookingRouter.js";
 import roomsRouter from "./rooms/roomsRouter.js";
 import usersRouter from "./users/usersRouter.js";
 import authRouter from "./auth/authRouter.js";
-import photoRouter from "./image/imageRouter.js";
+import photoRouter from "./lib/image/imageRouter.js";
 dotenv.config();
 connectDB()
 connectEmail();

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { upload } from "../services/imageService.js";
+import { upload } from "../../services/imageService.js";
 import { uploadPhoto, uploadPhotos, deletePhoto, deletePhotos } from "./imageController.js";
 
 const router = Router();
