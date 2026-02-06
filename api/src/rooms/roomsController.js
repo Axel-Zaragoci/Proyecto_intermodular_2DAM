@@ -52,7 +52,7 @@ export const createRoom = async (req, res) => {
     const doc = entry.toDocument();
     const saved = await doc.save();
 
-    return res.status(201).json(saved);
+    return res.status(200).json(saved);
   } catch (err) {
     // Error de clave duplicada (por ejemplo roomNumber unique)
     if (err?.code === 11000) {
@@ -78,7 +78,7 @@ export const createRoom = async (req, res) => {
 export const getAllRooms = async (req, res) => {
   try {
     const rooms = await roomDatabaseModel.find();
-    return res.json(rooms);
+    return res.status(200).json(rooms);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -105,7 +105,7 @@ export const getRoomById = async (req, res) => {
     // Si no existe, 404
     if (!room) return res.status(404).json({ message: "no se encontro esa habitacion" });
 
-    return res.json(room);
+    return res.status(200).json(room);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -129,44 +129,58 @@ export const getRoomById = async (req, res) => {
  */
 export const updateRoom = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
+
+    const {
+      type,
+      roomNumber,
+      maxGuests,
+      description,
+      mainImage,
+      pricePerNight,
+      extraBed,
+      crib,
+      offer,
+      extras,
+      extraImages,
+    } = req.body;
 
     // Busca la room actual para usar valores por defecto si no vienen en el body
-    const room = await roomDatabaseModel.findById(id);
+    const room = await roomDatabaseModel.findById(roomID);
     if (!room) return res.status(404).json({ message: "Room no encontrada" });
 
     // Construye un objeto de entrada con fallback a valores actuales
     const data = new RoomEntryData(
-      req.body.type ?? room.type,
-      req.body.roomNumber ?? room.roomNumber,
-      req.body.maxGuests ?? room.maxGuests,
-      req.body.description ?? room.description,
-      req.body.mainImage ?? room.mainImage,
-      req.body.pricePerNight ?? room.pricePerNight
+      type ?? room.type,
+      roomNumber ?? room.roomNumber,
+      maxGuests ?? room.maxGuests,
+      description ?? room.description,
+      mainImage ?? room.mainImage,
+      pricePerNight ?? room.pricePerNight
     );
 
-    // Completa campos opcionales con fallback a valores actuales
+    // Completa campos opcionales con recuerdo a valores actuales
     data.completeRoomData(
-      req.body.extraBed ?? room.extraBed,
-      req.body.crib ?? room.crib,
-      req.body.offer ?? room.offer,
-      req.body.extras ?? room.extras,
-      req.body.extraImages ?? room.extraImages
+      extraBed ?? room.extraBed,
+      crib ?? room.crib,
+      offer ?? room.offer,
+      extras ?? room.extras,
+      extraImages ?? room.extraImages
     );
 
-    // Valida la entrada (si tu clase implementa validate)
+    // Valida el objeto antes de actualizar
     data.validate();
 
     // Actualiza en BD
     const updated = await roomDatabaseModel.findByIdAndUpdate(
-      id,
+      roomID,
       { $set: data },
       { new: true, runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: "Room no encontrada" });
 
-    return res.json(updated);
+    return res.status(200).json(updated);
   } catch (err) {
     // Duplicado por unique (si roomNumber cambia a uno existente)
     if (err?.code === 11000) {
@@ -190,14 +204,144 @@ export const updateRoom = async (req, res) => {
  */
 export const deleteRoom = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { roomID } = req.params;
 
-    const deleted = await roomDatabaseModel.findByIdAndDelete(id);
+    const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
 
     if (!deleted) return res.status(404).json({ message: "Room no encontrada" });
 
-    return res.json({ message: "Room eliminada", deleted });
+    return res.status(200).json({ message: "Room eliminada", deleted });
   } catch (err) {
     return res.status(400).json({ message: err.message });
   }
 };
+
+/**
+ * Obtiene el listado de rooms con filtros por query params.
+ *
+ * @function getRoomsFiltered
+ * @param {import('express').Request} req - Petición HTTP.
+ * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
+ * @param {string} [req.query.name] - Filtro por nombre de la room.
+ * @param {string} [req.query.type] - Filtro por tipo de room.
+ * @param {string} [req.query.page] - Número de página para paginación.
+ * @param {string} [req.query.limit] - Límite de resultados por página.
+ * @param {import('express').Response} res - Respuesta HTTP.
+ * @param {import('express').NextFunction} next - Siguiente middleware.
+ * @returns {Promise<void>} No devuelve nada directamente, responde vía `res`.
+ *//**
+ * Obtiene el listado de rooms con filtros por query params (SIN PAGINACIÓN).
+ *
+ * @function getRoomsFiltered
+ * @param {import('express').Request} req - Petición HTTP.
+ * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
+ * @param {string} [req.query.type] - Filtro por tipo de room.
+ * @param {string} [req.query.isAvailable] - Filtro por disponibilidad ("true"/"false").
+ * @param {string} [req.query.minPrice] - Precio mínimo.
+ * @param {string} [req.query.maxPrice] - Precio máximo.
+ * @param {string} [req.query.guests] - Número mínimo de huéspedes.
+ * @param {string} [req.query.hasExtraBed] - "true"/"false".
+ * @param {string} [req.query.hasCrib] - "true"/"false".
+ * @param {string} [req.query.hasOffer] - "true"/"false".
+ * @param {string} [req.query.extras] - Lista separada por comas, ej: "wifi,tv".
+ * @param {string} [req.query.sortBy] - Campo de orden.
+ * @param {string} [req.query.sortOrder] - "asc" o "desc".
+ * @param {import('express').Response} res - Respuesta HTTP.
+ * @returns {Promise<void>} Responde vía `res`.
+ */
+export const getRoomsFiltered = async (req, res) => {
+  try {
+    const {
+      type,
+      isAvailable,
+      minPrice,
+      maxPrice,
+      guests,
+      hasExtraBed,
+      hasCrib,
+      hasOffer,
+      extras,
+      sortBy,
+      sortOrder,
+      roomNumber,
+    } = req.query;
+
+    const filter = {};
+
+    if (type) filter.type = String(type);
+
+    if (isAvailable !== undefined) {
+      filter.isAvailable = String(isAvailable).toLowerCase() === "true";
+    }
+
+    const num = (v) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : undefined;
+    };
+
+    const min = num(minPrice);
+    const max = num(maxPrice);
+
+    if (min !== undefined || max !== undefined) {
+      filter.pricePerNight = {};
+      if (min !== undefined) filter.pricePerNight.$gte = min;
+      if (max !== undefined) filter.pricePerNight.$lte = max;
+    }
+
+    if (guests !== undefined) {
+      const g = Number(guests);
+      if (Number.isFinite(g)) filter.maxGuests = { $gte: g };
+    }
+
+    if (roomNumber !== undefined) {
+      const rn = Number(roomNumber);
+      if (Number.isFinite(rn)) filter.roomNumber = rn;
+    }
+
+    if (extras) {
+      const extrasArr = String(extras)
+        .split(",")
+        .map((e) => e.trim())
+        .filter(Boolean);
+
+      if (extrasArr.length) {
+        filter.extras = { $all: extrasArr };
+      }
+    }
+
+    // flags
+    if (hasExtraBed !== undefined) {
+      filter.extraBed = String(hasExtraBed).toLowerCase() === "true";
+    }
+    if (hasCrib !== undefined) {
+      filter.crib = String(hasCrib).toLowerCase() === "true";
+    }
+    if (hasOffer !== undefined) {
+      const wantOffer = String(hasOffer).toLowerCase() === "true";
+      filter.offer = wantOffer ? { $gt: 0 } : 0;
+    }
+
+    // sorting
+    const allowedSort = new Set([
+      "pricePerNight",
+      "rate",
+      "roomNumber",
+      "type",
+      "maxGuests",
+    ]);
+    const sortField = allowedSort.has(sortBy) ? sortBy : "roomNumber";
+    const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+    const sort = { [sortField]: sortDir };
+
+    const items = await roomDatabaseModel.find(filter).sort(sort);
+
+    return res.status(200).json({
+      items,
+      appliedFilter: filter,
+      sort,
+    });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
+

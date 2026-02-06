@@ -27,8 +27,8 @@ describe('Bookings API (external)', () => {
   }
 
   const validBooking = {
-    userID: '69681f108598651dba187c8e',
-    roomID: '69681ef58598651dba187c8a',
+    client: '69681f108598651dba187c8e',
+    room: '69681ef58598651dba187c8a',
     checkInDate: '15/03/2026',
     checkOutDate: '16/03/2026',
     payDate: '14/01/2026',
