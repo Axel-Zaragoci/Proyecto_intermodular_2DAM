@@ -8,14 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun BookingScreen() {
+fun RoomScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Pantalla de reservas"
+            text = "Pantalla de habitaciones"
         )
     }
 }
