@@ -1,21 +1,47 @@
 ﻿package com.example.intermodular.views.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.intermodular.viewmodels.BookingViewModel
 
 @Composable
-fun BookingScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Pantalla de reservas"
-        )
+fun BookingScreen(
+    viewModel: BookingViewModel
+) {
+    val bookings by viewModel.bookings.collectAsState()
+    val loading by viewModel.isLoading.collectAsState()
+    val error by viewModel.errorMessage.collectAsState()
+
+    Column {
+        if (loading) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        error?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        LazyColumn {
+            items(bookings) { booking ->
+                Text(
+                    text = booking.id
+                )
+            }
+        }
     }
 }
