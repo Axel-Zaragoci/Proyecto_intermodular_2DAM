@@ -1,78 +1,54 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using desktop_app.Services;
+using desktop_app.ViewModels;
 
 namespace desktop_app.Views
 {
     public partial class LoginView : Window
     {
+        private readonly LoginViewModel _vm;
+
+        /// <summary>
+        /// Inicializa la vista de login y configura el enlace con su ViewModel.
+        /// </summary>
         public LoginView()
         {
             InitializeComponent();
-        }
 
-        /// <summary>
-        /// Maneja el evento Click del botón de inicio de sesión.
-        /// </summary>
-        private async void Login_Click(object sender, RoutedEventArgs e)
-        {
-            LoginButton.IsEnabled = false;
-            StatusText.Text = "";
-
-            try
+            _vm = new LoginViewModel();
+            _vm.OnLoginSuccess = () =>
             {
-                var email = EmailTextBox.Text?.Trim();
-                var password = PasswordBox.Password;
-
-                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-                {
-                    StatusText.Text = "Email y Contraseña son obligatorios.";
-                    return;
-                }
-
-                var rol = await AuthService.LoginAsync(email, password);
-
-                if (rol == "Usuario")
-                {
-                    StatusText.Text = "No tienes permisos para acceder.";
-                    return;
-                }
-
                 new MainWindow().Show();
-                this.Close();
-            }
-            catch (HttpRequestException ex)
-            {
-                StatusText.Text = $"Error de red: {ex.Message}";
-            }
-            catch (Exception ex)
-            {
-                StatusText.Text = ex.Message;
-            }
-            finally
-            {
-                LoginButton.IsEnabled = true;
-            }
+                Close();
+            };
+
+            DataContext = _vm;
+            PasswordBox.PasswordChanged += (_, __) => {if (!_vm.IsPasswordVisible)_vm.Password = PasswordBox.Password;};
+            _vm.PropertyChanged += VmOnPropertyChanged;
         }
+
         /// <summary>
-        /// Alterna la visibilidad de la contraseña entre modo oculto (<see cref="PasswordBox"/>) y modo visible (TextBox).
+        /// Maneja los cambios de propiedades del ViewModel relevantes para la vista.
         /// </summary>
-        private void TogglePassword_Click(object sender, RoutedEventArgs e)
+        private void VmOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (PasswordBox.Visibility == Visibility.Visible)
+            if (e.PropertyName != nameof(LoginViewModel.IsPasswordVisible)) return;
+
+            if (_vm.IsPasswordVisible)
             {
                 PasswordTextBox.Text = PasswordBox.Password;
-                PasswordBox.Visibility = Visibility.Collapsed;
-                PasswordTextBox.Visibility = Visibility.Visible;
+                PasswordTextBox.CaretIndex = PasswordTextBox.Text.Length;
+                PasswordTextBox.Focus();
             }
             else
             {
                 PasswordBox.Password = PasswordTextBox.Text;
-                PasswordTextBox.Visibility = Visibility.Collapsed;
-                PasswordBox.Visibility = Visibility.Visible;
+                PasswordBox.Focus();
             }
         }
     }
