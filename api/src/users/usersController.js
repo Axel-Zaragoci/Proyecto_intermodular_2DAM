@@ -23,11 +23,14 @@ import e from "express";
 export async function register(req, res) {
     try {
         const isPublic = !req.user;
-        const { firstName, lastName, email, password, dni, phoneNumber, birthDate, cityName, gender } = req.body;
+        const { firstName, lastName, email, dni, phoneNumber, birthDate, cityName, gender } = req.body;
+        var password = req.body.password;
         const birthDateObj = new Date(birthDate);
 
         if(isPublic) {
             if (!password) return res.status(400).json({ error: "La contraseña no puede estar vacia." });
+        } else {
+            password = "Password123!"; 
         }
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
         if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
@@ -82,11 +85,11 @@ function createBy(req, baseData, { rol, vipStatus }) {
     if (actorRol === "Trabajador") {
         if (rol !== "Usuario") throw new Error("Solamente puedes crear Usuarios.");
     } else if (actorRol === "Admin") {
-        if (rol !== "Usuario" && rol !== "Empleado") throw new Error("Un Admin solo puede crear Usuario o Empleado.");
+        if (rol !== "Usuario" && rol !== "Trabajador") throw new Error("Un Admin solo puede crear Usuario o Trabajador.");
     } else {
         throw new Error("No tienes permisos para crear usuarios con rol y estado VIP.");
 }
-    return new UserEntryData(baseData.firstName, baseData.lastName, baseData.email, baseData.password, baseData.dni, baseData.birthDate, baseData.cityName, baseData.gender, null, rol, vipStatus);
+    return new UserEntryData(baseData.firstName, baseData.lastName, baseData.email, baseData.password, baseData.dni, baseData.phoneNumber, baseData.birthDate, baseData.cityName, baseData.gender, null, rol, vipStatus);
 }
 
 /**
