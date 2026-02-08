@@ -129,7 +129,9 @@ namespace desktop_app.ViewModels
                 CityName = user.CityName,
                 ImageRoute = user.ImageRoute,
                 Rol = user.Rol,
-                VipStatus = user.VipStatus
+                VipStatus = user.VipStatus,
+                BirthDate = user.BirthDate,
+                Gender = user.Gender
             };
         }
     }
