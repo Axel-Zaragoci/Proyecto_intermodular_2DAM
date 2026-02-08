@@ -7,7 +7,7 @@
         xmlns:services="clr-namespace:desktop_app.Services"
         xmlns:local="clr-namespace:desktop_app"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="Hotel Pere Maria" 
         Height="600" 
         Width="1000" 
         WindowState="Maximized">
@@ -44,6 +44,8 @@
             </Button>
         </StackPanel>
 
-        <ContentControl Grid.Column="1" Content="{Binding CurrentView, Source={x:Static services:NavigationService.Instance}}"/>
+        <ScrollViewer x:Name="MainScrollViewer" Grid.Column="1">
+            <ContentControl Content="{Binding CurrentView, Source={x:Static services:NavigationService.Instance}}"/>
+        </ScrollViewer>
     </Grid>
 </Window>

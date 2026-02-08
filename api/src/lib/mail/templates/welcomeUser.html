@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bienvenido a Intermodular</title>
+    <style>
+      :root{
+        --bg-primary: #f7fbff;
+        --accent-start: #1e6fae;
+        --accent-end: #0f4c75;
+        --header-bg: linear-gradient(90deg,var(--accent-start),var(--accent-end));
+        --muted: #6b778c;
+        --text: #1f3b4d;
+        --brand: #1e5c8a;
+        --panel: #ffffff;
+        --border: #E6E8EF;
+      }
+
+      body{background-color:var(--bg-primary); margin:0; padding:20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:var(--text)}
+      .email-wrapper{max-width:680px; margin:0 auto}
+      .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden}
+      .header{background:var(--header-bg); color:#fff; padding:20px 24px; display:flex; align-items:center}
+      .brand{font-size:20px; font-weight:700}
+      .body{padding:20px 24px}
+      h1{font-size:20px; margin:0 0 10px}
+      p{margin:0 0 12px}
+      .info{background:#fafbfd; border:1px solid var(--border); padding:12px; border-radius:8px}
+      .row{display:flex; justify-content:space-between; gap:12px; margin:6px 0}
+      .label{color:var(--muted); font-size:13px}
+      .value{font-weight:600}
+      .cta{display:inline-block; margin-top:18px; background:var(--brand); color:#fff; text-decoration:none; padding:12px 18px; border-radius:8px}
+      .footer{padding:16px 24px; font-size:13px; color:var(--muted); border-top:1px solid var(--border)}
+      @media (max-width:480px){.header{padding:16px}.body{padding:16px}}
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="card">
+        <div class="header">
+          <div class="brand">Hotel Pere María</div>
+        </div>
+        <div class="body">
+          <h1>Bienvenido, {{firstName}}!</h1>
+          <p>Gracias por crear una cuenta en Hotel Pere María. Aquí tienes un resumen de tu cuenta:</p>
+
+          <div class="info">
+            <div class="row"><div class="label">Nombre</div><div class="value">{{firstName}} {{lastName}}</div></div>
+            <div class="row"><div class="label">Email</div><div class="value">{{email}}</div></div>
+            <div class="row"><div class="label">Rol</div><div class="value">{{rol}}</div></div>
+            <div class="row"><div class="label">VIP</div><div class="value">{{#vipStatus}}Activo{{/vipStatus}}{{^vipStatus}}No activo{{/vipStatus}}</div></div>
+          </div>
+
+          <p style="margin-top:14px">Si no solicitaste esta cuenta, ponte en contacto con nosotros inmediatamente.</p>
+        </div>
+        <div class="footer">Hotel Pere María · Equipo de soporte</div>
+      </div>
+    </div>
+  </body>
+</html>

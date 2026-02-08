@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Controls;
+using desktop_app.Models;
 using desktop_app.Views;
 
 namespace desktop_app.Services
@@ -12,7 +13,6 @@ namespace desktop_app.Services
     /// <remarks>Utiliza una única instancia para evitar tener múltiples colas de vistas</remarks>
     public class NavigationService : INotifyPropertyChanged
     {
-
         /// <summary>
         /// Atributo privado que almacena una instancia de esta clase si todavía no ha sido instanciada
         /// </summary>
@@ -23,14 +23,18 @@ namespace desktop_app.Services
         /// Propiedad pública de la clase para acceder a la instancia
         /// </summary>
         public static NavigationService Instance => _instance ??= new NavigationService();
-
-
+        
         /// <summary>
         /// Pila de vistas visitadas por el usuario
         /// Para indicar que UserView es la primera vista, la añado de base al stack
         /// </summary>
         private List<UserControl> _stackViews = [new BookingView()];
 
+        /// <summary>
+        /// Acción que se ejecuta cuando se necesita resetear el scroll al inicio
+        /// La MainWindow se suscribirá a esta acción
+        /// </summary>
+        public Action? ScrollToTopRequested;
 
         /// <summary>
         /// Propiedad para obtener o modificar la vista actual
@@ -72,6 +76,7 @@ namespace desktop_app.Services
         {
             CurrentView = StackViews.Find(e => e is T) ?? new T();
             OnPropertyChanged(nameof(CurrentView));
+            ScrollToTopRequested?.Invoke();
         }
 
         /// <summary>
@@ -91,5 +96,17 @@ namespace desktop_app.Services
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+
+        public void NavigateTo(Func<UserControl> factory)
+        {
+            var view = factory?.Invoke();
+            if (view == null) return;
+
+            CurrentView = view;
+            OnPropertyChanged(nameof(CurrentView));
+            ScrollToTopRequested?.Invoke();
+        }
+
     }
 }
