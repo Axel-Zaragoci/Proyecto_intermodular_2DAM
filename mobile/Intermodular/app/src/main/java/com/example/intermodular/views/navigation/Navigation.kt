@@ -12,6 +12,7 @@ import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.viewmodels.BookingViewModelFactory
 import com.example.intermodular.views.screens.BookingScreen
+import com.example.intermodular.views.screens.BookingScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 
@@ -33,7 +34,7 @@ fun Navigation(
                 factory = BookingViewModelFactory(repository)
             )
 
-            BookingScreen(
+            BookingScreenState(
                 viewModel = viewModel
             )
         }
