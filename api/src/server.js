@@ -13,6 +13,7 @@ import roomsRouter from "./rooms/roomsRouter.js";
 import usersRouter from "./users/usersRouter.js";
 import authRouter from "./auth/authRouter.js";
 import photoRouter from "./lib/image/imageRouter.js";
+import reviewsRouter from "./reviews/reviewsRouter.js";
 dotenv.config();
 connectDB()
 connectEmail();
@@ -38,6 +39,7 @@ app.use("/room", roomsRouter);
 app.use("/user", usersRouter);
 app.use("/auth", authRouter);
 app.use("/image", photoRouter);
+app.use("/review", reviewsRouter);
 
 app.listen(PORT, () => {
   console.log(`Servidor en el puerto ${PORT}`);
