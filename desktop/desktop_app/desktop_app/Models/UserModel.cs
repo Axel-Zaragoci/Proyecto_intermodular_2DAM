@@ -33,5 +33,8 @@ namespace desktop_app.Models
 
         [JsonPropertyName("vipStatus")]
         public bool VipStatus { get; set; }
+        
+        [JsonIgnore]
+        public string FullNameWithDni => $"{FirstName} {LastName} - {Dni}";
     }
 }

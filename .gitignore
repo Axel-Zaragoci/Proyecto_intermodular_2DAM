@@ -48,3 +48,40 @@ desktop/**/packages/
 TestResults/
 
 publish/
+
+# =========================
+# ANDROID (mobile/Intermodular)
+# =========================
+
+mobile/Intermodular/.gradle/
+mobile/Intermodular/**/build/
+mobile/Intermodular/build/
+
+mobile/Intermodular/local.properties
+mobile/Intermodular/.kotlin/
+
+# Android Studio / IntelliJ
+mobile/Intermodular/.idea/
+mobile/Intermodular/**/*.iml
+
+# Logs
+mobile/Intermodular/**/*.log
+
+# APK / AAB
+mobile/Intermodular/**/*.apk
+mobile/Intermodular/**/*.aab
+
+# NDK
+mobile/Intermodular/.externalNativeBuild/
+mobile/Intermodular/.cxx/
+
+# Firebase
+mobile/Intermodular/**/google-services.json
+
+# Keystores
+mobile/Intermodular/**/*.jks
+mobile/Intermodular/**/*.keystore
+
+# OS
+.DS_Store
+Thumbs.db

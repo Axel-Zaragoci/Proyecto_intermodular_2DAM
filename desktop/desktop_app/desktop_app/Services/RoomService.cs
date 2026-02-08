@@ -80,11 +80,13 @@ namespace desktop_app.Services
 
                 string contenido = await respuesta.Content.ReadAsStringAsync();
                 var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
                 var data = JsonSerializer.Deserialize<RoomsResponse>(contenido, opciones);
+                Console.WriteLine(data);
 
                 return data ?? new RoomsResponse();
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
