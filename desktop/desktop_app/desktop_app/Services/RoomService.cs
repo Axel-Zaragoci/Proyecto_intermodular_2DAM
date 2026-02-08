@@ -78,15 +78,19 @@ namespace desktop_app.Services
                 // 6) Leemos el JSON que devuelve la API
                 string contenido = await respuesta.Content.ReadAsStringAsync();
 
+                Console.WriteLine(contenido);
                 // 7) Deserializamos a RoomsResponse (IMPORTANTE: NO ES UNA LISTA)
                 var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
                 var data = JsonSerializer.Deserialize<RoomsResponse>(contenido, opciones);
+                Console.WriteLine(data);
 
                 // 8) Si viniera null por cualquier cosa, devolvemos vacío
                 return data ?? new RoomsResponse();
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 // Si hay excepción (API apagada, red, JSON inválido...), devolvemos null
                 return null;
             }

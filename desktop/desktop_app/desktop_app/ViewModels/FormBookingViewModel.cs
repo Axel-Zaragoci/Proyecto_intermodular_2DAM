@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using desktop_app.Commands;
 using desktop_app.Events;
@@ -43,6 +44,60 @@ namespace desktop_app.ViewModels
             }
         }
 
+        private ObservableCollection<UserModel> _clients = new ObservableCollection<UserModel>();
+        public ObservableCollection<UserModel> Clients
+        {
+            get => _clients;
+            set
+            {
+                _clients = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private async void LoadClients()
+        {
+            var users = await UserService.GetAllUsersAsync();
+
+            Clients.Clear();
+            foreach (var user in users)
+            {
+                Clients.Add(user);
+            }
+        }
+        
+        private ObservableCollection<RoomModel> _rooms = new ObservableCollection<RoomModel>();
+        public ObservableCollection<RoomModel> Rooms
+        {
+            get => _rooms;
+            set
+            {
+                _rooms = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        private async void LoadRooms()
+        {
+            var rooms = (await RoomService.GetRoomsFilteredAsync()).Items;
+
+            Rooms.Clear();
+            foreach (var room in rooms)
+            {
+                Rooms.Add(room);
+            }
+        }
+
+        private string _roomNumber = "";
+        public String RoomNumber
+        {
+            get => _roomNumber;
+            set
+            {
+                _roomNumber = value;
+                OnPropertyChanged();
+            }
+        }
         
         /// <summary>
         /// Propiedad para la actualización de la reserva
@@ -102,6 +157,9 @@ namespace desktop_app.ViewModels
             SaveCommand = new RelayCommand(async _ => await Save());
             CancelCommand = new RelayCommand(async _ => await Cancel());
             ShowCommand = new RelayCommand(_ => ShowData());
+            
+            LoadClients();
+            LoadRooms();
         }
 
         
@@ -159,7 +217,7 @@ namespace desktop_app.ViewModels
                 Booking.Client = userId;
 
                 RoomsFilter f = new RoomsFilter();
-                f.RoomNumber = Booking.RoomNumber;
+                f.RoomNumber = _roomNumber;
                 var roomId = (await RoomService.GetRoomsFilteredAsync(f))?.Items.First().Id;
                 Console.WriteLine(roomId);
                 if (roomId == "")

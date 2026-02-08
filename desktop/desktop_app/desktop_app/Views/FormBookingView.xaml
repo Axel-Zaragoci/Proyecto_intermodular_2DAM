@@ -44,13 +44,27 @@
             </Grid.RowDefinitions>
             
             <StackPanel>
-                <Label Content="DNI del cliente: " Target="DniTextBox" Style="{StaticResource LabelForm}"/>
-                <TextBox x:Name="DniTextBox" Text="{Binding ClientDni, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="{Binding Enabled}"/>
+                <Label Content="DNI del cliente: " Target="DniComboBox" Style="{StaticResource LabelForm}"/>
+                <ComboBox
+                    x:Name="DniComboBox"
+                    ItemsSource="{Binding Clients}"
+                    DisplayMemberPath="FullNameWithDni"
+                    SelectedValuePath="Dni"
+                    SelectedValue="{Binding ClientDni, Mode=TwoWay}"
+                    IsEnabled="{Binding Enabled}" 
+                    Style="{StaticResource DropdownStyle}"/>
             </StackPanel>
             
             <StackPanel Grid.Row="1">
-                <Label Content="Número de la habitación: " Target="RoomNumberTextBox" Style="{StaticResource LabelForm}"/>
-                <TextBox x:Name="RoomNumberTextBox" Text="{Binding Booking.RoomNumber, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="{Binding Enabled}"/>
+                <Label Content="Número de la habitación: " Target="RoomNumberComboBox" Style="{StaticResource LabelForm}"/>
+                <ComboBox 
+                    x:Name="RoomNumberComboBox"
+                      ItemsSource="{Binding Rooms}"
+                      DisplayMemberPath="RoomNumber"
+                      SelectedValuePath="RoomNumber"
+                      SelectedValue="{Binding RoomNumber, Mode=TwoWay}"
+                      IsEnabled="{Binding Enabled}" 
+                      Style="{StaticResource DropdownStyle}"/>
             </StackPanel>
             
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
