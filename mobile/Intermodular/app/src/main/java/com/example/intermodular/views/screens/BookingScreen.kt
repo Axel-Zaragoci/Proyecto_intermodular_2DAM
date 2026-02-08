@@ -15,12 +15,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.intermodular.models.Booking
 import com.example.intermodular.viewmodels.BookingViewModel
+import com.example.intermodular.views.components.BookingCard
 import com.example.intermodular.views.components.FilterList
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,9 +87,7 @@ fun BookingScreen(
 
         LazyColumn {
             items(bookings) { booking ->
-                Text(
-                    text = booking.id
-                )
+                BookingCard(booking, {})
             }
         }
     }

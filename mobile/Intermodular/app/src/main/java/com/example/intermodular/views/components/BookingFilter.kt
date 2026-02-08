@@ -1,7 +1,6 @@
 ﻿package com.example.intermodular.views.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,7 +46,7 @@ fun FilterList(
 ) {
     Column (
         modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 40.dp)
+            .padding(horizontal = 20.dp, vertical = 30.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.large
@@ -65,7 +64,7 @@ fun FilterList(
                 text = if (showFilters) "Ocultar filtros" else "Ver filtros",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(),
+                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         }

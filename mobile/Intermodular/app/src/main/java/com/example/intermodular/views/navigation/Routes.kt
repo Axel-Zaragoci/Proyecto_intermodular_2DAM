@@ -6,4 +6,8 @@ sealed class Routes(
     object Bookings : Routes("bookings")
     object Rooms : Routes("rooms")
     object User : Routes("user")
+    object MyBookings : Routes("myBookings")
+    object MyBookingDetails : Routes ("details/{id}") {
+        fun createRoute(bookingId: String) = "details/$bookingId"
+    }
 }

@@ -85,7 +85,7 @@ class BookingViewModel(
         _guests.value = value
     }
 
-    private val _showFilters = MutableStateFlow(false);
+    private val _showFilters = MutableStateFlow(true);
     val showFilters : StateFlow<Boolean> = _showFilters;
 
     fun changeFilterVisibility() {
