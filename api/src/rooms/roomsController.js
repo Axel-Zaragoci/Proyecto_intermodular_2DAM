@@ -174,7 +174,7 @@ export const updateRoom = async (req, res) => {
 
     console.log("UPDATE PAYLOAD (PROCESSED):", update);
 
-console.log(update)
+    console.log(update)
 
     const updated = await roomDatabaseModel.findByIdAndUpdate(
       roomID,
@@ -194,6 +194,7 @@ console.log(update)
 
 /**
  * Elimina una habitación por su ID.
+ * También elimina todas las reservas asociadas a esa habitación.
  *
  * @async
  * @function deleteRoom
@@ -207,6 +208,10 @@ console.log(update)
 export const deleteRoom = async (req, res) => {
   try {
     const { roomID } = req.params;
+
+    // Primero eliminar todas las reservas de esta habitación
+    const { bookingDatabaseModel } = await import("../booking/bookingModel.js");
+    await bookingDatabaseModel.deleteMany({ room: roomID });
 
     const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
 
@@ -313,29 +318,29 @@ export const getRoomsFiltered = async (req, res) => {
     }
 
     // sorting
-const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
+    const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
 
-/** @type {string} */
-const sortByStr = String(sortBy ?? "");
+    /** @type {string} */
+    const sortByStr = String(sortBy ?? "");
 
-/** @type {keyof any} */
-const sortField = allowedSort.has(sortByStr) ? sortByStr : "roomNumber";
+    /** @type {keyof any} */
+    const sortField = allowedSort.has(sortByStr) ? sortByStr : "roomNumber";
 
-/** @type {1 | -1} */
-const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+    /** @type {1 | -1} */
+    const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
 
-/** @type {Record<string, 1 | -1>} */
-const sort = { [sortField]: sortDir };
+    /** @type {Record<string, 1 | -1>} */
+    const sort = { [sortField]: sortDir };
 
-const items = await roomDatabaseModel.find(filter).sort(sort);
+    const items = await roomDatabaseModel.find(filter).sort(sort);
 
 
-res.status(200).json({ items, appliedFilter: filter, sort });
-return;
+    res.status(200).json({ items, appliedFilter: filter, sort });
+    return;
 
   } catch (err) {
-     res.status(400).json({ message: err.message });
-     return;
+    res.status(400).json({ message: err.message });
+    return;
   }
 };
 
