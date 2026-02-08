@@ -26,10 +26,12 @@ export async function register(req, res) {
         const { firstName, lastName, email, password, dni, phoneNumber, birthDate, cityName, gender } = req.body;
         const birthDateObj = new Date(birthDate);
 
+        if(isPublic) {
+            if (!password) return res.status(400).json({ error: "La contraseña no puede estar vacia." });
+        }
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
         if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
         if (!email) return res.status(400).json({errors: "El correo no puede estar vacio"});
-        if (!password) return res.status(400).json({ error: "La contraseña no puede estar vacia." });
         if (!dni) return res.status(400).json({ error: "El dni no puede estar vacio." });
         if (Number.isNaN(birthDateObj.getTime())) return res.status(400).json({ error: "La fecha no puede estar vacia." });
         if (!cityName) return res.status(400).json({ error: "La ciudad no puede estar vacia." });
@@ -264,4 +266,45 @@ export async function updateUser(req, res) {
         console.error("Error al actualizar el usuario:", error);
         return res.status(500).json({ error: 'Error del servidor' });
     }
+}
+
+
+/** * Controlador para eliminar un usuario por su ID
+ * 
+ * @async
+ * @function deleteUserById
+ * * @description
+ * Recibe el ID del usuario a eliminar desde los parámetros de la solicitud
+ * Verifica si el ID es válido
+ * Intenta eliminar el usuario con el ID especificado en la base de datos
+ * Devuelve un mensaje de éxito si el usuario se elimina correctamente o un mensaje de error si no se encuentra o hay un problema
+ * 
+ * @param {import('express').Request} req - Objeto de solicitud de Express
+ * @param {import('express').Response} res - Objeto de respuesta de Express
+ * 
+ * @returns {Promise} - Respuesta HTTP con: 
+ * - Código de estado 200 y mensaje de éxito si el usuario se elimina correctamente
+ * - Código de estado 400 y mensaje de error si el ID proporcionado no es válido
+ * - Código de estado 404 y mensaje de error si el usuario no se encuentra
+ * - Código de estado 500 y mensaje de error si hay un problema del servidor
+ */
+export async function deleteUserById(req, res) {
+  try {
+    const { id } = req.params;
+
+    console.log("ID recibido:", id);
+
+    const deleted = await userDatabaseModel.findByIdAndDelete(id);
+
+    console.log("Resultado delete:", deleted);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    return res.status(200).json({ message: "Usuario eliminado", id: deleted._id });
+  } catch (err) {
+    console.error("Error al borrar:", err);
+    return res.status(500).json({ error: "Error del servidor" });
+  }
 }

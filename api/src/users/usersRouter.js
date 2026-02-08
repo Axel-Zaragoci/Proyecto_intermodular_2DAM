@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser } from './usersController.js';
+import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser, deleteUserById } from './usersController.js';
 import { verifyToken ,authorizeRoles } from '../auth/authMiddleware.js';    
 const usersRouter = Router();
 
@@ -11,5 +11,6 @@ usersRouter.post('/registerApp', register);
 usersRouter.post('/registerEsc', verifyToken, authorizeRoles(["Admin", "Trabajador"]), register);
 
 usersRouter.post('/update', verifyToken, updateUser);
+usersRouter.delete('/delete', verifyToken, authorizeRoles(["Admin", "Trabajador"]), deleteUserById);
 
 export default usersRouter;
