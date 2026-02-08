@@ -1,4 +1,6 @@
 import { Schema, Types, model, isValidObjectId } from 'mongoose';
+import { roomDatabaseModel } from '../rooms/roomsModel.js';
+import { userDatabaseModel } from '../users/usersModel.js';
 
 /**
  * @typedef {Object} bookingSchema
@@ -20,11 +22,13 @@ import { Schema, Types, model, isValidObjectId } from 'mongoose';
 const bookingDatabaseSchema = new Schema({
     room: {
         type: Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'rooms'
     },
     client: {
         type: Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'users'
     },
     checkInDate: {
         type: Date,
@@ -72,6 +76,17 @@ const bookingDatabaseSchema = new Schema({
          */
     }
 });
+
+bookingDatabaseSchema.methods.poblar = async function() {
+    const userObject = await userDatabaseModel.findById(this.client).lean();
+    const roomObject = await roomDatabaseModel.findById(this.room).lean();
+
+    return {
+        ...this._doc,
+        userObject,
+        roomObject
+    }
+}
 
 export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 

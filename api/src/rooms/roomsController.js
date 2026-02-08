@@ -1,3 +1,4 @@
+
 import { roomDatabaseModel, RoomEntryData } from "./roomsModel.js";
 
 /**
@@ -131,67 +132,69 @@ export const updateRoom = async (req, res) => {
   try {
     const { roomID } = req.params;
 
-    const {
-      type,
-      roomNumber,
-      maxGuests,
-      description,
-      mainImage,
-      pricePerNight,
-      extraBed,
-      crib,
-      offer,
-      extras,
-      extraImages,
-    } = req.body;
+    const update = {};
 
-    // Busca la room actual para usar valores por defecto si no vienen en el body
-    const room = await roomDatabaseModel.findById(roomID);
-    if (!room) return res.status(404).json({ message: "Room no encontrada" });
+    // Log payload for debugging
+    console.log("UPDATE PAYLOAD (RECV):", req.body);
 
-    // Construye un objeto de entrada con fallback a valores actuales
-    const data = new RoomEntryData(
-      type ?? room.type,
-      roomNumber ?? room.roomNumber,
-      maxGuests ?? room.maxGuests,
-      description ?? room.description,
-      mainImage ?? room.mainImage,
-      pricePerNight ?? room.pricePerNight
-    );
+    // allowlist de campos actualizables
+    const fields = [
+      "type",
+      "roomNumber",
+      "maxGuests",
+      "description",
+      "mainImage",
+      "pricePerNight",
+      "extraBed",
+      "crib",
+      "offer",
+      "extras",
+      "extraImages",
+      "rate",
+      "isAvailable",
+    ];
 
-    // Completa campos opcionales con recuerdo a valores actuales
-    data.completeRoomData(
-      extraBed ?? room.extraBed,
-      crib ?? room.crib,
-      offer ?? room.offer,
-      extras ?? room.extras,
-      extraImages ?? room.extraImages
-    );
+    for (const f of fields) {
+      if (req.body[f] !== undefined) update[f] = req.body[f];
+    }
 
-    // Valida el objeto antes de actualizar
-    data.validate();
+    // coerce robusto de isAvailable (por si llega string o number)
+    if (update.isAvailable !== undefined) {
+      const val = update.isAvailable;
+      if (typeof val === "string") {
+        const v = val.trim().toLowerCase();
+        update.isAvailable = (v === "true" || v === "1" || v === "on");
+      } else if (typeof val === "number") {
+        update.isAvailable = (val === 1);
+      } else {
+        update.isAvailable = Boolean(val);
+        console.log(update.isAvailable)
+      }
+    }
 
-    // Actualiza en BD
+    console.log("UPDATE PAYLOAD (PROCESSED):", update);
+
+    console.log(update)
+
     const updated = await roomDatabaseModel.findByIdAndUpdate(
       roomID,
-      { $set: data },
-      { new: true, runValidators: true }
+      { $set: update },
+      { new: true, runValidators: true, context: "query" }
     );
 
     if (!updated) return res.status(404).json({ message: "Room no encontrada" });
 
     return res.status(200).json(updated);
   } catch (err) {
-    // Duplicado por unique (si roomNumber cambia a uno existente)
-    if (err?.code === 11000) {
-      return res.status(409).json({ message: "roomNumber ya existe" });
-    }
+    if (err?.code === 11000) return res.status(409).json({ message: "roomNumber ya existe" });
     return res.status(400).json({ message: err.message });
   }
 };
 
+
 /**
  * Elimina una habitación por su ID.
+ * También elimina todas las reservas asociadas a esa habitación.
  *
  * @async
  * @function deleteRoom
@@ -206,6 +209,10 @@ export const deleteRoom = async (req, res) => {
   try {
     const { roomID } = req.params;
 
+    // Primero eliminar todas las reservas de esta habitación
+    const { bookingDatabaseModel } = await import("../booking/bookingModel.js");
+    await bookingDatabaseModel.deleteMany({ room: roomID });
+
     const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);
 
     if (!deleted) return res.status(404).json({ message: "Room no encontrada" });
@@ -217,37 +224,26 @@ export const deleteRoom = async (req, res) => {
 };
 
 /**
- * Obtiene el listado de rooms con filtros por query params.
- *
- * @function getRoomsFiltered
- * @param {import('express').Request} req - Petición HTTP.
- * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
- * @param {string} [req.query.name] - Filtro por nombre de la room.
- * @param {string} [req.query.type] - Filtro por tipo de room.
- * @param {string} [req.query.page] - Número de página para paginación.
- * @param {string} [req.query.limit] - Límite de resultados por página.
- * @param {import('express').Response} res - Respuesta HTTP.
- * @param {import('express').NextFunction} next - Siguiente middleware.
- * @returns {Promise<void>} No devuelve nada directamente, responde vía `res`.
- *//**
+ * @typedef {Object} RoomsQuery
+ * @property {string} [type]
+ * @property {string} [isAvailable]
+ * @property {string} [minPrice]
+ * @property {string} [maxPrice]
+ * @property {string} [guests]
+ * @property {string} [hasExtraBed]
+ * @property {string} [hasCrib]
+ * @property {string} [hasOffer]
+ * @property {string} [extras]
+ * @property {string} [sortBy]
+ * @property {string} [sortOrder]
+ * @property {string} [roomNumber]
+ */
+
+/**
  * Obtiene el listado de rooms con filtros por query params (SIN PAGINACIÓN).
- *
- * @function getRoomsFiltered
- * @param {import('express').Request} req - Petición HTTP.
- * @param {Object.<string, string>} [req.query] - Parámetros de filtro opcionales.
- * @param {string} [req.query.type] - Filtro por tipo de room.
- * @param {string} [req.query.isAvailable] - Filtro por disponibilidad ("true"/"false").
- * @param {string} [req.query.minPrice] - Precio mínimo.
- * @param {string} [req.query.maxPrice] - Precio máximo.
- * @param {string} [req.query.guests] - Número mínimo de huéspedes.
- * @param {string} [req.query.hasExtraBed] - "true"/"false".
- * @param {string} [req.query.hasCrib] - "true"/"false".
- * @param {string} [req.query.hasOffer] - "true"/"false".
- * @param {string} [req.query.extras] - Lista separada por comas, ej: "wifi,tv".
- * @param {string} [req.query.sortBy] - Campo de orden.
- * @param {string} [req.query.sortOrder] - "asc" o "desc".
- * @param {import('express').Response} res - Respuesta HTTP.
- * @returns {Promise<void>} Responde vía `res`.
+ * @param {import("express").Request<{}, {}, {}, RoomsQuery>} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>}
  */
 export const getRoomsFiltered = async (req, res) => {
   try {
@@ -322,26 +318,29 @@ export const getRoomsFiltered = async (req, res) => {
     }
 
     // sorting
-    const allowedSort = new Set([
-      "pricePerNight",
-      "rate",
-      "roomNumber",
-      "type",
-      "maxGuests",
-    ]);
-    const sortField = allowedSort.has(sortBy) ? sortBy : "roomNumber";
+    const allowedSort = new Set(["pricePerNight", "rate", "roomNumber", "type", "maxGuests"]);
+
+    /** @type {string} */
+    const sortByStr = String(sortBy ?? "");
+
+    /** @type {keyof any} */
+    const sortField = allowedSort.has(sortByStr) ? sortByStr : "roomNumber";
+
+    /** @type {1 | -1} */
     const sortDir = String(sortOrder).toLowerCase() === "desc" ? -1 : 1;
+
+    /** @type {Record<string, 1 | -1>} */
     const sort = { [sortField]: sortDir };
 
     const items = await roomDatabaseModel.find(filter).sort(sort);
 
-    return res.status(200).json({
-      items,
-      appliedFilter: filter,
-      sort,
-    });
+
+    res.status(200).json({ items, appliedFilter: filter, sort });
+    return;
+
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+    res.status(400).json({ message: err.message });
+    return;
   }
 };
 
