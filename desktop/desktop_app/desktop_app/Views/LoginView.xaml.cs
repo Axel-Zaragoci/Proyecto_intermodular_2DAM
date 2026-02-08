@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,6 +14,9 @@ namespace desktop_app.Views
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Maneja el evento Click del botón de inicio de sesión.
+        /// </summary>
         private async void Login_Click(object sender, RoutedEventArgs e)
         {
             LoginButton.IsEnabled = false;
@@ -29,7 +33,13 @@ namespace desktop_app.Views
                     return;
                 }
 
-                await AuthService.LoginAsync(email, password);
+                var rol = await AuthService.LoginAsync(email, password);
+
+                if (rol == "Usuario")
+                {
+                    StatusText.Text = "No tienes permisos para acceder.";
+                    return;
+                }
 
                 new MainWindow().Show();
                 this.Close();
@@ -45,6 +55,24 @@ namespace desktop_app.Views
             finally
             {
                 LoginButton.IsEnabled = true;
+            }
+        }
+        /// <summary>
+        /// Alterna la visibilidad de la contraseña entre modo oculto (<see cref="PasswordBox"/>) y modo visible (TextBox).
+        /// </summary>
+        private void TogglePassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (PasswordBox.Visibility == Visibility.Visible)
+            {
+                PasswordTextBox.Text = PasswordBox.Password;
+                PasswordBox.Visibility = Visibility.Collapsed;
+                PasswordTextBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PasswordBox.Password = PasswordTextBox.Text;
+                PasswordTextBox.Visibility = Visibility.Collapsed;
+                PasswordBox.Visibility = Visibility.Visible;
             }
         }
     }
