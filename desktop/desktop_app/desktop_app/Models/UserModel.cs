@@ -22,6 +22,18 @@ namespace desktop_app.Models
         [JsonPropertyName("dni")]
         public string Dni { get; set; }
 
+        [JsonPropertyName("phoneNumber")]
+        public string PhoneNumber { get; set; }
+
+        [JsonIgnore]
+        public string PhoneDisplay => string.IsNullOrWhiteSpace(PhoneNumber) ? "Desconocido" : PhoneNumber;
+
+        [JsonPropertyName("birthDate")]
+        public DateTime BirthDate { get; set; }
+
+        [JsonPropertyName("gender")]
+        public string Gender { get; set; }
+
         [JsonPropertyName("cityName")]
         public string CityName { get; set; }
 
@@ -31,7 +43,10 @@ namespace desktop_app.Models
         [JsonPropertyName("rol")]
         public string Rol { get; set; }
 
+        [JsonIgnore]
+        public string VipText => VipStatus ? "Sí" : "No";
+
         [JsonPropertyName("vipStatus")]
-        public string VipStatus { get; set; }
+        public bool VipStatus { get; set; }
     }
 }
