@@ -492,6 +492,7 @@
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Foreground" Value="#1F3B4D"/>
+        <Setter Property="Height" Value="40" />
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -508,6 +509,9 @@
                 <Setter Property="BorderBrush" Value="#1E88E5"/>
                 <Setter Property="BorderThickness" Value="2"/>
             </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#ebeeff"/>
+            </Trigger>
         </Style.Triggers>
     </Style>
     
@@ -521,7 +525,8 @@
                         Background="White"
                         BorderBrush="#C5DDEE"
                         BorderThickness="1"
-                        Padding="10, 6">
+                        Padding="10, 6"
+                        Height="40">
                         <Grid x:Name="PART_Root">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -707,6 +712,10 @@
                         </Trigger>
                         <Trigger Property="IsDropDownOpen" Value="True">
                             <Setter TargetName="Bd" Property="BorderBrush" Value="#1e88e5" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="#ebeeff"/>
+                            <Setter TargetName="ToggleButton" Property="Background" Value="#ebeeff"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

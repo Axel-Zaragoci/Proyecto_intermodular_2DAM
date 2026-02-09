@@ -26,13 +26,13 @@ namespace desktop_app.Views
             if (sender is not ListView listView || listView.View is not GridView gridView)
                 return;
 
-            int fixedColumns = 3;
-            double fixedWidth = gridView.Columns[0].Width + gridView.Columns[^1].Width + gridView.Columns[^2].Width;
+            int fixedColumns = 2;
+            double fixedWidth = gridView.Columns[^1].Width + gridView.Columns[^2].Width;
 
             double availableWidth = listView.ActualWidth - fixedWidth - 10;
             double autoWidth = availableWidth / (gridView.Columns.Count - fixedColumns);
 
-            for (int i = 1; i < gridView.Columns.Count - fixedColumns; i++)
+            for (int i = 0; i < gridView.Columns.Count - fixedColumns; i++)
             {
                 gridView.Columns[i].Width = autoWidth;
             }

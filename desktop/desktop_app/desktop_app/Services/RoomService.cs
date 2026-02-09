@@ -82,7 +82,6 @@ namespace desktop_app.Services
                 var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
                 var data = JsonSerializer.Deserialize<RoomsResponse>(contenido, opciones);
-                Console.WriteLine(data);
 
                 return data ?? new RoomsResponse();
             }
