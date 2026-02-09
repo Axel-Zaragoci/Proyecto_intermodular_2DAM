@@ -88,13 +88,12 @@ namespace desktop_app.ViewModels
             }
         }
 
-        private string _roomNumber = "";
         public String RoomNumber
         {
-            get => _roomNumber;
+            get => _booking.RoomNumber;
             set
             {
-                _roomNumber = value;
+                _booking.RoomNumber = value;
                 OnPropertyChanged();
             }
         }
@@ -115,6 +114,7 @@ namespace desktop_app.ViewModels
                 OnPropertyChanged(nameof(Enabled));
                 OnPropertyChanged(nameof(Disabled));
                 OnPropertyChanged(nameof(ClientDni));
+                OnPropertyChanged(nameof(RoomNumber));
             }
         }
 
@@ -217,9 +217,9 @@ namespace desktop_app.ViewModels
                 Booking.Client = userId;
 
                 RoomsFilter f = new RoomsFilter();
-                f.RoomNumber = _roomNumber;
+                f.RoomNumber = _booking.RoomNumber;
                 var roomId = (await RoomService.GetRoomsFilteredAsync(f))?.Items.First().Id;
-                Console.WriteLine(roomId);
+                
                 if (roomId == "")
                 {
                     MessageBox.Show("Error al obtener la habitación");
