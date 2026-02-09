@@ -35,7 +35,7 @@ export async function createReview(req, res) {
 export async function getReviews(req, res) {
     try {
         const reviews = await reviewDatabaseModel.find()
-            .populate("user", "name email")
+            .populate("user", "firstName lastName email")
             .populate("room", "roomNumber type")
             .populate("booking", "checkInDate checkOutDate");
         return res.status(200).json(reviews);
@@ -53,7 +53,7 @@ export async function getReviewById(req, res) {
     try {
         const { reviewID } = req.params;
         const review = await reviewDatabaseModel.findById(reviewID)
-            .populate("user", "name email")
+            .populate("user", "firstName lastName email")
             .populate("room", "roomNumber type")
             .populate("booking", "checkInDate checkOutDate");
 
@@ -76,7 +76,7 @@ export async function getReviewsByRoom(req, res) {
     try {
         const { roomID } = req.params;
         const reviews = await reviewDatabaseModel.find({ room: roomID })
-            .populate("user", "name email")
+            .populate("user", "firstName lastName email")
             .populate("booking", "checkInDate checkOutDate");
         return res.status(200).json(reviews);
     } catch (err) {

@@ -14,6 +14,9 @@ import com.example.intermodular.viewmodels.BookingViewModelFactory
 import com.example.intermodular.views.screens.BookingScreen
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
+import com.example.intermodular.data.repository.RoomRepository
+import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.viewmodels.RoomViewModelFactory
 
 @Composable
 fun Navigation(
@@ -38,7 +41,16 @@ fun Navigation(
             )
         }
         composable(Routes.Rooms.route) {
-            RoomScreen()
+            val api = RetrofitProvider.api
+            val repository = RoomRepository(api)
+            
+             val viewModel: RoomViewModel = viewModel(
+                factory = RoomViewModelFactory(repository)
+            )
+
+            RoomScreen(
+                roomViewModel = viewModel
+            )
         }
         composable(Routes.User.route) {
             UserScreen()
