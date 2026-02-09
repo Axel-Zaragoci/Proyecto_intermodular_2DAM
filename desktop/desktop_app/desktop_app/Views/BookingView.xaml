@@ -35,14 +35,6 @@
         <ListView Grid.Row="2" ItemsSource="{Binding Bookings}" SizeChanged="ListView_SizeChanged" AlternationCount="2" ItemContainerStyle="{StaticResource AlternatingListViewItemStyle}" Margin="10 3" BorderThickness="0.5">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="" HeaderContainerStyle="{StaticResource TableHeader}" Width="60">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Style="{StaticResource UpdateBookingBtn}" Content="visibility" Command="{Binding DataContext.ShowBookingDetailsCommand, RelativeSource={RelativeSource AncestorType=ListView}}" CommandParameter="{Binding}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    
                     <GridViewColumn Header="Habitación" HeaderContainerStyle="{StaticResource TableHeader}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

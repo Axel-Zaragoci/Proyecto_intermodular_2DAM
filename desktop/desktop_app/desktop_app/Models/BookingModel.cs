@@ -19,17 +19,16 @@ namespace desktop_app.Models
         [JsonPropertyName("checkOutDate")]
         public  DateTime CheckOutDate { get; set; } = DateTime.Now;
 
-        [JsonPropertyName("payDate")] 
-        public DateTime PayDate { get; set; }
+        [JsonPropertyName("payDate")] public DateTime PayDate { get; set; } = DateTime.Now;
         
         [JsonPropertyName("totalPrice")]
         public decimal TotalPrice { get; set; }
 
         [JsonPropertyName("pricePerNight")]
-        public decimal PricePerNight { get; set; }
+        public decimal? PricePerNight { get; set; }
 
         [JsonPropertyName("offer")]
-        public decimal Offer { get; set; }
+        public decimal? Offer { get; set; }
 
         [JsonPropertyName("status")]
         public string Status { get; set; }

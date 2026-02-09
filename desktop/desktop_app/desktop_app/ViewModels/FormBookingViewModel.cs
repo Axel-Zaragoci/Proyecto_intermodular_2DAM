@@ -11,97 +11,19 @@ namespace desktop_app.ViewModels
 {
     public class FormBookingViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Modo Singleton del ViewModel
-        /// </summary>
         private static FormBookingViewModel? _instance;
-        public static FormBookingViewModel Instance => _instance ??= new FormBookingViewModel();
+        public static FormBookingViewModel Instance =>
+            _instance ??= new FormBookingViewModel();
 
-        
-        /// <summary>
-        /// Parámetro que modifica el título de la ventana según se utilice para crear o modificar una reserva
-        /// </summary>
-        public string Title => Booking.Id != "" ? "Actualizar reserva" : "Crear reserva";
-        
-        
-        /// <summary>
-        /// Parámetros para activar o desactivar campos/botones según el modo de la ventana
-        /// </summary>
-        public bool Enabled => _booking.Id == "";
+        public string Title =>
+            string.IsNullOrEmpty(Booking.Id)
+                ? "Crear reserva"
+                : "Actualizar reserva";
+
+        public bool Enabled => string.IsNullOrEmpty(Booking.Id);
         public bool Disabled => !Enabled;
-        
-        
-        /// <summary>
-        /// Propiedad para la modificación del DNI del cliente
-        /// </summary>
-        public string ClientDni
-        {
-            get => _booking.ClientDni;
-            set
-            {
-                _booking.ClientDni = value;
-                OnPropertyChanged();
-            }
-        }
 
-        private ObservableCollection<UserModel> _clients = new ObservableCollection<UserModel>();
-        public ObservableCollection<UserModel> Clients
-        {
-            get => _clients;
-            set
-            {
-                _clients = value;
-                OnPropertyChanged();
-            }
-        }
-        
-        private async void LoadClients()
-        {
-            var users = await UserService.GetAllUsersAsync();
 
-            Clients.Clear();
-            foreach (var user in users)
-            {
-                Clients.Add(user);
-            }
-        }
-        
-        private ObservableCollection<RoomModel> _rooms = new ObservableCollection<RoomModel>();
-        public ObservableCollection<RoomModel> Rooms
-        {
-            get => _rooms;
-            set
-            {
-                _rooms = value;
-                OnPropertyChanged();
-            }
-        }
-        
-        private async void LoadRooms()
-        {
-            var rooms = (await RoomService.GetRoomsFilteredAsync()).Items;
-
-            Rooms.Clear();
-            foreach (var room in rooms)
-            {
-                Rooms.Add(room);
-            }
-        }
-
-        public String RoomNumber
-        {
-            get => _booking.RoomNumber;
-            set
-            {
-                _booking.RoomNumber = value;
-                OnPropertyChanged();
-            }
-        }
-        
-        /// <summary>
-        /// Propiedad para la actualización de la reserva
-        /// Se utiliza para determinar el modo de la ventana
-        /// </summary>
         private BookingModel _booking;
         public BookingModel Booking
         {
@@ -110,158 +32,260 @@ namespace desktop_app.ViewModels
             {
                 _booking = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(Title));
-                OnPropertyChanged(nameof(Enabled));
-                OnPropertyChanged(nameof(Disabled));
-                OnPropertyChanged(nameof(ClientDni));
-                OnPropertyChanged(nameof(RoomNumber));
+                RefreshAll();
             }
         }
 
-        
-        /// <summary>
-        /// Comando para el botón de guardar
-        /// </summary>
-        public ICommand SaveCommand { get; }
 
-        
-        /// <summary>
-        /// Comando para el botón de volver
-        /// </summary>
-        public ICommand ReturnCommand { get; } = new RelayCommand(_ =>
+        private ObservableCollection<UserModel> _clients = new();
+        public ObservableCollection<UserModel> Clients
         {
-            NavigationService.Instance.NavigateTo<BookingView>();
-        });
+            get => _clients;
+            set => SetProperty(ref _clients, value);
+        }
 
-        
-        
-        /// <summary>
-        /// Comando para el botón de cancelar reserva
-        /// </summary>
+        private async void LoadClients()
+        {
+            Clients.Clear();
+            var users = await UserService.GetAllUsersAsync();
+            foreach (var user in users)
+                Clients.Add(user);
+        }
+
+        public string ClientDni
+        {
+            get => Booking.ClientDni;
+            set
+            {
+                Booking.ClientDni = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        private ObservableCollection<RoomModel> _rooms = new();
+        public ObservableCollection<RoomModel> Rooms
+        {
+            get => _rooms;
+            set => SetProperty(ref _rooms, value);
+        }
+
+        private async void LoadRooms()
+        {
+            Rooms.Clear();
+            var rooms = (await RoomService.GetRoomsFilteredAsync()).Items;
+            foreach (var room in rooms)
+                Rooms.Add(room);
+        }
+
+        public string RoomNumber
+        {
+            get => Booking.RoomNumber;
+            set
+            {
+                Booking.RoomNumber = value;
+                ChangeRoomData(Booking.RoomNumber);
+                OnPropertyChanged();
+            }
+        }
+
+        public async void ChangeRoomData(String roomNumber)
+        {
+            String id = "";
+            foreach (var room in _rooms)
+            {
+                if (room.RoomNumber == roomNumber)
+                {
+                    id = room.Id;
+                }
+            }
+
+            RoomModel Room = await RoomService.GetRoomByIdAsync(id);
+            PricePerNight = Room.PricePerNight ?? 0;
+            Offer = Room.Offer ?? 0;
+        }
+
+        public DateTime CheckInDate
+        {
+            get => Booking.CheckInDate;
+            set
+            {
+                Booking.CheckInDate = value;
+                OnPropertyChanged();
+                RecalculateTotal();
+            }
+        }
+
+        public DateTime CheckOutDate
+        {
+            get => Booking.CheckOutDate;
+            set
+            {
+                Booking.CheckOutDate = value;
+                OnPropertyChanged();
+                RecalculateTotal();
+            }
+        }
+
+        public DateTime PayDate
+        {
+            get => Booking.PayDate;
+            set
+            {
+                Booking.PayDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public decimal PricePerNight
+        {
+            get => Booking.PricePerNight ?? 0;
+            set
+            {
+                Booking.PricePerNight = value;
+                OnPropertyChanged();
+                RecalculateTotal();
+            }
+        }
+
+        public decimal Offer
+        {
+            get => Booking.Offer ?? 0;
+            set
+            {
+                Booking.Offer = value;
+                OnPropertyChanged();
+                RecalculateTotal();
+            }
+        }
+
+        public decimal TotalPrice
+        {
+            get => Booking.TotalPrice;
+            private set
+            {
+                Booking.TotalPrice = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int TotalNights
+        {
+            get => Booking.TotalNights;
+            private set
+            {
+                Booking.TotalNights = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
-        
-        
-        /// <summary>
-        /// Comando para ver los detalles de la reserva
-        /// </summary>
         public ICommand ShowCommand { get; }
-        
-        /// <summary>
-        /// Constructor de la clase
-        /// Crea una reserva vacía sobre la que crear
-        /// Asigna los comandos de guardar y cancelar
-        /// </summary>
+
+        public ICommand ReturnCommand { get; } =
+            new RelayCommand(_ =>
+                NavigationService.Instance.NavigateTo<BookingView>());
+
+
         private FormBookingViewModel()
         {
             Booking = new BookingModel();
+
             SaveCommand = new RelayCommand(async _ => await Save());
             CancelCommand = new RelayCommand(async _ => await Cancel());
             ShowCommand = new RelayCommand(_ => ShowData());
-            
+
             LoadClients();
             LoadRooms();
         }
 
-        
-        /// <summary>
-        /// Función para cancelar una reserva
-        /// Se referencia en el comando de cancelar
-        /// </summary>
+
+        private void RecalculateTotal()
+        {
+            if (CheckOutDate <= CheckInDate)
+            {
+                TotalNights = 0;
+                TotalPrice = 0;
+                return;
+            }
+
+            TotalNights = (CheckOutDate.Date - CheckInDate.Date).Days;
+
+            var basePrice = TotalNights * PricePerNight;
+            var discount = basePrice * (Offer / 100m);
+
+            TotalPrice = basePrice - discount;
+        }
+
+        private void RefreshAll()
+        {
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(Enabled));
+            OnPropertyChanged(nameof(Disabled));
+
+            OnPropertyChanged(nameof(ClientDni));
+            OnPropertyChanged(nameof(RoomNumber));
+
+            OnPropertyChanged(nameof(CheckInDate));
+            OnPropertyChanged(nameof(CheckOutDate));
+            OnPropertyChanged(nameof(PayDate));
+
+            OnPropertyChanged(nameof(PricePerNight));
+            OnPropertyChanged(nameof(Offer));
+            OnPropertyChanged(nameof(TotalPrice));
+            OnPropertyChanged(nameof(TotalNights));
+        }
+
+        private async Task Save()
+        {
+            if (string.IsNullOrEmpty(Booking.Id))
+            {
+                var userId = await UserService.GetUserIdByDniAsync(ClientDni);
+                Booking.Client = userId;
+
+                var filter = new RoomsFilter { RoomNumber = RoomNumber };
+                Booking.Room =
+                    (await RoomService.GetRoomsFilteredAsync(filter))
+                    ?.Items.First().Id;
+                
+                await BookingService.CreateBookingAsync(Booking);
+            }
+            else
+            {
+                await BookingService.UpdateBookingAsync(Booking);
+            }
+
+            await BookingEvents.RaiseBookingChanged();
+            NavigationService.Instance.NavigateTo<BookingView>();
+        }
+
         private async Task Cancel()
         {
             if (Booking.Status == "Cancelada")
             {
-                MessageBox.Show("Esta reserva ya está cancelada", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Esta reserva ya está cancelada");
                 return;
             }
-            
-            var result = MessageBox.Show("¿Seguro que quieres cancelar esta reserva?", "Confirmar cancelación", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
-            if (result != MessageBoxResult.Yes)
+            if (MessageBox.Show("¿Cancelar reserva?",
+                    "Confirmación",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
-            
-            try
-            {
-                var update = await BookingService.CancelBookingAsync(Booking.Id);
-                if (update == null)
-                {
-                    MessageBox.Show("No se ha podido leer la respuesta del servidor");
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            
-            await BookingEvents.RaiseBookingChanged();
-            NavigationService.Instance.NavigateTo<BookingView>();
-        }
-        
-        
-        /// <summary>
-        /// Función para guardar una reserva
-        /// Se referencia en el comando de guardar
-        /// </summary>
-        private async Task Save()
-        {
-            if (Booking.Id == "")
-            {
-                var userId = await UserService.GetUserIdByDniAsync(ClientDni);
-                if (userId == "Error")
-                {
-                    MessageBox.Show("Error al obtener el usuario");
-                    return;
-                }
-                Booking.Client = userId;
 
-                RoomsFilter f = new RoomsFilter();
-                f.RoomNumber = _booking.RoomNumber;
-                var roomId = (await RoomService.GetRoomsFilteredAsync(f))?.Items.First().Id;
-                
-                if (roomId == "")
-                {
-                    MessageBox.Show("Error al obtener la habitación");
-                    return;
-                }
-                Booking.Room = roomId;
-
-                try
-                {
-                    var create = await BookingService.CreateBookingAsync(Booking);
-                    if (create == null)
-                    {
-                        MessageBox.Show("Ha ocurrido un error al crear la reserva");
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-            }
-            else
-            {
-                try
-                {
-                    await BookingService.UpdateBookingAsync(Booking);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-            }
-            
+            await BookingService.CancelBookingAsync(Booking.Id);
             await BookingEvents.RaiseBookingChanged();
             NavigationService.Instance.NavigateTo<BookingView>();
         }
 
         private void ShowData()
         {
-            MessageBox.Show(Booking.ToString(), "Información completa", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                Booking.ToString(),
+                "Información completa",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
     }
 }

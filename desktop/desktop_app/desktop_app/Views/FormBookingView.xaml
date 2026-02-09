@@ -18,7 +18,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <Border Style="{StaticResource HeaderWrapper}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Border Grid.ColumnSpan="2" Style="{StaticResource HeaderWrapper}">
             <StackPanel>
                 <TextBlock Text="{Binding Title}" Style="{StaticResource HeaderMainTitle}"/>
             
@@ -28,14 +33,13 @@
             </StackPanel>
         </Border>
         
-        <StackPanel Grid.Row="1" Style="{StaticResource BtnWrapper}">
+        <StackPanel Grid.Column="0" Grid.Row="1" Style="{StaticResource BtnWrapper}">
             <Button Content="Volver" Style="{StaticResource RedReturnBtn}" Command="{Binding ReturnCommand}"/>
             <Button Content="Guardar" Style="{StaticResource SaveBtn}" Command="{Binding SaveCommand}"/>
             <Button Content="Cancelar" Style="{StaticResource CancelBtn}" Command="{Binding CancelCommand}" IsEnabled="{Binding Disabled}"/>
-            <Button Content="Ver detalles" Style="{StaticResource CancelBtn}" Command="{Binding ShowCommand}"/>
         </StackPanel>
         
-        <Grid Grid.Row="2" Margin="0 15 0 0" Width="500" HorizontalAlignment="Left">
+        <Grid Grid.Column="0" Grid.Row="2" Margin="0 15 15 0" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -68,7 +72,7 @@
             </StackPanel>
             
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <Grid Width="500">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -76,12 +80,12 @@
                     
                     <StackPanel>
                         <Label Content="Fecha de inicio: " Target="FirstNightDatePicker" Style="{StaticResource LabelForm}"/>
-                        <DatePicker x:Name="FirstNightDatePicker" SelectedDate="{Binding Booking.CheckInDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" Margin="0 0 10 0"/>
+                        <DatePicker x:Name="FirstNightDatePicker" SelectedDate="{Binding CheckInDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" Margin="0 0 10 0"/>
                     </StackPanel>
             
                     <StackPanel Grid.Column="1">
                         <Label Content="Fecha de fin: " Target="LastNightDatePicker" Style="{StaticResource LabelForm}"/>
-                        <DatePicker x:Name="LastNightDatePicker" SelectedDate="{Binding Booking.CheckOutDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}"/>
+                        <DatePicker x:Name="LastNightDatePicker" SelectedDate="{Binding CheckOutDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -89,6 +93,36 @@
             <StackPanel Grid.Row="3">
                 <Label Content="Cantidad de huéspedes: " Target="GuestsTextBox" Style="{StaticResource LabelForm}"/>
                 <TextBox x:Name="GuestsTextBox" Text="{Binding Booking.Guests, Mode=TwoWay}" Style="{StaticResource TextBoxForm}"/>
+            </StackPanel>
+        </Grid>
+        
+    
+        <Grid Grid.Column="1" Grid.Row="2" Margin="15 15 0 0" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0">
+                <Label Content="Fecha de pago: " Target="PayDateTextBox" Style="{StaticResource LabelForm}"/>
+                <TextBox x:Name="PayDateTextBox" Text="{Binding PayDate, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="1">
+                <Label Content="Precio total: " Target="TotalPriceTextBox" Style="{StaticResource LabelForm}"/>
+                <TextBox x:Name="TotalPriceTextBox" Text="{Binding TotalPrice, Mode=OneWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="2">
+                <Label Content="Precio por noche: " Target="PricePerNightTextBox" Style="{StaticResource LabelForm}"/>
+                <TextBox x:Name="PricePerNightTextBox" Text="{Binding PricePerNight, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Row="3">
+                <Label Content="% de oferta: " Target="OfferTextBox" Style="{StaticResource LabelForm}"/>
+                <TextBox x:Name="OfferTextBox" Text="{Binding Offer, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
             </StackPanel>
         </Grid>
     </Grid>
