@@ -15,8 +15,14 @@ using System.Windows.Input;
 
 namespace desktop_app.ViewModels
 {
+    /// <summary>
+    /// ViewModel para la vista de lista de habitaciones.
+    /// </summary>
     public class RoomViewModel : ViewModelBase
     {
+        #region Propiedades
+
+        /// <summary>Colección de habitaciones mostradas.</summary>
         private ObservableCollection<RoomModel> _rooms = new();
         public ObservableCollection<RoomModel> Rooms
         {
@@ -24,6 +30,7 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _rooms, value);
         }
 
+        /// <summary>Texto de estado (resultados, cargando, error).</summary>
         private string _statusText = "";
         public string StatusText
         {
@@ -31,88 +38,7 @@ namespace desktop_app.ViewModels
             set => SetProperty(ref _statusText, value);
         }
 
-        private string _type = "";
-        public string Type
-        {
-            get => _type;
-            set => SetProperty(ref _type, value == "Todos" ? "" : value);
-        }
-
-        private bool _onlyAvailable;
-        public bool OnlyAvailable
-        {
-            get => _onlyAvailable;
-            set => SetProperty(ref _onlyAvailable, value);
-        }
-
-        private string _guestsText = "";
-        public string GuestsText
-        {
-            get => _guestsText;
-            set => SetProperty(ref _guestsText, value);
-        }
-
-        private string _minPriceText = "";
-        public string MinPriceText
-        {
-            get => _minPriceText;
-            set => SetProperty(ref _minPriceText, value);
-        }
-
-        private string _maxPriceText = "";
-        public string MaxPriceText
-        {
-            get => _maxPriceText;
-            set => SetProperty(ref _maxPriceText, value);
-        }
-
-        private bool _hasExtraBed;
-        public bool HasExtraBed
-        {
-            get => _hasExtraBed;
-            set => SetProperty(ref _hasExtraBed, value);
-        }
-
-        private bool _hasCrib;
-        public bool HasCrib
-        {
-            get => _hasCrib;
-            set => SetProperty(ref _hasCrib, value);
-        }
-
-        private bool _hasOffer;
-        public bool HasOffer
-        {
-            get => _hasOffer;
-            set => SetProperty(ref _hasOffer, value);
-        }
-
-        private string _extrasText = "";
-        public string ExtrasText
-        {
-            get => _extrasText;
-            set => SetProperty(ref _extrasText, value);
-        }
-
-        private string _sortBy = "roomNumber";
-        public string SortBy
-        {
-            get => _sortBy;
-            set => SetProperty(ref _sortBy, value);
-        }
-
-        private string _sortOrder = "asc";
-        public string SortOrder
-        {
-            get => _sortOrder;
-            set => SetProperty(ref _sortOrder, value);
-        }
-
-        public AsyncRelayCommand SearchCommand { get; }
-        public AsyncRelayCommand RefreshCommand { get; }
-        public RelayCommand ClearFiltersCommand { get; }
-        public RelayCommand DeleteRoomCommand { get; }
-
+        /// <summary>Habitación seleccionada.</summary>
         private RoomModel? _selectedRoom;
         public RoomModel? SelectedRoom
         {
@@ -122,10 +48,128 @@ namespace desktop_app.ViewModels
 
         private RoomsFilter _lastFilter = new RoomsFilter();
 
+        #endregion
+
+        #region Propiedades de Filtro
+
+        private string _type = "";
+        /// <summary>Tipo de habitación para filtrar.</summary>
+        public string Type
+        {
+            get => _type;
+            set => SetProperty(ref _type, value == "Todos" ? "" : value);
+        }
+
+        private bool _onlyAvailable;
+        /// <summary>Filtrar solo disponibles.</summary>
+        public bool OnlyAvailable
+        {
+            get => _onlyAvailable;
+            set => SetProperty(ref _onlyAvailable, value);
+        }
+
+        private string _guestsText = "";
+        /// <summary>Número de huéspedes (texto).</summary>
+        public string GuestsText
+        {
+            get => _guestsText;
+            set => SetProperty(ref _guestsText, value);
+        }
+
+        private string _minPriceText = "";
+        /// <summary>Precio mínimo (texto).</summary>
+        public string MinPriceText
+        {
+            get => _minPriceText;
+            set => SetProperty(ref _minPriceText, value);
+        }
+
+        private string _maxPriceText = "";
+        /// <summary>Precio máximo (texto).</summary>
+        public string MaxPriceText
+        {
+            get => _maxPriceText;
+            set => SetProperty(ref _maxPriceText, value);
+        }
+
+        private bool _hasExtraBed;
+        /// <summary>Filtrar con cama extra.</summary>
+        public bool HasExtraBed
+        {
+            get => _hasExtraBed;
+            set => SetProperty(ref _hasExtraBed, value);
+        }
+
+        private bool _hasCrib;
+        /// <summary>Filtrar con cuna.</summary>
+        public bool HasCrib
+        {
+            get => _hasCrib;
+            set => SetProperty(ref _hasCrib, value);
+        }
+
+        private bool _hasOffer;
+        /// <summary>Filtrar con oferta.</summary>
+        public bool HasOffer
+        {
+            get => _hasOffer;
+            set => SetProperty(ref _hasOffer, value);
+        }
+
+        private string _extrasText = "";
+        /// <summary>Extras a buscar (CSV).</summary>
+        public string ExtrasText
+        {
+            get => _extrasText;
+            set => SetProperty(ref _extrasText, value);
+        }
+
+        private string _sortBy = "roomNumber";
+        /// <summary>Campo de ordenamiento.</summary>
+        public string SortBy
+        {
+            get => _sortBy;
+            set => SetProperty(ref _sortBy, value);
+        }
+
+        private string _sortOrder = "asc";
+        /// <summary>Dirección de ordenamiento.</summary>
+        public string SortOrder
+        {
+            get => _sortOrder;
+            set => SetProperty(ref _sortOrder, value);
+        }
+
+        #endregion
+
+        #region Commands
+
+        /// <summary>Comando para buscar habitaciones.</summary>
+        public AsyncRelayCommand SearchCommand { get; }
+
+        /// <summary>Comando para refrescar la lista.</summary>
+        public AsyncRelayCommand RefreshCommand { get; }
+
+        /// <summary>Comando para limpiar filtros.</summary>
+        public RelayCommand ClearFiltersCommand { get; }
+
+        /// <summary>Comando para eliminar una habitación.</summary>
+        public RelayCommand DeleteRoomCommand { get; }
+
+        /// <summary>Comando para ir a crear habitación.</summary>
         public ICommand GoCreateRoomCommand { get; }
+
+        /// <summary>Comando para ir a editar habitación.</summary>
         public ICommand GoUpdateRoomCommand { get; }
+
+        /// <summary>Comando para volver a la lista.</summary>
         public ICommand BackToRoomsCommand { get; }
 
+        #endregion
+
+        /// <summary>
+        /// Inicializa el ViewModel y carga datos iniciales.
+        /// </summary>
         public RoomViewModel()
         {
             SearchCommand = new AsyncRelayCommand(SearchAsync);
@@ -148,6 +192,12 @@ namespace desktop_app.ViewModels
             _ = LoadInitialAsync();
         }
 
+        #region Métodos Privados
+
+        /// <summary>
+        /// Elimina una habitación tras confirmación.
+        /// </summary>
+        /// <param name="room">Habitación a eliminar.</param>
         private async Task DeleteRoomAsync(RoomModel? room)
         {
             if (room == null) return;
@@ -158,8 +208,7 @@ namespace desktop_app.ViewModels
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
-            if (confirm != MessageBoxResult.Yes)
-                return;
+            if (confirm != MessageBoxResult.Yes) return;
 
             var ok = await RoomService.DeleteRoomAsync(room.Id);
 
@@ -211,7 +260,6 @@ namespace desktop_app.ViewModels
             ExtrasText = "";
             SortBy = "roomNumber";
             SortOrder = "asc";
-
             _lastFilter = new RoomsFilter();
         }
 
@@ -232,6 +280,11 @@ namespace desktop_app.ViewModels
             StatusText = $"Resultados: {Rooms.Count}";
         }
 
+        /// <summary>
+        /// Construye el filtro desde los valores de la UI.
+        /// </summary>
+        /// <returns>Filtro configurado.</returns>
+        /// <exception cref="Exception">Si algún campo tiene formato inválido.</exception>
         private RoomsFilter BuildFilterFromUi()
         {
             var f = new RoomsFilter();
@@ -290,10 +343,16 @@ namespace desktop_app.ViewModels
 
             return f;
         }
+
+        #endregion
     }
 
+    /// <summary>
+    /// ViewModel para crear una habitación.
+    /// </summary>
     public class CreateRoomViewModel : ViewModelBase
     {
+        /// <summary>Modelo de la habitación en creación.</summary>
         private RoomModel _room = new() { IsAvailable = true, Rate = 0 };
         public RoomModel Room
         {
@@ -302,6 +361,7 @@ namespace desktop_app.ViewModels
         }
 
         private string _extrasText = "";
+        /// <summary>Extras como texto CSV.</summary>
         public string ExtrasText
         {
             get => _extrasText;
@@ -309,23 +369,18 @@ namespace desktop_app.ViewModels
         }
 
         private string _extraImagesText = "";
+        /// <summary>Info de imágenes extra.</summary>
         public string ExtraImagesText
         {
             get => _extraImagesText;
             set => SetProperty(ref _extraImagesText, value);
         }
 
-        public AsyncRelayCommand SaveCommand { get; }
-        public RelayCommand CancelCommand { get; }
-
-        // Subida de fotos (paths locales)
         private string? _mainImageLocalPath;
         private List<string> _extraImagesLocalPaths = new();
 
-        public RelayCommand PickMainImageLocalCommand { get; }
-        public RelayCommand PickExtraImagesLocalCommand { get; }
-
         private string _mainImageLabel = "Sin seleccionar";
+        /// <summary>Nombre del archivo de imagen principal.</summary>
         public string MainImageLabel
         {
             get => _mainImageLabel;
@@ -333,17 +388,29 @@ namespace desktop_app.ViewModels
         }
 
         private string _extraImagesLabel = "0 seleccionadas";
+        /// <summary>Contador de imágenes extra.</summary>
         public string ExtraImagesLabel
         {
             get => _extraImagesLabel;
             set => SetProperty(ref _extraImagesLabel, value);
         }
 
+        /// <summary>Comando para guardar.</summary>
+        public AsyncRelayCommand SaveCommand { get; }
+
+        /// <summary>Comando para cancelar.</summary>
+        public RelayCommand CancelCommand { get; }
+
+        /// <summary>Comando para seleccionar imagen principal.</summary>
+        public RelayCommand PickMainImageLocalCommand { get; }
+
+        /// <summary>Comando para seleccionar imágenes extra.</summary>
+        public RelayCommand PickExtraImagesLocalCommand { get; }
+
         public CreateRoomViewModel()
         {
             SaveCommand = new AsyncRelayCommand(SaveAsync);
             CancelCommand = new RelayCommand(_ => NavigationService.Instance.NavigateTo<RoomView>());
-
             PickMainImageLocalCommand = new RelayCommand(_ => PickMainImageLocal());
             PickExtraImagesLocalCommand = new RelayCommand(_ => PickExtraImagesLocal());
         }
@@ -373,16 +440,18 @@ namespace desktop_app.ViewModels
             if (dlg.ShowDialog() != true) return;
 
             _extraImagesLocalPaths = dlg.FileNames.ToList();
-
             ExtraImagesLabel = $"{_extraImagesLocalPaths.Count} seleccionadas";
             ExtraImagesText = string.Join(", ", _extraImagesLocalPaths.Select(Path.GetFileName));
         }
 
+        /// <summary>
+        /// Valida, sube imágenes y crea la habitación.
+        /// </summary>
+        /// <exception cref="Exception">Si hay errores de validación o subida.</exception>
         private async Task SaveAsync()
         {
             try
             {
-                // Validaciones básicas
                 if (string.IsNullOrWhiteSpace(Room.RoomNumber))
                     throw new Exception("RoomNumber es obligatorio.");
 
@@ -392,30 +461,25 @@ namespace desktop_app.ViewModels
                 if (Room.MaxGuests <= 0)
                     throw new Exception("MaxGuests debe ser mayor que 0.");
 
-                // Extras (csv -> list)
                 Room.Extras = (ExtrasText ?? "")
                     .Split(',')
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .ToList();
 
-                // 1) Subir MainImage si se seleccionó
                 if (!string.IsNullOrWhiteSpace(_mainImageLocalPath))
                 {
                     var uploadedMain = await ImageService.UploadSingleAsync(_mainImageLocalPath);
                     if (uploadedMain == null)
                         throw new Exception("No se pudo subir la imagen principal.");
-
-                    Room.MainImage = uploadedMain.Url; // "/uploads/xxx.jpg"
+                    Room.MainImage = uploadedMain.Url;
                 }
 
-                // 2) Subir ExtraImages si hay seleccionadas
                 if (_extraImagesLocalPaths != null && _extraImagesLocalPaths.Count > 0)
                 {
                     var uploadedExtras = await ImageService.UploadManyAsync(_extraImagesLocalPaths);
                     if (uploadedExtras == null)
                         throw new Exception("No se pudieron subir las imágenes extra.");
-
                     Room.ExtraImages = uploadedExtras.Select(x => x.Url).ToList();
                     ExtraImagesText = string.Join(", ", Room.ExtraImages);
                     ExtraImagesLabel = $"{Room.ExtraImages.Count} seleccionadas";
@@ -427,10 +491,7 @@ namespace desktop_app.ViewModels
                     ExtraImagesLabel = "0 seleccionadas";
                 }
 
-                // 3) Crear habitación (usa el CreateRoomAsync que lanza excepción si falla)
                 var created = await RoomService.CreateRoomAsync(Room);
-
-                // 4) Navegar al final
                 NavigationService.Instance.NavigateTo<RoomView>();
             }
             catch (Exception ex)
@@ -440,16 +501,26 @@ namespace desktop_app.ViewModels
         }
     }
 
+    /// <summary>
+    /// ViewModel para editar una habitación.
+    /// </summary>
     public class UpdateRoomViewModel : ViewModelBase
     {
-        private RoomModel _room;
+        /// <summary>Item de imagen para la galería.</summary>
         public class RoomImageItem
         {
-            public string Url { get; set; } = "";          // "/uploads/xxx.jpg"
-            public string AbsoluteUrl { get; set; } = "";  // "http://localhost:3000/uploads/xxx.jpg"
-            public bool IsMain { get; set; }               // para badge Principal
+            /// <summary>Ruta relativa.</summary>
+            public string Url { get; set; } = "";
+
+            /// <summary>URL absoluta para mostrar.</summary>
+            public string AbsoluteUrl { get; set; } = "";
+
+            /// <summary>Es imagen principal.</summary>
+            public bool IsMain { get; set; }
         }
 
+        private RoomModel _room;
+        /// <summary>Habitación en edición.</summary>
         public RoomModel Room
         {
             get => _room;
@@ -457,6 +528,7 @@ namespace desktop_app.ViewModels
         }
 
         private string _extrasText = "";
+        /// <summary>Extras como CSV.</summary>
         public string ExtrasText
         {
             get => _extrasText;
@@ -464,23 +536,21 @@ namespace desktop_app.ViewModels
         }
 
         private string _extraImagesText = "";
+        /// <summary>Info de imágenes extra.</summary>
         public string ExtraImagesText
         {
             get => _extraImagesText;
             set => SetProperty(ref _extraImagesText, value);
         }
 
-        public AsyncRelayCommand SaveCommand { get; }
-        public RelayCommand CancelCommand { get; }
+        /// <summary>Imágenes existentes para la galería.</summary>
+        public ObservableCollection<RoomImageItem> ExistingImages { get; } = new();
 
-        // imágenes
         private string? _mainImageLocalPath;
         private List<string> _extraImagesLocalPaths = new();
 
-        public RelayCommand PickMainImageLocalCommand { get; }
-        public RelayCommand PickExtraImagesLocalCommand { get; }
-
         private string _mainImageLabel = "Sin seleccionar";
+        /// <summary>Nombre del archivo de imagen principal.</summary>
         public string MainImageLabel
         {
             get => _mainImageLabel;
@@ -488,17 +558,32 @@ namespace desktop_app.ViewModels
         }
 
         private string _extraImagesLabel = "0 seleccionadas";
+        /// <summary>Contador de imágenes extra nuevas.</summary>
         public string ExtraImagesLabel
         {
             get => _extraImagesLabel;
             set => SetProperty(ref _extraImagesLabel, value);
         }
 
+        /// <summary>Comando para guardar cambios.</summary>
+        public AsyncRelayCommand SaveCommand { get; }
 
-        public ObservableCollection<RoomImageItem> ExistingImages { get; } = new();
+        /// <summary>Comando para cancelar.</summary>
+        public RelayCommand CancelCommand { get; }
 
+        /// <summary>Comando para seleccionar nueva imagen principal.</summary>
+        public RelayCommand PickMainImageLocalCommand { get; }
+
+        /// <summary>Comando para seleccionar nuevas imágenes extra.</summary>
+        public RelayCommand PickExtraImagesLocalCommand { get; }
+
+        /// <summary>Comando para eliminar una imagen.</summary>
         public ICommand DeleteImageCommand { get; }
 
+        /// <summary>
+        /// Inicializa el ViewModel con una habitación existente.
+        /// </summary>
+        /// <param name="room">Habitación a editar.</param>
         public UpdateRoomViewModel(RoomModel room)
         {
             _room = room;
@@ -508,7 +593,6 @@ namespace desktop_app.ViewModels
 
             SaveCommand = new AsyncRelayCommand(SaveAsync);
             CancelCommand = new RelayCommand(_ => NavigationService.Instance.NavigateTo<RoomView>());
-
             PickMainImageLocalCommand = new RelayCommand(_ => PickMainImageLocal());
             PickExtraImagesLocalCommand = new RelayCommand(_ => PickExtraImagesLocal());
 
@@ -517,15 +601,16 @@ namespace desktop_app.ViewModels
                 (p) => p is RoomImageItem it && !string.IsNullOrWhiteSpace(it.Url)
             );
 
-            
             RefreshExistingImages();
         }
-        // Llamar cuando cargas la habitación
+
+        /// <summary>
+        /// Recarga la galería de imágenes existentes.
+        /// </summary>
         public void RefreshExistingImages()
         {
             ExistingImages.Clear();
 
-            // Principal
             if (!string.IsNullOrWhiteSpace(Room.MainImage))
             {
                 ExistingImages.Add(new RoomImageItem
@@ -536,7 +621,6 @@ namespace desktop_app.ViewModels
                 });
             }
 
-            // Extras
             if (Room.ExtraImages != null)
             {
                 foreach (var u in Room.ExtraImages.Where(x => !string.IsNullOrWhiteSpace(x)))
@@ -553,20 +637,22 @@ namespace desktop_app.ViewModels
             OnPropertyChanged(nameof(ExistingImages));
         }
 
+        /// <summary>
+        /// Elimina una imagen del servidor y del modelo.
+        /// </summary>
+        /// <param name="p">RoomImageItem a eliminar.</param>
         private async Task DeleteImageAsync(object p)
         {
             if (p is not RoomImageItem img) return;
 
             var confirm = MessageBox.Show(
-                "¿Seguro que quieres borrar esta imagen?\n\nSe eliminará del servidor y se quitará de la habitación.",
+                "¿Seguro que quieres borrar esta imagen?\n\nSe eliminará del servidor.",
                 "Confirmar borrado",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
-            if (confirm != MessageBoxResult.Yes)
-                return;
+            if (confirm != MessageBoxResult.Yes) return;
 
-         
             var ok = await ImageService.DeleteImageAsync(img.Url);
             if (!ok)
             {
@@ -575,32 +661,22 @@ namespace desktop_app.ViewModels
                 return;
             }
 
-     
             ExistingImages.Remove(img);
 
-       
             if (img.IsMain)
             {
-                Room.MainImage = null;         
+                Room.MainImage = null;
                 MainImageLabel = "Sin seleccionar";
             }
             else
             {
-             
                 Room.ExtraImages.Remove(img.Url);
-
-        
                 ExtraImagesLabel = $"{Room.ExtraImages.Count} seleccionadas";
                 ExtraImagesText = string.Join(", ", Room.ExtraImages);
             }
 
             OnPropertyChanged(nameof(Room));
-
-         
         }
-
-
-
 
         private void PickMainImageLocal()
         {
@@ -630,18 +706,20 @@ namespace desktop_app.ViewModels
             ExtraImagesLabel = $"{_extraImagesLocalPaths.Count} seleccionadas";
         }
 
+        /// <summary>
+        /// Guarda los cambios en la habitación.
+        /// </summary>
+        /// <exception cref="Exception">Si hay errores de subida o actualización.</exception>
         private async Task SaveAsync()
         {
             try
             {
-                // (Opcional) actualizar extras desde csv
                 Room.Extras = (ExtrasText ?? "")
                     .Split(',')
                     .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrWhiteSpace(x))
                     .ToList();
 
-                // Main image
                 if (!string.IsNullOrWhiteSpace(_mainImageLocalPath))
                 {
                     var up = await ImageService.UploadSingleAsync(_mainImageLocalPath);
@@ -649,7 +727,6 @@ namespace desktop_app.ViewModels
                     Room.MainImage = up.Url;
                 }
 
-                // Extra images
                 if (_extraImagesLocalPaths.Count > 0)
                 {
                     var ups = await ImageService.UploadManyAsync(_extraImagesLocalPaths);
@@ -657,10 +734,8 @@ namespace desktop_app.ViewModels
 
                     Room.ExtraImages ??= new List<string>();
                     Room.ExtraImages.AddRange(ups.Select(x => x.Url));
-
                     ExtraImagesText = string.Join(", ", Room.ExtraImages);
                 }
-
 
                 var ok = await RoomService.UpdateRoomAsync(Room.Id, Room);
                 if (!ok) throw new Exception("No se pudo actualizar la habitación (API).");

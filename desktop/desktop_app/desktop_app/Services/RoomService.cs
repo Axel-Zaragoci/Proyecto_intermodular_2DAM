@@ -3,30 +3,41 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json; // UrlEncode
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
 
 namespace desktop_app.Services
 {
+    /// <summary>
+    /// Servicio para operaciones CRUD de habitaciones contra la API REST.
+    /// </summary>
     public static class RoomService
     {
-        // FILTER  (GET /room/) : Devuelve una lista envuelta en RoomsResponse
+        private static readonly JsonSerializerOptions _jsonOptions =
+            new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+        /// <summary>
+        /// Obtiene habitaciones aplicando un filtro opcional.
+        /// </summary>
+        /// <param name="f">Filtro de búsqueda. Si es null, devuelve todas.</param>
+        /// <returns>Respuesta con lista de habitaciones, o null si hay error de conexión.</returns>
         public static async Task<RoomsResponse?> GetRoomsFilteredAsync(RoomsFilter? f = null)
         {
             try
             {
-                // Si no viene filtro, creamos uno vacío que equivale a pedir todas las habitaciones
                 f ??= new RoomsFilter();
 
-                // Preparamos los parámetros del req.query
                 var parameters = new Dictionary<string, string?>();
 
                 if (!string.IsNullOrWhiteSpace(f.Type))
                     parameters["type"] = f.Type;
 
-   
                 if (f.IsAvailable.HasValue)
                     parameters["isAvailable"] = f.IsAvailable.Value.ToString().ToLowerInvariant();
 
@@ -50,8 +61,7 @@ namespace desktop_app.Services
 
                 if (!string.IsNullOrWhiteSpace(f.RoomNumber))
                     parameters["roomNumber"] = f.RoomNumber;
-                
-                // ---- extras: "wifi,parking" ----
+
                 if (f.Extras != null && f.Extras.Count > 0)
                     parameters["extras"] = string.Join(",", f.Extras);
 
@@ -61,17 +71,13 @@ namespace desktop_app.Services
                 if (!string.IsNullOrWhiteSpace(f.SortOrder))
                     parameters["sortOrder"] = f.SortOrder;
 
-                // BuildQuery convierte el diccionario en texto: "?type=double&minPrice=50"
                 string url = ApiService.BaseUrl + "room" + BuildQuery(parameters);
 
-                // PETICIÓN HTTP (ASÍNCRONA)
-                // 'await' espera la respuesta sin congelar la app.
                 var respuesta = await ApiService._httpClient.GetAsync(url);
 
                 if (!respuesta.IsSuccessStatusCode)
-                    return new RoomsResponse(); // Si falla, devuelve vacío.
+                    return new RoomsResponse();
 
-                // DESERIALIZACIÓN (JSON -> OBJETOS C#)
                 string contenido = await respuesta.Content.ReadAsStringAsync();
                 var opciones = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -85,37 +91,11 @@ namespace desktop_app.Services
             }
         }
 
-        // recorre el diccionario y une con "&" y "=" ...
-        // Usa WebUtility.UrlEncode para manejar espacios y caracteres raros.
-        private static string BuildQuery(Dictionary<string, string?> parameters)
-        {
-            var sb = new StringBuilder();
-            bool first = true;
-
-            foreach (var kv in parameters)
-            {
-            
-                if (string.IsNullOrWhiteSpace(kv.Value))
-                    continue;
-
-                sb.Append(first ? "?" : "&");
-                first = false;
-
-                sb.Append(WebUtility.UrlEncode(kv.Key));
-                sb.Append("=");
-                sb.Append(WebUtility.UrlEncode(kv.Value));
-            }
-
-            return sb.ToString();
-        }
-
-        private static readonly JsonSerializerOptions _jsonOptions =
-            new JsonSerializerOptions 
-            { 
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
+        /// <summary>
+        /// Obtiene una habitación por su ID.
+        /// </summary>
+        /// <param name="roomId">ID de la habitación.</param>
+        /// <returns>La habitación encontrada, o null si no existe.</returns>
         public static async Task<RoomModel?> GetRoomByIdAsync(string roomId)
         {
             try
@@ -134,7 +114,13 @@ namespace desktop_app.Services
             }
         }
 
-        // CREATE  (POST /room/)
+        /// <summary>
+        /// Crea una nueva habitación.
+        /// </summary>
+        /// <param name="room">Datos de la habitación a crear.</param>
+        /// <returns>La habitación creada con su ID asignado.</returns>
+        /// <exception cref="HttpRequestException">Si la API responde con error.</exception>
+        /// <exception cref="Exception">Si no se puede deserializar la respuesta.</exception>
         public static async Task<RoomModel> CreateRoomAsync(RoomModel room)
         {
             var url = ApiService.BaseUrl + "room";
@@ -154,15 +140,18 @@ namespace desktop_app.Services
 
             if (created is null)
                 throw new Exception(
-                    $"La API respondió OK, pero no se pudo deserializar el JSON.\n" +
-                    $"Body:\n{body}"
+                    $"La API respondió OK, pero no se pudo deserializar.\nBody:\n{body}"
                 );
 
             return created;
         }
 
-
-        // UPDATE (PATCH /room/:roomID)
+        /// <summary>
+        /// Actualiza una habitación existente.
+        /// </summary>
+        /// <param name="roomId">ID de la habitación a actualizar.</param>
+        /// <param name="room">Datos actualizados.</param>
+        /// <returns>True si se actualizó correctamente, false en caso contrario.</returns>
         public static async Task<bool> UpdateRoomAsync(string roomId, RoomModel room)
         {
             try
@@ -184,7 +173,11 @@ namespace desktop_app.Services
             }
         }
 
-        // DELETE (DELETE /room/:roomID)
+        /// <summary>
+        /// Elimina una habitación.
+        /// </summary>
+        /// <param name="roomId">ID de la habitación a eliminar.</param>
+        /// <returns>True si se eliminó correctamente, false en caso contrario.</returns>
         public static async Task<bool> DeleteRoomAsync(string roomId)
         {
             try
@@ -197,6 +190,32 @@ namespace desktop_app.Services
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Construye una query string desde un diccionario.
+        /// </summary>
+        /// <param name="parameters">Diccionario clave-valor.</param>
+        /// <returns>Query string formateada (?key1=value1&amp;key2=value2).</returns>
+        private static string BuildQuery(Dictionary<string, string?> parameters)
+        {
+            var sb = new StringBuilder();
+            bool first = true;
+
+            foreach (var kv in parameters)
+            {
+                if (string.IsNullOrWhiteSpace(kv.Value))
+                    continue;
+
+                sb.Append(first ? "?" : "&");
+                first = false;
+
+                sb.Append(WebUtility.UrlEncode(kv.Key));
+                sb.Append("=");
+                sb.Append(WebUtility.UrlEncode(kv.Value));
+            }
+
+            return sb.ToString();
         }
     }
 }

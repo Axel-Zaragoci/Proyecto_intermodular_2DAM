@@ -2,9 +2,15 @@
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.intermodular.data.remote.ApiService
+import com.example.intermodular.data.remote.RetrofitProvider
+import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.viewmodels.BookingViewModel
+import com.example.intermodular.viewmodels.BookingViewModelFactory
 import com.example.intermodular.views.screens.BookingScreen
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
@@ -20,7 +26,16 @@ fun Navigation(
         modifier = modifier
     ) {
         composable(Routes.Bookings.route) {
-            BookingScreen()
+            val api = RetrofitProvider.api
+            val repository = BookingRepository(api)
+
+            val viewModel: BookingViewModel = viewModel(
+                factory = BookingViewModelFactory(repository)
+            )
+
+            BookingScreen(
+                viewModel = viewModel
+            )
         }
         composable(Routes.Rooms.route) {
             RoomScreen()
