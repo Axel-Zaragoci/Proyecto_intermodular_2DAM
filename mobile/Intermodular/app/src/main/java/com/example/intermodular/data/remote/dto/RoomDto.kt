@@ -10,7 +10,7 @@ data class RoomDto(
     val pricePerNight: Int,
     val extraBed: Boolean,
     val crib: Boolean,
-    val offer: Int,
+    val offer: Double?,
     val extras: List<String>,
     val extraImages: List<String>,
     val isAvailable: Boolean,

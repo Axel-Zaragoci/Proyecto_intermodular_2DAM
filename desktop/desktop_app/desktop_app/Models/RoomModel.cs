@@ -75,6 +75,18 @@ namespace desktop_app.Models
         /// <summary>Valoración media (0-5).</summary>
         [JsonPropertyName("rate")]
         public double Rate { get; set; }
+
+        /// <summary>Media de reseñas calculada (se establece al cargar).</summary>
+        [JsonIgnore]
+        public double? AverageRating { get; set; }
+
+        /// <summary>Texto formateado de la media de reseñas.</summary>
+        [JsonIgnore]
+        public string AverageRatingText => AverageRating.HasValue ? $"★ {AverageRating:F1}" : "";
+
+        /// <summary>Indica si hay reseñas para mostrar la media.</summary>
+        [JsonIgnore]
+        public bool HasReviews => AverageRating.HasValue && AverageRating > 0;
     }
 
     /// <summary>

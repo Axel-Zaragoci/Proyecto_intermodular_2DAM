@@ -1,6 +1,7 @@
 using desktop_app.Commands;
 using desktop_app.Models;
 using desktop_app.Services;
+using desktop_app.ViewModels;
 using desktop_app.Views;
 using System;
 using System.Collections.ObjectModel;
@@ -162,6 +163,9 @@ namespace desktop_app.ViewModels.Room
         /// <summary>Comando para volver a la lista.</summary>
         public ICommand BackToRoomsCommand { get; }
 
+        /// <summary>Comando para ver las reseñas de una habitación.</summary>
+        public ICommand ShowReviewsCommand { get; }
+
         #endregion
 
         /// <summary>
@@ -185,6 +189,12 @@ namespace desktop_app.ViewModels.Room
 
             BackToRoomsCommand = new RelayCommand(_ =>
                 NavigationService.Instance.NavigateTo<RoomView>());
+
+            ShowReviewsCommand = new RelayCommand(param =>
+            {
+                if (param is not RoomModel room) return;
+                NavigationService.Instance.NavigateTo(() => new ReviewsView(room));
+            });
 
             _ = LoadInitialAsync();
         }
@@ -271,6 +281,16 @@ namespace desktop_app.ViewModels.Room
                 StatusText = "Error conectando con la API.";
                 MessageBox.Show("No se pudo conectar con la API.");
                 return;
+            }
+
+            // Cargar media de reseñas para cada habitación
+            foreach (var room in response.Items)
+            {
+                var reviews = await Services.ReviewService.GetReviewsByRoomAsync(room.Id);
+                if (reviews.Count > 0)
+                {
+                    room.AverageRating = reviews.Average(r => r.Rating);
+                }
             }
 
             Rooms = new ObservableCollection<RoomModel>(response.Items);

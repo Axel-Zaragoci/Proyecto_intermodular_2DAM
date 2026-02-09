@@ -91,7 +91,7 @@ namespace desktop_app.ViewModels.Room
         public RelayCommand PickExtraImagesLocalCommand { get; }
 
         /// <summary>Comando para eliminar una imagen.</summary>
-        public ICommand DeleteImageCommand { get; }
+        public AsyncRelayCommand<RoomImageItem> DeleteImageCommand { get; }
 
         /// <summary>
         /// Inicializa el ViewModel con una habitación existente.
@@ -109,9 +109,9 @@ namespace desktop_app.ViewModels.Room
             PickMainImageLocalCommand = new RelayCommand(_ => PickMainImageLocal());
             PickExtraImagesLocalCommand = new RelayCommand(_ => PickExtraImagesLocal());
 
-            DeleteImageCommand = new RelayCommand(
-                async (p) => await DeleteImageAsync(p),
-                (p) => p is RoomImageItem it && !string.IsNullOrWhiteSpace(it.Url)
+            DeleteImageCommand = new AsyncRelayCommand<RoomImageItem>(
+                DeleteImageAsync,
+                (img) => img != null && !string.IsNullOrWhiteSpace(img.Url)
             );
 
             RefreshExistingImages();
@@ -153,19 +153,20 @@ namespace desktop_app.ViewModels.Room
         /// <summary>
         /// Elimina una imagen del servidor y del modelo.
         /// </summary>
-        /// <param name="p">RoomImageItem a eliminar.</param>
-        private async Task DeleteImageAsync(object p)
+        /// <param name="img">RoomImageItem a eliminar.</param>
+        private async Task DeleteImageAsync(RoomImageItem img)
         {
-            if (p is not RoomImageItem img) return;
+            if (img == null) return;
 
             var confirm = MessageBox.Show(
-                "¿Seguro que quieres borrar esta imagen?\n\nSe eliminará del servidor.",
+                "¿Seguro que quieres borrar esta imagen?\n\nSe eliminará del servidor y de la habitación.",
                 "Confirmar borrado",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
             if (confirm != MessageBoxResult.Yes) return;
 
+            // 1. Borrar la imagen del servidor
             var ok = await ImageService.DeleteImageAsync(img.Url);
             if (!ok)
             {
@@ -174,6 +175,7 @@ namespace desktop_app.ViewModels.Room
                 return;
             }
 
+            // 2. Actualizar el modelo local
             ExistingImages.Remove(img);
 
             if (img.IsMain)
@@ -183,9 +185,17 @@ namespace desktop_app.ViewModels.Room
             }
             else
             {
-                Room.ExtraImages.Remove(img.Url);
-                ExtraImagesLabel = $"{Room.ExtraImages.Count} seleccionadas";
-                ExtraImagesText = string.Join(", ", Room.ExtraImages);
+                Room.ExtraImages?.Remove(img.Url);
+                ExtraImagesLabel = $"{Room.ExtraImages?.Count ?? 0} seleccionadas";
+                ExtraImagesText = string.Join(", ", Room.ExtraImages ?? new List<string>());
+            }
+
+            // 3. Guardar los cambios en la base de datos
+            var updated = await RoomService.UpdateRoomAsync(Room.Id, Room);
+            if (!updated)
+            {
+                MessageBox.Show("La imagen se borró del servidor, pero no se pudo actualizar la habitación en la base de datos.", 
+                    "Advertencia", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             OnPropertyChanged(nameof(Room));
@@ -215,7 +225,10 @@ namespace desktop_app.ViewModels.Room
 
             if (dlg.ShowDialog() != true) return;
 
-            _extraImagesLocalPaths = dlg.FileNames.ToList();
+            // Acumular las nuevas imágenes seleccionadas en lugar de reemplazarlas
+            var newFiles = dlg.FileNames.ToList();
+            _extraImagesLocalPaths.AddRange(newFiles);
+            
             ExtraImagesLabel = $"{_extraImagesLocalPaths.Count} seleccionadas";
         }
 
@@ -235,6 +248,12 @@ namespace desktop_app.ViewModels.Room
 
                 if (!string.IsNullOrWhiteSpace(_mainImageLocalPath))
                 {
+                    // Si ya hay una imagen principal, borrarla del servidor antes de subir la nueva
+                    if (!string.IsNullOrWhiteSpace(Room.MainImage))
+                    {
+                        await ImageService.DeleteImageAsync(Room.MainImage);
+                    }
+                    
                     var up = await ImageService.UploadSingleAsync(_mainImageLocalPath);
                     if (up == null) throw new Exception("No se pudo subir la imagen principal.");
                     Room.MainImage = up.Url;

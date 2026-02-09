@@ -48,6 +48,8 @@ namespace desktop_app.Services
             try
             {
                 using var form = new MultipartFormDataContent();
+                long totalSize = 0;
+                int count = 0;
 
                 foreach (var path in filePaths)
                 {
@@ -55,12 +57,12 @@ namespace desktop_app.Services
                     var fileContent = new ByteArrayContent(bytes);
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(GetMimeType(path));
 
-                
                     form.Add(fileContent, "photos", System.IO.Path.GetFileName(path));
                 }
 
                 var url = ApiService.BaseUrl + "image/many";
                 var resp = await ApiService._httpClient.PostAsync(url, form);
+                
                 if (!resp.IsSuccessStatusCode) return null;
 
                 var json = await resp.Content.ReadAsStringAsync();
@@ -68,8 +70,9 @@ namespace desktop_app.Services
 
                 return data?.Files ?? new List<UploadFileDto>();
             }
-            catch
+            catch (Exception ex)
             {
+                System.Windows.MessageBox.Show($"DEBUG Exception UploadMany:\n{ex.Message}", "Debug Exception");
                 return null;
             }
         }
@@ -110,12 +113,21 @@ namespace desktop_app.Services
                     return false;
 
                 var url = ApiService.BaseUrl.TrimEnd('/') + "/image/" + Uri.EscapeDataString(filename);
+                
+                // DEBUG
+                //System.Windows.MessageBox.Show($"DEBUG DeleteImageAsync:\nInput: {urlOrFilename}\nFilename: {filename}\nURL: {url}", "Debug API");
+                
                 var resp = await ApiService._httpClient.DeleteAsync(url);
+                
+                // DEBUG respuesta
+                //var content = await resp.Content.ReadAsStringAsync();
+                //System.Windows.MessageBox.Show($"DEBUG Response:\nStatus: {resp.StatusCode}\nContent: {content}", "Debug API Response");
 
                 return resp.IsSuccessStatusCode;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Windows.MessageBox.Show($"DEBUG Exception:\n{ex.Message}", "Debug Exception");
                 return false;
             }
         }
