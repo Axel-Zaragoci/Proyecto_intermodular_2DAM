@@ -123,6 +123,37 @@
         </Style.Triggers>
     </Style>
     
+    <Style x:Key="ClearFiltersBtn" TargetType="Button">
+        <Setter Property="Background" Value="#6c757d"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="#6c757d"/>
+        <Setter Property="Padding" Value="12 6"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="400"/>
+        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border CornerRadius="4" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+                        
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#5a6268"/>
+                <Setter Property="BorderBrush" Value="#545b62"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#545b62"/>
+                <Setter Property="BorderBrush" Value="#4e555b"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!--
     ESTILOS DE LAS TABLAS
     -->
@@ -238,7 +269,7 @@
         <Setter Property="BorderBrush" Value="#dc3545"/>
         <Setter Property="Padding" Value="12 6"/>
         <Setter Property="FontSize" Value="20"/>
-        <Setter Property="FontWeight" Value="400"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontFamily" Value="/Resources/#Material Icons Outlined"/>
         
         <Setter Property="Template">
@@ -270,6 +301,41 @@
                 <Setter Property="Background" Value="#dc3545"/>
                 <Setter Property="BorderBrush" Value="#dc3545"/>
                 <Setter Property="Opacity" Value=".65"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="DeleteOverlayBtn" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Background" Value="Red"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontFamily" Value="/Resources/#Material Icons Outlined"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="5"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="12">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#cc0000"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#990000"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -405,13 +471,20 @@
     <!-- 
     ESTILOS DE FORMULARIOS
     -->
+    <Style x:Key="FormBorder" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="#E6E8EF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Padding" Value="14"/>
+    </Style>
+    
     <Style x:Key="LabelForm" TargetType="Label">
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="#15507d"/>
         <Setter Property="Margin" Value="0,20,0,0"/>
     </Style>
-
     
     <Style x:Key="TextBoxForm" TargetType="TextBox">
         <Setter Property="BorderBrush" Value="#C5DDEE"/>
@@ -494,6 +567,47 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    
+    <Style x:Key="FormCheckBox" TargetType="CheckBox">
+        <Setter Property="Background" Value="#F3F5F8"/>
+        <Setter Property="BorderBrush" Value="#E6E8EF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Width="16"
+                                Height="16"
+                                CornerRadius="3"
+                                Margin="0 0 5 0">
+                            <TextBlock Text="done" FontFamily="/Resources/#Material Icons Outlined" x:Name="Check"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Content}" Margin="0 0 20 0" FontSize="12"/>
+                    </StackPanel>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="Check" Property="Visibility" Value="Hidden"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="TextBoxDescriptionForm" TargetType="TextBox">
+        <Setter Property="Height" Value="85"/>
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Padding" Value="10, 6"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="#E6E8EF"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
     
     <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
@@ -599,5 +713,320 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!--
+    ESTILO DE FORMULARIO DE IMÁGENES
+    -->
+    <Style x:Key="ImageBorderForm" TargetType="Border">
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="BorderThickness" Value="1.5"/>
+        <Setter Property="BorderBrush" Value="#D7DDE6"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+    
+    <Style x:Key="ImageTitle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#223045"/>
+    </Style>
+    
+    <Style x:Key="ImageButton" TargetType="Button">
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="12,0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="#1E5C8A"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="ImageName" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#6b778c"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+    
+    <Style x:Key="ImageCountBorder" TargetType="Border">
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="#EEF4FF"/>
+        <Setter Property="BorderBrush" Value="#CFE0FF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,3"/>
+    </Style>
+    
+    <Style x:Key="ImageBorderMsg" TargetType="Border">
+        <Setter Property="Margin" Value="0 12 0 0"/>
+        <Setter Property="BorderBrush" Value="#E6E8EF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Background" Value="#fafbfd"/>
+        <Setter Property="Padding" Value="10"/>
+    </Style>
+    
+    <Style x:Key="ImageViewBorder" TargetType="Border">
+        <Setter Property="Width" Value="140"/>
+        <Setter Property="Height" Value="105"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="BorderBrush" Value="#E6E8EF"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="#eef3f7"/>
+        <Setter Property="Margin" Value="0 0 10 10"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+    </Style>
+    
+    <Style x:Key="MainImageBorder" TargetType="Border">
+        <Setter Property="Background" Value="#AA000000"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Padding" Value="8, 3"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMain}" Value="True">
+                <Setter Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!--
+    ESTILOS DE TARJETAS DE HABITACIONES
+    -->
+    <DataTemplate x:Key="RoomCardTemplate">
+        <Border Background="White"
+            BorderBrush="#E6E8EF"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="16"
+            Margin="0,0,18,18"
+            SnapsToDevicePixels="True">
 
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- FOTO -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Cabecera -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Tipo -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Separador -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Max huéspedes -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Precio -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Separador -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Extras -->
+                    <RowDefinition Height="Auto"/>
+
+                    <!-- Spacer para empujar botones abajo -->
+                    <RowDefinition Height="*"/>
+
+                    <!-- Botones -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- ===== FOTO PRINCIPAL ===== -->
+                <Border Grid.Row="0"
+                    Height="140"
+                    CornerRadius="12"
+                    Margin="0,0,0,12"
+                    Background="#EEF3F7"
+                    ClipToBounds="True">
+
+                    <Grid>
+                        <!-- Imagen como brush en un Border interno -->
+                        <Border CornerRadius="12">
+                            <Border.Background>
+                                <ImageBrush ImageSource="{Binding MainImageAbs}"
+                                        Stretch="Fill"/>
+                            </Border.Background>
+                        </Border>
+
+                        <!-- Texto si no hay imagen -->
+                        <TextBlock Text="Sin imagen"
+                   Foreground="#6B7280"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding MainImageAbs}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding MainImageAbs}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                </Border>
+
+
+
+                <!-- ===== Cabecera: Habitación ===== -->
+                <TextBlock Grid.Row="1"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Text="{Binding RoomNumber, StringFormat=Habitación {0}}"/>
+
+                <!-- ===== Tipo + Badge Disponibilidad ===== -->
+                <Grid Grid.Row="2" Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Foreground="#6B7280"
+                               Text="{Binding Type}"
+                               VerticalAlignment="Center"/>
+
+                    <Border Grid.Column="1"
+                            CornerRadius="999"
+                            Padding="10,4"
+                            VerticalAlignment="Center">
+
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#10B981"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                        <Setter Property="Background" Value="#EF4444"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <TextBlock FontWeight="SemiBold" FontSize="10">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="White"/>
+                                    <Setter Property="Text" Value="Disponible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                            <Setter Property="Text" Value="No disponible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
+                </Grid>
+
+                <!-- ===== Separador 1 ===== -->
+                <Separator Grid.Row="3"
+                       Margin="0,12,0,12"
+                       Background="#E5E7EB"/>
+
+                <!-- ===== Max huéspedes ===== -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Foreground="#6B7280"
+                           Text="Máx. huéspedes:"/>
+
+                    <TextBlock Grid.Column="1"
+                           FontWeight="Bold"
+                           Text="{Binding MaxGuests}"/>
+                </Grid>
+
+                <!-- ===== Precio ===== -->
+                <Grid Grid.Row="5" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Foreground="#6B7280"
+                           Text="Precio/noche:"/>
+
+                    <TextBlock Grid.Column="1"
+                           FontWeight="Bold"
+                           Text="{Binding PricePerNight, StringFormat={}{0}€}"/>
+                </Grid>
+
+                <!-- ===== Separador 2 ===== -->
+                <Separator Grid.Row="6"
+                       Margin="0,12,0,12"
+                       Background="#E5E7EB"/>
+
+                <!-- ===== Extras ===== -->
+                <StackPanel Grid.Row="7">
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Text" Value="✓ Cama extra"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ExtraBed}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock Margin="0,6,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Text" Value="✓ Cuna disponible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Crib}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- ===== Botones (abajo del todo) ===== -->
+                <Grid Grid.Row="9" Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                        Style="{StaticResource UpdateBookingBtn}"
+                        Content="edit"
+                        Command="{Binding DataContext.GoUpdateRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"/>
+
+                    <Button Grid.Column="2"
+                        Style="{StaticResource DeleteBookingBtn}"
+                        Content="delete"
+                        Command="{Binding DataContext.DeleteRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </DataTemplate>
 </ResourceDictionary>

@@ -34,13 +34,13 @@ const roomDatabaseSchema = new Schema({
   pricePerNight: { type: Number, required: true, min: 0 },
 
   // ---- Optionals ----
-  extraBed: { type: Boolean, default: false }, 
-  crib: { type: Boolean, default: false },     
+  extraBed: { type: Boolean, default: false },
+  crib: { type: Boolean, default: false },
 
-  
+
   offer: { type: Number, default: 0, min: 0, max: 100 },
 
-  
+
   extras: { type: [String], default: [] },
   extraImages: { type: [String], default: [] },
 
@@ -121,6 +121,18 @@ class RoomEntryData {
     if (typeof this.offer !== "number") this.offer = 0;
     this.offer = Math.max(0, Math.min(this.offer, 100));
   }
+
+  /**
+   * Establece la disponibilidad
+   * @param {boolean} isAvailable
+   */
+setAvailability(isAvailable) {
+  if (typeof isAvailable === "boolean") {
+    this.isAvailable = isAvailable;
+    return;
+  }
+
+}
 
 
   /**
