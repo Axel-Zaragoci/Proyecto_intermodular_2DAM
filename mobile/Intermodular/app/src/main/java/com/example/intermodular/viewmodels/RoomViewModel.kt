@@ -37,21 +37,7 @@ class RoomViewModel(
         loadRooms()
     }
 
-    fun onSearchTextChange(text: String) {
-        _searchText.value = text
-        
-        // Apply client-side filtering on the currently loaded rooms
-        val currentRooms = _rooms.value
-        if (text.isBlank()) {
-            _filteredRooms.value = currentRooms
-        } else {
-             _filteredRooms.value = currentRooms.filter { room ->
-                room.roomNumber.contains(text, ignoreCase = true) ||
-                        room.type.contains(text, ignoreCase = true) ||
-                        room.description.contains(text, ignoreCase = true)
-            }
-        }
-    }
+
 
     fun updateFilter(filter: RoomFilter) {
         _currentFilter.value = filter
