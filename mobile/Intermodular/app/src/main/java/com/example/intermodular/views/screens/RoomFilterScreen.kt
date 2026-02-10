@@ -62,7 +62,7 @@ fun RoomFilterScreen(
         ) {
             // Type Dropdown
             var expanded by remember { mutableStateOf(false) }
-            val types = listOf("Simple", "Doble", "Suite", "Family")
+            val types = listOf("Single", "Double", "Suite", "Family")
             
             ExposedDropdownMenuBox(
                 expanded = expanded,

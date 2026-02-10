@@ -78,6 +78,22 @@ namespace desktop_app.ViewModels.Room
             set => SetProperty(ref _extraImagesLabel, value);
         }
 
+        /// <summary>Texto formateado de la media de reviews.</summary>
+        private string _reviewAverageText = "";
+        public string ReviewAverageText
+        {
+            get => _reviewAverageText;
+            set => SetProperty(ref _reviewAverageText, value);
+        }
+
+        /// <summary>Indica si hay reviews para mostrar la media.</summary>
+        private bool _hasReviewAverage;
+        public bool HasReviewAverage
+        {
+            get => _hasReviewAverage;
+            set => SetProperty(ref _hasReviewAverage, value);
+        }
+
         /// <summary>Comando para guardar cambios.</summary>
         public AsyncRelayCommand SaveCommand { get; }
 
@@ -115,6 +131,30 @@ namespace desktop_app.ViewModels.Room
             );
 
             RefreshExistingImages();
+            _ = LoadReviewAverageAsync();
+        }
+
+        /// <summary>
+        /// Carga las reviews de la habitación y calcula la media.
+        /// </summary>
+        private async Task LoadReviewAverageAsync()
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(Room.Id)) return;
+
+                var reviews = await ReviewService.GetReviewsByRoomAsync(Room.Id);
+                if (reviews != null && reviews.Count > 0)
+                {
+                    var avg = reviews.Average(r => r.Rating);
+                    ReviewAverageText = $" {avg:F1} / 5 ";
+                    HasReviewAverage = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[UpdateRoomVM] Error: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -186,6 +226,12 @@ namespace desktop_app.ViewModels.Room
             else
             {
                 Room.ExtraImages?.Remove(img.Url);
+                // Sanitize list to remove potential nulls/gaps
+                if (Room.ExtraImages != null)
+                {
+                    Room.ExtraImages = Room.ExtraImages.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                }
+
                 ExtraImagesLabel = $"{Room.ExtraImages?.Count ?? 0} seleccionadas";
                 ExtraImagesText = string.Join(", ", Room.ExtraImages ?? new List<string>());
             }
