@@ -182,11 +182,7 @@ class BookingViewModel(
             hasOffer = true
         )
 
-        if (_filteredRooms.value.isEmpty()) loadData()
-
-        _filteredRooms.value = _filteredRooms.value.filter { room ->
-            room.offer != null && room.offer > 0
-        }
+        loadData()
 
         _showFilters.value = false
     }
