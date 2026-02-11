@@ -1,8 +1,9 @@
-package com.example.intermodular.viewmodels
+﻿package com.example.intermodular.viewmodels.viewModelFacotry
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.intermodular.data.repository.RoomRepository
+import com.example.intermodular.viewmodels.RoomViewModel
 
 class RoomViewModelFactory(
     private val repository: RoomRepository

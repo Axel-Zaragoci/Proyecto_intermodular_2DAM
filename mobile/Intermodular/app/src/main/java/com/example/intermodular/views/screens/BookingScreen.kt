@@ -16,9 +16,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.intermodular.models.Booking
+import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.views.components.BookingCard
 import com.example.intermodular.views.components.FilterList
+import com.example.intermodular.views.components.RoomCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +29,7 @@ fun BookingScreen(
     changeFilterVisibility: () -> Unit,
     loading : Boolean,
     error : String?,
-    bookings : List<Booking>,
+    rooms : List<Room>,
     selectedStartDate : Long?,
     selectedEndDate : Long?,
     onStartDateSelected : (Long?) -> Unit,
@@ -86,8 +88,8 @@ fun BookingScreen(
         )
 
         LazyColumn {
-            items(bookings) { booking ->
-                BookingCard(booking, {})
+            items(rooms) { room ->
+                RoomCard(room)
             }
         }
     }
@@ -98,7 +100,7 @@ fun BookingScreen(
 fun BookingScreenState(
     viewModel: BookingViewModel
 ) {
-    val bookings by viewModel.bookings.collectAsState()
+    val rooms by viewModel.filteredRooms.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()
     val selectedStartDate by viewModel.selectedStartDate.collectAsState()
@@ -114,14 +116,14 @@ fun BookingScreenState(
         changeFilterVisibility = viewModel::changeFilterVisibility,
         loading = loading,
         error = error,
-        bookings = bookings,
+        rooms = rooms,
         selectedStartDate = selectedStartDate,
         selectedEndDate = selectedEndDate,
         onStartDateSelected = viewModel::onStartDateSelected,
         onEndDateSelected = viewModel::onEndDateSelected,
         maxPrice = maxPrice,
         onMaxPriceChanged = viewModel::onMaxPriceChanged,
-        guests = guests,
+        guests = guests.toString(),
         onGuestsChanged = viewModel::onGuestsChanged,
         extraBed = extraBed,
         onExtraBedCheckChanged = viewModel::onExtraBedCheckChanged,
