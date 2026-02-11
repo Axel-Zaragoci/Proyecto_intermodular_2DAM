@@ -45,7 +45,8 @@ fun Navigation(
             )
 
             BookingScreenState(
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navigationController
             )
         }
         composable(Routes.Rooms.route) {

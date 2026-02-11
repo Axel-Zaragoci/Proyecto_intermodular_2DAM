@@ -15,17 +15,20 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.intermodular.models.Room
 import com.example.intermodular.BuildConfig
+import kotlin.math.roundToInt
 
 @Composable
 fun RoomCard(
     room: Room,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    buttonText : String = "Ver detalles",
+    onButtonClick: (Room) -> Unit
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
@@ -60,7 +63,7 @@ fun RoomCard(
             Column(modifier = Modifier.padding(16.dp)) {
                 // Room Number and Type
                 Text(
-                    text = "Room ${room.roomNumber} - ${room.type}",
+                    text = "Habitación ${room.roomNumber} - ${room.type}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -72,14 +75,26 @@ fun RoomCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "$${room.pricePerNight}/night",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Column() {
+                        Text(
+                            text = "$${room.pricePerNight}/noche",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        room.offer?.let {
+                            if(it > 0.0) {
+                                Text(
+                                    text = "${room.offer.roundToInt()}% de descuento",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
                     
                      Text(
-                        text = if (room.isAvailable) "Available" else "Occupied",
+                        text = if (room.isAvailable) "Disponible" else "Ocupada",
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (room.isAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                     )
@@ -96,12 +111,12 @@ fun RoomCard(
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Button(
-                    onClick = { /* TODO: Navigate to details */ },
+                    onClick = { onButtonClick(room) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("More Details")
+                    Text(buttonText)
                 }
             }
         }

@@ -1,29 +1,34 @@
 ﻿package com.example.intermodular.views.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.math.roundToInt
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.Alignment
 
 @Composable
 fun FilterList(
@@ -55,17 +60,30 @@ fun FilterList(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Box (
+        Row (
             modifier = Modifier
                 .clickable { changeVisibility() }
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ){
             Text(
                 text = if (showFilters) "Ocultar filtros" else "Ver filtros",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-                textAlign = TextAlign.Center
+                modifier = Modifier
+                    .padding(0.dp, 8.dp, 10.dp, 8.dp)
+            )
+            Icon(
+                imageVector = if (showFilters) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                contentDescription = "Icono mostrar / ocultar",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    ),
             )
         }
 
@@ -182,7 +200,7 @@ fun FilterList(
             ){
                 Button(
                     onClick = { filter() },
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
@@ -194,7 +212,7 @@ fun FilterList(
 
                 Button(
                     onClick = { filterOffer() },
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )

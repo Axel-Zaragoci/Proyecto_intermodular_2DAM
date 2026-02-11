@@ -71,7 +71,10 @@ fun RoomScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(rooms) { room ->
-                    RoomCard(room = room)
+                    RoomCard(
+                        room = room,
+                        onButtonClick = { /*TODO*/ }
+                    )
                 }
             }
         }

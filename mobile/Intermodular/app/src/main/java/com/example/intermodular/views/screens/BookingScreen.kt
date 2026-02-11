@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.BookingViewModel
@@ -43,7 +44,8 @@ fun BookingScreen(
     cradle : Boolean,
     onCradleCheckChanged : (Boolean) -> Unit,
     filter : () -> Unit,
-    filterOffer: () -> Unit
+    filterOffer: () -> Unit,
+    onBookButtonClick: (Room) -> Unit
 ) {
     Column (
         verticalArrangement = Arrangement.Center,
@@ -89,7 +91,11 @@ fun BookingScreen(
 
         LazyColumn {
             items(rooms) { room ->
-                RoomCard(room)
+                RoomCard(
+                    room = room,
+                    buttonText = "Reservar",
+                    onButtonClick = onBookButtonClick
+                )
             }
         }
     }
@@ -98,7 +104,8 @@ fun BookingScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingScreenState(
-    viewModel: BookingViewModel
+    viewModel: BookingViewModel,
+    navController: NavHostController
 ) {
     val rooms by viewModel.filteredRooms.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
@@ -130,6 +137,9 @@ fun BookingScreenState(
         cradle = cradle,
         onCradleCheckChanged = viewModel::onCradleCheckChanged,
         filter = viewModel::filter,
-        filterOffer = viewModel::filterOffer
+        filterOffer = viewModel::filterOffer,
+        onBookButtonClick = { room ->
+            navController.navigate("bookRoom/$room")
+        }
     )
 }
