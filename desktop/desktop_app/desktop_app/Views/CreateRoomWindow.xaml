@@ -153,11 +153,6 @@
                 </StackPanel>
 
                 <!-- ===== FILA 2 ===== -->
-                <StackPanel Grid.Column="0" Grid.Row="2" Margin="0,0,12,10">
-                    <Label Content="Rate" Style="{StaticResource LabelForm}"/>
-                    <TextBox Style="{StaticResource TextBoxForm}"
-                 Text="{Binding Room.Rate, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
 
                 <StackPanel Grid.Column="2" Grid.Row="1" Margin="0,0,0,10">
                     <Label Content="Oferta" Style="{StaticResource LabelForm}"/>

@@ -9,6 +9,10 @@
              FocusManager.FocusedElement="{Binding ElementName=HeaderMain}"
              Style="{StaticResource UserControlBase}">
 
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+
     <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,8 +28,20 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel>
-                    <TextBlock  x:Name="HeaderMain"  Text="Crear habitación" Style="{StaticResource HeaderMainTitle}"/>
+                    <TextBlock  x:Name="HeaderMain"  Text="Actualizar habitación" Style="{StaticResource HeaderMainTitle}"/>
                     <TextBlock Text="Rellena los datos y guarda." Style="{StaticResource UpdateIdStyle}"/>
+                </StackPanel>
+
+                <!-- REVIEW AVERAGE IN HEADER -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0"
+                            Visibility="{Binding HasReviewAverage, Converter={StaticResource BoolToVisibility}}">
+                    <Border Background="#FFF8E1" CornerRadius="8" Padding="12,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="★" Foreground="#F59E0B" FontSize="18" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="{Binding ReviewAverageText}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="#92400E" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Grid>
         </Border>
@@ -50,13 +66,13 @@
                 <!-- ===== FILA 0 ===== -->
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,12,10">
                     <Label Content="Número" Style="{StaticResource LabelForm}"/>
-                    <TextBox Style="{StaticResource TextBoxForm}" Text="{Binding Room.RoomNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox IsEnabled="False" Style="{StaticResource TextBoxForm}" Text="{Binding Room.RoomNumber, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,12,10">
                     <Label Content="Tipo" Style="{StaticResource LabelForm}"/>
                     <ComboBox Style="{StaticResource DropdownStyle}"
-                              SelectedValue="{Binding Room.Type, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding Room.Type, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False"
                               SelectedValuePath="Tag">
                         <ComboBoxItem Content="single" Tag="single"/>
                         <ComboBoxItem Content="double" Tag="double"/>
@@ -73,7 +89,7 @@
                 <!-- ===== FILA 1 ===== -->
                 <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,12,10">
                     <Label Content="Máx. huéspedes" Style="{StaticResource LabelForm}"/>
-                    <TextBox Style="{StaticResource TextBoxForm}" Text="{Binding Room.MaxGuests, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Style="{StaticResource TextBoxForm}" IsEnabled="False" Text="{Binding Room.MaxGuests, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,12,10">
@@ -87,10 +103,7 @@
                 </StackPanel>
 
                 <!-- ===== FILA 2 ===== -->
-                <StackPanel Grid.Column="0" Grid.Row="2" Margin="0,0,12,10">
-                    <Label Content="Rate" Style="{StaticResource LabelForm}"/>
-                    <TextBox Style="{StaticResource TextBoxForm}" Text="{Binding Room.Rate, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
+
 
                 <StackPanel Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" Margin="0,2,0,10">
                     <Label Content="Opciones" Style="{StaticResource LabelForm}"/>
@@ -185,7 +198,7 @@
                     -->
                     <Border Style="{StaticResource ImageBorderMsg}">
                         <StackPanel>
-                            <TextBlock Text="Fotos actuales (puedes eliminarlas)" Style="{StaticResource ImageTitle}"/>
+                                                        <TextBlock Text="Fotos actuales (puedes eliminarlas)" Style="{StaticResource ImageTitle}"/>
                             <ItemsControl ItemsSource="{Binding ExistingImages}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -197,10 +210,11 @@
                                     <DataTemplate>
                                         <Border Style="{StaticResource ImageViewBorder}">
                                             <Grid>
-                                                <!-- Miniatura -->
-                                                <Image Stretch="UniformToFill"
-                                                   Source="{Binding AbsoluteUrl}"
-                                                   />
+                                                <Border CornerRadius="9">
+                                                    <Border.Background>
+                                                        <ImageBrush ImageSource="{Binding AbsoluteUrl}" Stretch="UniformToFill"/>
+                                                    </Border.Background>
+                                                </Border>
 
 
                                                 <!-- Texto si no hay imagen -->

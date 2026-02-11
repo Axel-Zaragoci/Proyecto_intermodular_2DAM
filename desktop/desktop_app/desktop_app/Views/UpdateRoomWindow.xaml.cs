@@ -9,7 +9,7 @@ namespace desktop_app.Views
         public UpdateRoomWindow(RoomModel room)
         {
             InitializeComponent();
-            DataContext = new UpdateRoomViewModel(room);
+            DataContext = new desktop_app.ViewModels.Room.UpdateRoomViewModel(room);
         }
 
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
