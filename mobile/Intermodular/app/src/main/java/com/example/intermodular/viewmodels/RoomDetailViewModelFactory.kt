@@ -5,15 +5,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.data.repository.RoomRepository
 
-class RoomViewModelFactory(
-    private val repository: RoomRepository,
+class RoomDetailViewModelFactory(
+    private val roomRepository: RoomRepository,
     private val reviewRepository: ReviewRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RoomViewModel::class.java)) {
-            return RoomViewModel(repository, reviewRepository) as T
+        if (modelClass.isAssignableFrom(RoomDetailViewModel::class.java)) {
+            return RoomDetailViewModel(roomRepository, reviewRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

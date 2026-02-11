@@ -27,12 +27,14 @@ import com.example.intermodular.models.RoomFilter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomScreen(
+    onNavigateToDetail : (String) -> Unit ,
     roomViewModel: RoomViewModel
 ) {
     val rooms by roomViewModel.filteredRooms.collectAsState()
     val isLoading by roomViewModel.isLoading.collectAsState()
     val errorMessage by roomViewModel.errorMessage.collectAsState()
     val currentFilter by roomViewModel.currentFilter.collectAsState()
+    val roomRatings by roomViewModel.roomRatings.collectAsState()
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
@@ -67,11 +69,18 @@ fun RoomScreen(
                 Text(text = errorMessage ?: "Unknown error")
             }
         } else {
+            android.util.Log.d("RoomScreen", "Displaying ${rooms.size} rooms with ${roomRatings.size} ratings")
+            android.util.Log.d("RoomScreen", "Ratings map: $roomRatings")
+            
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(rooms) { room ->
-                    RoomCard(room = room)
+                    RoomCard(
+                        room = room,
+                        averageRating = roomRatings[room.id],
+                        onRoomClick = { onNavigateToDetail(room.id) }
+                    )
                 }
             }
         }

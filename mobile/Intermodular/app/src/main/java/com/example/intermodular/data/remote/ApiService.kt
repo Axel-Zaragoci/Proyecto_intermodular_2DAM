@@ -1,9 +1,11 @@
 ﻿package com.example.intermodular.data.remote
 
 import com.example.intermodular.data.remote.dto.BookingDto
+import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -24,4 +26,7 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = null,
         @Query("sortOrder") sortOrder: String? = null
     ) : RoomsResponseDto
+
+    @GET("review/room/{roomID}")
+    suspend fun getReviewsByRoom(@Path("roomID") roomId: String): List<ReviewDto>
 }
