@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const UPLOAD_DIR = path.join(__dirname, "../../uploads");
+const UPLOAD_DIR = path.join(__dirname, "../../../uploads");
 
 export const uploadPhoto = (req, res) => {
   if (!req.file) {
@@ -21,7 +21,7 @@ export const uploadPhoto = (req, res) => {
   });
 };
 
-const MAX_TOTAL = 20 * 1024 * 1024; // 20MB total
+const MAX_TOTAL = 100 * 1024 * 1024; // 100MB total
 
 export const uploadPhotos = (req, res) => {
   const total = (req.files ?? []).reduce((acc, f) => acc + f.size, 0);

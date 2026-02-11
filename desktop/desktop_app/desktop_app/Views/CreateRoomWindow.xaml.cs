@@ -23,7 +23,7 @@ namespace desktop_app.Views
         public CreateRoomWindow()
         {
             InitializeComponent();
-            var vm = new CreateRoomViewModel();
+            var vm = new desktop_app.ViewModels.Room.CreateRoomViewModel();
             DataContext = vm;
         }
 

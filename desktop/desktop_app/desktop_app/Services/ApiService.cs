@@ -1,16 +1,41 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using desktop_app.Models;
+﻿using System;
+using System.Net.Http;
 
 namespace desktop_app.Services
 {
-    //Clase baseica para conexión con la base de datos
+    /// <summary>
+    /// Servicio centralizado para la configuración y gestión del cliente HTTP.
+    /// </summary>
     public static class ApiService
     {
-        // Creada conexión http y url base para conexiones
-        public static readonly HttpClient _httpClient = new HttpClient();
-        public const string BaseUrl = "http://localhost:3000/";
+        /// <summary>
+        /// URL Base en la que nos basamos.
+        /// </summary>
+        public const string BaseUrl = "http://51.255.198.95:4000/";
 
+        /// <summary>
+        /// Cliente HTTP reutilizable configurado con autenticación automática.
+        /// </summary>
+        public static readonly HttpClient _httpClient = CreateClient();
+
+        /// <summary>
+        /// Crea y configura la instancia de <see cref="HttpClient"/>.
+        /// </summary>
+        /// <returns>
+        /// Una instancia de <see cref="HttpClient"/> con la URL base y el handler de autenticación configurados.
+        /// </returns>
+        private static HttpClient CreateClient()
+        {
+            var handler = new AuthHeaderHandler
+            {
+                InnerHandler = new HttpClientHandler()
+            };
+
+            var client = new HttpClient(handler)
+            {
+                BaseAddress = new Uri(BaseUrl)
+            };
+            return client;
+        }
     }
 }

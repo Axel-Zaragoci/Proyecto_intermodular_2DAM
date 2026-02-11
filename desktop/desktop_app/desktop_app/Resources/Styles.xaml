@@ -492,6 +492,7 @@
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Foreground" Value="#1F3B4D"/>
+        <Setter Property="Height" Value="40" />
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -508,6 +509,9 @@
                 <Setter Property="BorderBrush" Value="#1E88E5"/>
                 <Setter Property="BorderThickness" Value="2"/>
             </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="#ebeeff"/>
+            </Trigger>
         </Style.Triggers>
     </Style>
     
@@ -521,7 +525,8 @@
                         Background="White"
                         BorderBrush="#C5DDEE"
                         BorderThickness="1"
-                        Padding="10, 6">
+                        Padding="10, 6"
+                        Height="40">
                         <Grid x:Name="PART_Root">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -708,6 +713,10 @@
                         <Trigger Property="IsDropDownOpen" Value="True">
                             <Setter TargetName="Bd" Property="BorderBrush" Value="#1e88e5" />
                         </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="#ebeeff"/>
+                            <Setter TargetName="ToggleButton" Property="Background" Value="#ebeeff"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -880,6 +889,32 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
+
+                        <!-- Badge de media de reseñas -->
+                        <Border HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="8"
+                                Background="#1F3B4D"
+                                CornerRadius="8"
+                                Padding="8,4">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasReviews}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="★" Foreground="#FFC107" FontSize="12" Margin="0,0,4,0"/>
+                                <TextBlock Text="{Binding AverageRating, StringFormat='{}{0:F1}'}" 
+                                           Foreground="White" 
+                                           FontSize="12" 
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
 
                 </Border>
@@ -1010,7 +1045,9 @@
                 <Grid Grid.Row="9" Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
@@ -1020,7 +1057,48 @@
                         Command="{Binding DataContext.GoUpdateRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                         CommandParameter="{Binding}"/>
 
+                    <!-- Botón reseñas (estrella) -->
                     <Button Grid.Column="2"
+                            ToolTip="Ver reseñas"
+                            Command="{Binding DataContext.ShowReviewsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"
+                            Cursor="Hand"
+                            Padding="10,6"
+                            BorderThickness="0">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#FFC107"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="border" 
+                                                    Background="{TemplateBinding Background}" 
+                                                    Padding="{TemplateBinding Padding}" 
+                                                    CornerRadius="4"
+                                                    Cursor="Hand">
+                                                <TextBlock Text="★" 
+                                                           FontSize="16" 
+                                                           Foreground="White" 
+                                                           HorizontalAlignment="Center" 
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#e0a800"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter TargetName="border" Property="Background" Value="#c69500"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Grid.Column="4"
                         Style="{StaticResource DeleteBookingBtn}"
                         Content="delete"
                         Command="{Binding DataContext.DeleteRoomCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"

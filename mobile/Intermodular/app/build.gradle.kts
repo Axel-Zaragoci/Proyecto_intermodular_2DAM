@@ -22,7 +22,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            "\"http://192.168.18.74:3000/\""
+            "\"http://51.255.198.95:4000/\""
         )
     }
 
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
