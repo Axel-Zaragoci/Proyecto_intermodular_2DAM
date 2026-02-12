@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.MyBookingsViewModel
@@ -25,7 +26,8 @@ fun MyBookingsScreen(
     loading : Boolean,
     error : String?,
     bookings : List<Booking>,
-    rooms : List<Room>
+    rooms : List<Room>,
+    onDetailsButtonClick: (String) -> Unit
 ) {
     Column (
         verticalArrangement = Arrangement.Center,
@@ -54,7 +56,8 @@ fun MyBookingsScreen(
             items(bookings.size) { i ->
                 BookingCard(
                     booking = bookings[i],
-                    room = rooms.find { room ->  bookings[i].roomId == room.id }!!
+                    room = rooms.find { room ->  bookings[i].roomId == room.id }!!,
+                    onDetailsButtonClick = onDetailsButtonClick
                 )
             }
         }
@@ -64,7 +67,8 @@ fun MyBookingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyBookingsScreenState(
-    viewModel: MyBookingsViewModel
+    viewModel: MyBookingsViewModel,
+    navController: NavHostController
 ) {
     val bookings by viewModel.bookings.collectAsStateWithLifecycle()
     val loading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -75,6 +79,9 @@ fun MyBookingsScreenState(
         loading = loading,
         error = error,
         bookings = bookings,
-        rooms = rooms
+        rooms = rooms,
+        onDetailsButtonClick = { bookingId ->
+            navController.navigate("details/$bookingId")
+        }
     )
 }

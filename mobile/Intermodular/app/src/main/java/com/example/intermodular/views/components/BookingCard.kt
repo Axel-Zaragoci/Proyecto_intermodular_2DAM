@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +27,8 @@ import com.example.intermodular.models.Room
 @Composable
 fun BookingCard(
     booking: Booking,
-    room : Room
+    room : Room,
+    onDetailsButtonClick: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -109,6 +111,15 @@ fun BookingCard(
                     InformationComponent(
                         title = "Fecha de fin",
                         value = booking.checkOutDate.dayOfMonth.toString() + "/" + booking.checkOutDate.monthValue + "/" + booking.checkOutDate.year
+                    )
+                }
+
+                Button(
+                    onClick = { onDetailsButtonClick(booking.id) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Ver detalles"
                     )
                 }
             }

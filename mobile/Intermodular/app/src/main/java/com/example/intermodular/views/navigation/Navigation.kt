@@ -19,10 +19,13 @@ import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
+import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
+import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
 
 @Composable
@@ -35,6 +38,7 @@ fun Navigation(
         startDestination = Routes.Bookings.route,
         modifier = modifier
     ) {
+
         composable(Routes.Bookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -49,6 +53,7 @@ fun Navigation(
                 navController = navigationController
             )
         }
+
         composable(Routes.Rooms.route) {
             val api = RetrofitProvider.api
             val repository = RoomRepository(api)
@@ -61,9 +66,11 @@ fun Navigation(
                 roomViewModel = viewModel
             )
         }
+
         composable(Routes.User.route) {
             UserScreen(navigationController)
         }
+
         composable(Routes.MyBookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -74,7 +81,8 @@ fun Navigation(
             )
 
             MyBookingsScreenState(
-                viewModel = viewModel
+                viewModel = viewModel,
+                navController = navigationController
             )
         }
 
@@ -96,6 +104,29 @@ fun Navigation(
             )
 
             NewBookingState(viewModel)
+        }
+
+        composable(
+            route = Routes.MyBookingDetails.route,
+            arguments = listOf(
+                navArgument("bookingId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val bookingId = backStackEntry.arguments?.getString("bookingId")!!
+
+            val api = RetrofitProvider.api
+            val bookingRepository = BookingRepository(api)
+            val roomRepository = RoomRepository(api)
+
+            val viewModel: MyBookingDetailsViewModel = viewModel(
+                factory = MyBookingDetailsViewModelFactory(
+                    bookingId,
+                    bookingRepository,
+                    roomRepository
+                )
+            )
+
+            MyBookingDetailsState(viewModel)
         }
     }
 }
