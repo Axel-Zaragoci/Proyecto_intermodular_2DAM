@@ -16,10 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.BookingViewModel
-import com.example.intermodular.views.components.BookingCard
 import com.example.intermodular.views.components.FilterList
 import com.example.intermodular.views.components.RoomCard
 
@@ -139,7 +137,7 @@ fun BookingScreenState(
         filter = viewModel::filter,
         filterOffer = viewModel::filterOffer,
         onBookButtonClick = { room ->
-            navController.navigate("bookRoom/$room")
+            navController.navigate("bookRoom/${room.id}")
         }
     )
 }

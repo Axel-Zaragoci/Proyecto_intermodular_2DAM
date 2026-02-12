@@ -1,6 +1,5 @@
 ﻿package com.example.intermodular.viewmodels
 
-import java.util.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.intermodular.data.repository.BookingRepository
@@ -11,11 +10,9 @@ import com.example.intermodular.models.RoomFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Date
 
 class BookingViewModel(
     private val bookingRepository: BookingRepository,

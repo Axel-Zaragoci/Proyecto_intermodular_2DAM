@@ -2,18 +2,24 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
+import com.example.intermodular.models.Room
+import com.example.intermodular.models.RoomFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MyBookingsViewModel(
-    private val repository: BookingRepository
+    private val bookingRepository: BookingRepository,
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
     private val _bookings = MutableStateFlow<List<Booking>>(emptyList())
     val bookings: StateFlow<List<Booking>> = _bookings
+
+    private val _rooms = MutableStateFlow<List<Room>>(emptyList())
+    val rooms : StateFlow<List<Room>> = _rooms
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -29,7 +35,11 @@ class MyBookingsViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _bookings.value = repository.getBookings()
+                val rooms = roomRepository.getRooms(RoomFilter())
+                _rooms.value = rooms
+
+                val bookings = bookingRepository.getBookings()
+                _bookings.value = bookings
             } catch (e: Exception) {
                 _errorMessage.value = e.message
             } finally {

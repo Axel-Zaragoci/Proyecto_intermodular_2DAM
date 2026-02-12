@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -15,11 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import com.example.intermodular.models.Booking
+import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.MyBookingsViewModel
 import com.example.intermodular.views.components.BookingCard
-import com.example.intermodular.views.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +25,7 @@ fun MyBookingsScreen(
     loading : Boolean,
     error : String?,
     bookings : List<Booking>,
-    onViewDetailsClick : (String) -> Unit
+    rooms : List<Room>
 ) {
     Column (
         verticalArrangement = Arrangement.Center,
@@ -53,10 +51,10 @@ fun MyBookingsScreen(
         }
 
         LazyColumn {
-            items(bookings) { booking ->
+            items(bookings.size) { i ->
                 BookingCard(
-                    booking = booking,
-                    onViewDetailsClick = onViewDetailsClick
+                    booking = bookings[i],
+                    room = rooms.find { room ->  bookings[i].roomId == room.id }!!
                 )
             }
         }
@@ -66,21 +64,17 @@ fun MyBookingsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyBookingsScreenState(
-    viewModel: MyBookingsViewModel,
-    navController : NavHostController
+    viewModel: MyBookingsViewModel
 ) {
     val bookings by viewModel.bookings.collectAsState()
     val loading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()
+    val rooms by viewModel.rooms.collectAsState()
 
     MyBookingsScreen(
         loading = loading,
         error = error,
         bookings = bookings,
-        onViewDetailsClick = { id ->
-            navController.navigate(
-                Routes.MyBookingDetails.createRoute(id)
-            )
-        }
+        rooms = rooms
     )
 }

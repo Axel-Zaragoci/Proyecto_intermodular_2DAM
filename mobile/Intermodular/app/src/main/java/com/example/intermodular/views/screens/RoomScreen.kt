@@ -12,17 +12,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.views.components.RoomCard
-import com.example.intermodular.models.RoomFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

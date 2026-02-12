@@ -1,7 +1,5 @@
 ﻿package com.example.intermodular.data.remote
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 import java.time.Instant
