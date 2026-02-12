@@ -200,7 +200,7 @@ export class BookingEntryData {
                         checkOutDate: this.checkOutDate.toISOString(), 
                         totalPrice: this.totalPrice, 
                         pricePerNight: this.pricePerNight, 
-                        offer: this.offer, 
+                        offer: Math.round(this.offer), 
                         guests: this.guests, 
                         totalNights: this.totalNights};
         return doc.set(data).save();
