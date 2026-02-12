@@ -119,7 +119,7 @@ export class BookingEntryData {
     completeBookingData(pricePerNight, offer) {
         this.offer = offer
         this.totalNights = Math.ceil((this.checkOutDate.getTime() - this.checkInDate.getTime()) / (1000 * 60 * 60 * 24))
-        this.pricePerNight = pricePerNight * (1 - offer / 100)
+        this.pricePerNight = Math.round(pricePerNight * (1 - offer / 100))
         this.totalPrice = this.totalNights * this.pricePerNight
         this.ready = true
     }
