@@ -1,5 +1,11 @@
 ﻿package com.example.intermodular.viewmodels
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.intermodular.data.repository.BookingRepository
@@ -35,7 +41,7 @@ class BookingViewModel(
     private val _selectedEndDate = MutableStateFlow<Long?>(null)
     val selectedEndDate : StateFlow<Long?> = _selectedEndDate
 
-    private val _maxPrice = MutableStateFlow(0)
+    private val _maxPrice = MutableStateFlow(1000)
     val maxPrice : StateFlow<Int> = _maxPrice
 
     private val _guests = MutableStateFlow<String>("")
@@ -81,6 +87,11 @@ class BookingViewModel(
                     _errorMessage.value = "Las fechas son obligatorias"
                     return@launch
                 }
+                if (_guests.value.isEmpty()) {
+                    _errorMessage.value = "Las cantidad de huéspedes es obligatoria"
+                    return@launch
+                }
+
 
                 if (!startDate.isBefore(endDate)) {
                     _errorMessage.value = "La fecha de salida debe ser posterior a la de entrada"
@@ -90,6 +101,8 @@ class BookingViewModel(
                 _filteredRooms.value = rooms.filter { room ->
                     isRoomAvailable(room, selectedStartDateAsLocalDate()!!, selectedEndDateAsLocalDate()!!)
                 }
+
+                _showFilters.value = false
             }
             catch (e: Exception) {
                 _errorMessage.value = e.message
@@ -166,8 +179,6 @@ class BookingViewModel(
         )
 
         loadData()
-
-        _showFilters.value = false
     }
 
     fun filterOffer() {
@@ -180,7 +191,5 @@ class BookingViewModel(
         )
 
         loadData()
-
-        _showFilters.value = false
     }
 }

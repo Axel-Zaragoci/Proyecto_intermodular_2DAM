@@ -96,6 +96,19 @@ fun BookingScreen(
                 )
             }
         }
+
+        if (rooms.isEmpty() && !showFilters) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No se encontrar habitaciones disponibles",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }
 
