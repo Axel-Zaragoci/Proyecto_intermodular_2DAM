@@ -1,8 +1,6 @@
 ﻿package com.example.intermodular.data.remote.mapper
 
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.models.Booking
 import java.time.ZoneOffset

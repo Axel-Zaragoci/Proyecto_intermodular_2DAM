@@ -12,27 +12,24 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.views.components.RoomCard
-import com.example.intermodular.models.RoomFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomScreen(
     roomViewModel: RoomViewModel
 ) {
-    val rooms by roomViewModel.filteredRooms.collectAsState()
-    val isLoading by roomViewModel.isLoading.collectAsState()
-    val errorMessage by roomViewModel.errorMessage.collectAsState()
-    val currentFilter by roomViewModel.currentFilter.collectAsState()
+    val rooms by roomViewModel.filteredRooms.collectAsStateWithLifecycle()
+    val isLoading by roomViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessage by roomViewModel.errorMessage.collectAsStateWithLifecycle()
+    val currentFilter by roomViewModel.currentFilter.collectAsStateWithLifecycle()
 
     var showFilterSheet by remember { mutableStateOf(false) }
 
@@ -71,7 +68,10 @@ fun RoomScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(rooms) { room ->
-                    RoomCard(room = room)
+                    RoomCard(
+                        room = room,
+                        onButtonClick = { /*TODO*/ }
+                    )
                 }
             }
         }

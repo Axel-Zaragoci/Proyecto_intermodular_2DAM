@@ -1,7 +1,12 @@
 package com.example.intermodular.views.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,23 +14,25 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.intermodular.models.Room
 import com.example.intermodular.BuildConfig
+import kotlin.math.roundToInt
 
 @Composable
 fun RoomCard(
     room: Room,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    buttonText : String = "Ver detalles",
+    onButtonClick: (Room) -> Unit
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
@@ -60,7 +67,7 @@ fun RoomCard(
             Column(modifier = Modifier.padding(16.dp)) {
                 // Room Number and Type
                 Text(
-                    text = "Room ${room.roomNumber} - ${room.type}",
+                    text = "Habitación ${room.roomNumber} - ${room.type}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -72,14 +79,26 @@ fun RoomCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "$${room.pricePerNight}/night",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Column() {
+                        Text(
+                            text = "$${room.pricePerNight}/noche",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        room.offer?.let {
+                            if(it > 0.0) {
+                                Text(
+                                    text = "${room.offer.roundToInt()}% de descuento",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
                     
                      Text(
-                        text = if (room.isAvailable) "Available" else "Occupied",
+                        text = if (room.isAvailable) "Disponible" else "En mantenimiento",
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (room.isAvailable) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error
                     )
@@ -96,12 +115,12 @@ fun RoomCard(
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Button(
-                    onClick = { /* TODO: Navigate to details */ },
+                    onClick = { onButtonClick(room) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("More Details")
+                    Text(buttonText)
                 }
             }
         }
