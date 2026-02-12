@@ -204,6 +204,13 @@ export async function createBooking(req, res) {
 
         const bdBooking = await booking.save()
         const populated = await bdBooking.poblar()
+
+        bdBooking.totalPrice = Math.round(populated.totalPrice);
+        bdBooking.pricePerNight = Math.round(populated.pricePerNight);
+        bdBooking.offer = Math.round(populated.offer);
+        bdBooking.guests = Math.round(populated.guests);
+        bdBooking.totalNights = Math.round(populated.totalNights);
+
         sendEmail(user.email, "Reserva confirmada", "newBooking", populated)
         return res.status(201).json(bdBooking)
     }
