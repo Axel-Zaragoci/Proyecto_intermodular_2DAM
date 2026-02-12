@@ -1,9 +1,12 @@
 ﻿package com.example.intermodular.data.remote
 
 import com.example.intermodular.data.remote.dto.BookingDto
+import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface ApiService {
@@ -24,4 +27,9 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = null,
         @Query("sortOrder") sortOrder: String? = null
     ) : RoomsResponseDto
+
+    @POST("auth/login")
+    suspend fun login(
+        @Body body: Map<String, String>
+    ): LoginDto
 }
