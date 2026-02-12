@@ -2,7 +2,7 @@
 
 import com.example.intermodular.BuildConfig
 import com.example.intermodular.data.remote.auth.AuthInterceptor
-import com.example.intermodular.data.remote.auth.TokenProviderImpl
+import com.example.intermodular.data.remote.auth.SessionManager
 import com.squareup.moshi.Moshi
 import retrofit2.Retrofit
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -20,7 +20,7 @@ object RetrofitProvider {
 
     private fun okHttpClient(): OkHttpClient =
         OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(TokenProviderImpl))
+            .addInterceptor(AuthInterceptor(SessionManager))
             .build()
 
     private fun retrofit(): Retrofit =

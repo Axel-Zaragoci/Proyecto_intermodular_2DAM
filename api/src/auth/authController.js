@@ -45,7 +45,7 @@ export async function login(req, res) {
             .setExpirationTime('1h')
             .sign(encoder.encode(process.env.JWT_SECRET));
 
-        return res.send({ token, rol: user.rol });
+        return res.send({ token, rol: user.rol, id: String(user._id) });
     } catch (error) {
         console.error('Error en el login:', error);
         return res.status(500).json({ error: 'Error del servidor' });
