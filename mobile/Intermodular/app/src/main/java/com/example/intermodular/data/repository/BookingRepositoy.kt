@@ -16,4 +16,9 @@ class BookingRepository(
     suspend fun getBookingById(id : String) : Booking {
         return api.getBookingById(id).toDomain()
     }
+
+    suspend fun getBookingsByUserId(id: String) : List<Booking> {
+        return api.getBookingsByUserId(id)
+            .map { it.toDomain() }
+    }
 }
