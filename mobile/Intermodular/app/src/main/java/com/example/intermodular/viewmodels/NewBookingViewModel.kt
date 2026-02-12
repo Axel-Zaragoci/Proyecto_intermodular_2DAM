@@ -41,6 +41,12 @@ class NewBookingViewModel(
     private val _room = MutableStateFlow<Room?>(null)
     val Room : StateFlow<Room?> = _room
 
+    private val _totalPrice = MutableStateFlow<Int?>(null)
+    val totalPrice : StateFlow<Int?> = _totalPrice;
+
+    private val _bookingCreated = MutableStateFlow(false)
+    val bookingCreated: StateFlow<Boolean> = _bookingCreated
+
     init {
         loadRoom()
     }
@@ -51,6 +57,7 @@ class NewBookingViewModel(
             try {
                 val rooms = roomRepository.getRooms(RoomFilter())
                 _room.value = rooms.first{ it.id == roomId }
+                calculateTotalPrice()
             }
             catch (e: Exception) {
                 _errorMessage.value = e.message
@@ -74,4 +81,54 @@ class NewBookingViewModel(
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate()
         }
+
+    fun onStartDateChange(date: Long?) {
+        date?.let { _startDate.value = it }
+        calculateTotalPrice()
+    }
+
+    fun onEndDateChange(date: Long?) {
+        date?.let { _endDate.value = it }
+        calculateTotalPrice()
+    }
+
+    fun onGuestsChange(value: String) {
+        _guests.value = value
+    }
+
+    private fun calculateTotalPrice() {
+        val room = _room.value ?: return
+        val start = startDateAsLocalDate() ?: return
+        val end = endDateAsLocalDate() ?: return
+
+        val nights = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt()
+        if (nights <= 0) return
+
+        val base = nights * room.pricePerNight
+        val discount = room.offer?.let { base * (it / 100) } ?: 0.0
+        _totalPrice.value = (base - discount).toInt()
+    }
+
+    fun createBooking() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+
+                bookingRepository.createBooking(
+                    roomId = roomId,
+                    checkIn = _startDate.value,
+                    checkOut = _endDate.value,
+                    guests = _guests.value.toInt()
+                )
+
+                _bookingCreated.value = true
+
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
 }

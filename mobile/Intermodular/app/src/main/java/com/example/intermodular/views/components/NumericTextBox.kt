@@ -1,11 +1,13 @@
 ﻿package com.example.intermodular.views.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
@@ -44,5 +46,6 @@ fun NumericTextBox(
 
             cursorColor = MaterialTheme.colorScheme.primary
         ),
+        modifier = Modifier.fillMaxWidth()
     )
 }

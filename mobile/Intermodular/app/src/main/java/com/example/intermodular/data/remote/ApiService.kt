@@ -1,6 +1,7 @@
 ﻿package com.example.intermodular.data.remote
 
 import com.example.intermodular.data.remote.dto.BookingDto
+import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import retrofit2.http.Body
@@ -18,6 +19,12 @@ interface ApiService {
 
     @GET("booking/client/{id}")
     suspend fun getBookingsByUserId(@Path("id") id: String) : List<BookingDto>
+
+    @POST("booking")
+    suspend fun createBooking(
+        @Body body: CreateBookingDto
+    ): BookingDto
+
 
     @GET("room")
     suspend fun getRooms(
