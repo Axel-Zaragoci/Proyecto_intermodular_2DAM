@@ -150,7 +150,7 @@ fun BookingScreenState(
         filter = viewModel::filter,
         filterOffer = viewModel::filterOffer,
         onBookButtonClick = { room ->
-            navController.navigate("bookRoom/${room.id}")
+            navController.navigate("bookRoom/${room.id}?startDate=$selectedStartDate&endDate=$selectedEndDate&guests=$guests")
         }
     )
 }

@@ -89,18 +89,24 @@ fun Navigation(
         composable(
             route = Routes.BookRoom.route,
             arguments = listOf(
-                navArgument("roomId") { type = NavType.StringType }
+                navArgument("roomId") { type = NavType.StringType },
+                navArgument("startDate") { type = NavType.LongType },
+                navArgument("endDate") { type = NavType.LongType },
+                navArgument("guests") { type = NavType.StringType }
             )
         ) { backStackEntry ->
 
             val roomId = backStackEntry.arguments?.getString("roomId")!!
+            val startDate = backStackEntry.arguments?.getLong("startDate")
+            val endDate = backStackEntry.arguments?.getLong("endDate")
+            val guests = backStackEntry.arguments?.getString("guests")!!
 
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
             val roomRepository = RoomRepository(api)
 
             val viewModel: NewBookingViewModel = viewModel(
-                factory = NewBookingViewModelFactory(bookingRepository, roomRepository, roomId)
+                factory = NewBookingViewModelFactory(bookingRepository, roomRepository, roomId, startDate!!, endDate!!, guests)
             )
 
             NewBookingState(viewModel)
