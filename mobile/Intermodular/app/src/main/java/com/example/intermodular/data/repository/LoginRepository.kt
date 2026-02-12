@@ -1,7 +1,7 @@
 package com.example.intermodular.data.repository
 
 import com.example.intermodular.data.remote.ApiService
-import com.example.intermodular.data.remote.auth.TokenProviderImpl
+import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.remote.dto.LoginDto
 
 class LoginRepository(
@@ -17,12 +17,12 @@ class LoginRepository(
             )
         )
 
-        TokenProviderImpl.setToken(response.token)
+        SessionManager.setSession(response.token, response.id)
 
         return response
     }
 
     fun logout() {
-        TokenProviderImpl.clearToken()
+        SessionManager.clearSession()
     }
 }
