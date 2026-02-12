@@ -88,6 +88,18 @@ bookingDatabaseSchema.methods.poblar = async function() {
     }
 }
 
+bookingDatabaseSchema.set('toJSON', {
+    transform: (_doc, ret) => {
+        ret.totalPrice = Math.floor(ret.totalPrice);
+        ret.pricePerNight = Math.floor(ret.pricePerNight);
+        ret.offer = Math.floor(ret.offer);
+        ret.guests = Math.floor(ret.guests);
+        ret.totalNights = Math.floor(ret.totalNights);
+        return ret;
+    }
+});
+
+
 export const bookingDatabaseModel = model('booking', bookingDatabaseSchema)
 
 /** Clase que obtiene los datos para la reserva */
@@ -200,7 +212,7 @@ export class BookingEntryData {
                         checkOutDate: this.checkOutDate.toISOString(), 
                         totalPrice: this.totalPrice, 
                         pricePerNight: this.pricePerNight, 
-                        offer: Math.round(this.offer), 
+                        offer: this.offer, 
                         guests: this.guests, 
                         totalNights: this.totalNights};
         return doc.set(data).save();
