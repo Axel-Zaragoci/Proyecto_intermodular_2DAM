@@ -7,19 +7,20 @@ import { getOneBookingById,
     cancelBooking,
     updateBooking,
     deleteBooking} from "./bookingController.js";
+import { verifyToken } from "../auth/authMiddleware.js";
 
 const router = Router();
 
-router.get("/:id", getOneBookingById);
-router.get("/client/:id", getBookingsByClientId);
-router.get("/room/:id", getBookingsByRoomId);
-router.get("/", getBookings);
+router.get("/:id", verifyToken, getOneBookingById);
+router.get("/client/:id", verifyToken, getBookingsByClientId);
+router.get("/room/:id", verifyToken, getBookingsByRoomId);
+router.get("/", verifyToken, getBookings);
 
-router.post("/", createBooking);
+router.post("/", verifyToken, createBooking);
 
-router.patch("/:id/cancel", cancelBooking);
-router.patch("/:id", updateBooking);
+router.patch("/:id/cancel", verifyToken, cancelBooking);
+router.patch("/:id", verifyToken, updateBooking);
 
-router.delete("/:id", deleteBooking);
+router.delete("/:id", verifyToken, deleteBooking);
 
 export default router;
