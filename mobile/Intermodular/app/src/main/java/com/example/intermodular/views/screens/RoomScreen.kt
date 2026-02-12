@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.views.components.RoomCard
 
@@ -25,10 +26,10 @@ import com.example.intermodular.views.components.RoomCard
 fun RoomScreen(
     roomViewModel: RoomViewModel
 ) {
-    val rooms by roomViewModel.filteredRooms.collectAsState()
-    val isLoading by roomViewModel.isLoading.collectAsState()
-    val errorMessage by roomViewModel.errorMessage.collectAsState()
-    val currentFilter by roomViewModel.currentFilter.collectAsState()
+    val rooms by roomViewModel.filteredRooms.collectAsStateWithLifecycle()
+    val isLoading by roomViewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessage by roomViewModel.errorMessage.collectAsStateWithLifecycle()
+    val currentFilter by roomViewModel.currentFilter.collectAsStateWithLifecycle()
 
     var showFilterSheet by remember { mutableStateOf(false) }
 

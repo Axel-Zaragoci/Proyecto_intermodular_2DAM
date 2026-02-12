@@ -10,11 +10,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.intermodular.models.Booking
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.views.components.InformationComponent
@@ -126,9 +126,9 @@ fun MyBookingDetailsScreen(
 fun MyBookingDetailsState(
     viewModel: MyBookingDetailsViewModel
 ) {
-    val booking by viewModel.booking.collectAsState()
-    val loading by viewModel.isLoading.collectAsState()
-    val error by viewModel.errorMessage.collectAsState()
+    val booking by viewModel.booking.collectAsStateWithLifecycle()
+    val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
 
 
     MyBookingDetailsScreen(

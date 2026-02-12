@@ -10,10 +10,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.MyBookingsViewModel
@@ -66,10 +66,10 @@ fun MyBookingsScreen(
 fun MyBookingsScreenState(
     viewModel: MyBookingsViewModel
 ) {
-    val bookings by viewModel.bookings.collectAsState()
-    val loading by viewModel.isLoading.collectAsState()
-    val error by viewModel.errorMessage.collectAsState()
-    val rooms by viewModel.rooms.collectAsState()
+    val bookings by viewModel.bookings.collectAsStateWithLifecycle()
+    val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val rooms by viewModel.rooms.collectAsStateWithLifecycle()
 
     MyBookingsScreen(
         loading = loading,

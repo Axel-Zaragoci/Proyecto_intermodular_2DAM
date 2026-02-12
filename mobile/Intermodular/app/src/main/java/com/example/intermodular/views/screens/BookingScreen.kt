@@ -11,10 +11,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.BookingViewModel
@@ -105,16 +105,16 @@ fun BookingScreenState(
     viewModel: BookingViewModel,
     navController: NavHostController
 ) {
-    val rooms by viewModel.filteredRooms.collectAsState()
-    val loading by viewModel.isLoading.collectAsState()
-    val error by viewModel.errorMessage.collectAsState()
-    val selectedStartDate by viewModel.selectedStartDate.collectAsState()
-    val selectedEndDate by viewModel.selectedEndDate.collectAsState()
-    val maxPrice by viewModel.maxPrice.collectAsState()
-    val guests by viewModel.guests.collectAsState()
-    val extraBed by viewModel.extraBed.collectAsState()
-    val cradle by viewModel.cradle.collectAsState()
-    val showFilters by viewModel.showFilters.collectAsState()
+    val rooms by viewModel.filteredRooms.collectAsStateWithLifecycle()
+    val loading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val selectedStartDate by viewModel.selectedStartDate.collectAsStateWithLifecycle()
+    val selectedEndDate by viewModel.selectedEndDate.collectAsStateWithLifecycle()
+    val maxPrice by viewModel.maxPrice.collectAsStateWithLifecycle()
+    val guests by viewModel.guests.collectAsStateWithLifecycle()
+    val extraBed by viewModel.extraBed.collectAsStateWithLifecycle()
+    val cradle by viewModel.cradle.collectAsStateWithLifecycle()
+    val showFilters by viewModel.showFilters.collectAsStateWithLifecycle()
 
     BookingScreen(
         showFilters = showFilters,
