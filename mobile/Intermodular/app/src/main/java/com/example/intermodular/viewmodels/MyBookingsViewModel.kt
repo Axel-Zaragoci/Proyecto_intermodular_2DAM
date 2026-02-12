@@ -2,6 +2,7 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
@@ -38,7 +39,7 @@ class MyBookingsViewModel(
                 val rooms = roomRepository.getRooms(RoomFilter())
                 _rooms.value = rooms
 
-                val bookings = bookingRepository.getBookings()
+                val bookings = bookingRepository.getBookingsByUserId(SessionManager.getUserId()!!)
                 _bookings.value = bookings
             } catch (e: Exception) {
                 _errorMessage.value = e.message

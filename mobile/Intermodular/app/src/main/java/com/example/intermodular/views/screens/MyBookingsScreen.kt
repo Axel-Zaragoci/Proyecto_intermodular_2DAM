@@ -52,6 +52,19 @@ fun MyBookingsScreen(
             )
         }
 
+        if (bookings.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No se han encontrado reservas anteriores",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         LazyColumn {
             items(bookings.size) { i ->
                 BookingCard(
