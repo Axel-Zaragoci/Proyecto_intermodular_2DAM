@@ -239,6 +239,7 @@ export class BookingEntryData {
 async function dateOverlap(roomID, checkInDate, checkOutDate, id = null) {
     const query = {
         room: roomID,
+        status: "Abierta",
         checkInDate: { $lt: checkOutDate },
         checkOutDate: { $gt: checkInDate }
     };

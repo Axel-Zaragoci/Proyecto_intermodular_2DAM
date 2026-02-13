@@ -4,8 +4,10 @@ import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
+import com.example.intermodular.data.remote.dto.UpdateBookingDto
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -23,6 +25,15 @@ interface ApiService {
     @POST("booking")
     suspend fun createBooking(
         @Body body: CreateBookingDto
+    ): BookingDto
+
+    @PATCH("booking/{id}/cancel")
+    suspend fun cancelBooking(@Path("id") id: String): BookingDto
+
+    @PATCH("booking/{id}")
+    suspend fun updateBooking(
+        @Path("id") id: String,
+        @Body body: UpdateBookingDto
     ): BookingDto
 
 

@@ -164,7 +164,7 @@ class BookingViewModel(
 
         val roomBookings = _bookings.filter { it.roomId == room.id }
 
-        return roomBookings.none { booking ->
+        return roomBookings.filter { it.status == "Abierta" }.none { booking ->
             booking.checkInDate < userEnd &&
                     booking.checkOutDate > userStart
         }

@@ -3,6 +3,7 @@
 import com.example.intermodular.data.remote.ApiService
 import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.remote.dto.CreateBookingDto
+import com.example.intermodular.data.remote.dto.UpdateBookingDto
 import com.example.intermodular.data.remote.mapper.toDomain
 import com.example.intermodular.models.Booking
 
@@ -43,6 +44,24 @@ class BookingRepository(
         )
 
         return api.createBooking(dto).toDomain()
+    }
+
+    suspend fun cancelBooking(bookingId: String): Booking {
+        return api.cancelBooking(bookingId).toDomain()
+    }
+
+    suspend fun updateBooking(
+        bookingId: String,
+        checkIn: Long,
+        checkOut: Long,
+        guests: Int
+    ): Booking {
+        val dto = UpdateBookingDto(
+            checkInDate = checkIn,
+            checkOutDate = checkOut,
+            guests = guests
+        )
+        return api.updateBooking(bookingId, dto).toDomain()
     }
 
 }
