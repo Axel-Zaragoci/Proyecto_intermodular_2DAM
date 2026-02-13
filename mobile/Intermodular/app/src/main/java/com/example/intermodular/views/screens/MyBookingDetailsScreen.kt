@@ -34,6 +34,7 @@ import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.views.components.BookingDataForm
+import com.example.intermodular.views.components.PaymentPopup
 
 @Composable
 fun MyBookingDetailsScreen(
@@ -44,6 +45,9 @@ fun MyBookingDetailsScreen(
     booking: Booking?,
     startDate: Long?,
     endDate: Long?,
+    mostrarPopup : Boolean,
+    mensajePopup : String,
+    onPopupDismiss: () -> Unit,
     onUpdateClick: () -> Unit,
     onCancelClick: () -> Unit,
     onStartDateChange: (Long?) -> Unit,
@@ -130,6 +134,13 @@ fun MyBookingDetailsScreen(
             ) {
                 Text("Cancelar reserva")
             }
+
+
+            PaymentPopup(
+                mostrar = mostrarPopup,
+                mensaje = mensajePopup,
+                onDismiss = onPopupDismiss
+            )
         }
     }
 }
@@ -142,6 +153,8 @@ fun MyBookingDetailsState(
     val error by viewModel.errorMessage.collectAsStateWithLifecycle()
     val room by viewModel.room.collectAsStateWithLifecycle()
     val booking by viewModel.booking.collectAsStateWithLifecycle()
+    val mostrarPopup by viewModel.mostrarPopup.collectAsStateWithLifecycle()
+    val mensajePopup by viewModel.mensajePopup.collectAsStateWithLifecycle()
 
     MyBookingDetailsScreen(
         loading = loading,
@@ -149,6 +162,9 @@ fun MyBookingDetailsState(
         room = room,
         status = booking?.status,
         booking = booking,
+        mostrarPopup = mostrarPopup,
+        mensajePopup = mensajePopup,
+        onPopupDismiss = {},
         startDate = viewModel.checkInDateToMilliseconds(),
         endDate = viewModel.checkOutDateToMilliseconds(),
         onUpdateClick = viewModel::updateBooking,

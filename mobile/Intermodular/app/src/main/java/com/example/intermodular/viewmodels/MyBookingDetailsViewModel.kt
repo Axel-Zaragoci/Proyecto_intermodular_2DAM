@@ -8,6 +8,7 @@ import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import com.example.intermodular.models.RoomFilter
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -32,6 +33,12 @@ class MyBookingDetailsViewModel (
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
+
+    private val _mostrarPopup = MutableStateFlow(false)
+    val mostrarPopup: StateFlow<Boolean> = _mostrarPopup
+
+    private val _mensajePopup = MutableStateFlow("")
+    val mensajePopup: StateFlow<String> = _mensajePopup
 
     init {
         loadBooking()
@@ -133,6 +140,8 @@ class MyBookingDetailsViewModel (
                     checkOut = endMillis,
                     guests = currentBooking.guests
                 )
+                if (_booking.value?.totalPrice != updated.totalPrice) procesarPago()
+
                 _booking.value = updated
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
@@ -156,5 +165,25 @@ class MyBookingDetailsViewModel (
                 _isLoading.value = false
             }
         }
+    }
+
+    fun procesarPago() {
+        viewModelScope.launch {
+            _mensajePopup.value = "Procesando pago..."
+            _mostrarPopup.value = true
+
+            delay(3000)
+
+            _mensajePopup.value = "Pago completado"
+
+            delay(1000)
+
+            cerrarPopup()
+        }
+    }
+
+    private fun cerrarPopup() {
+        _mostrarPopup.value = false
+        _mensajePopup.value = ""
     }
 }
