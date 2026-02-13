@@ -153,7 +153,8 @@ fun FilterList(
                 NumericTextBox(
                     number = guests,
                     onValueChanged = onGuestsChanged,
-                    label = "Cantidad de huéspedes"
+                    label = "Cantidad de huéspedes",
+                    numbers = listOf("1", "2", "3", "4", "5")
                 )
             }
 

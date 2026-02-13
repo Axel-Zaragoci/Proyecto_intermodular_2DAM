@@ -53,7 +53,8 @@ fun BookingDataForm(
             NumericTextBox(
                 number = guests,
                 onValueChanged = onGuestsDataChange,
-                label = "Cantidad de huéspedes:"
+                label = "Cantidad de huéspedes:",
+                numbers = listOf("1", "2", "3", "4", "5")
             )
         }
 
