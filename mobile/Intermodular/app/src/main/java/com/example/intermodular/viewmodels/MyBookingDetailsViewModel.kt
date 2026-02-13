@@ -2,6 +2,7 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import kotlin.let
 
 class MyBookingDetailsViewModel (
     private val bookingId : String,
@@ -52,8 +54,7 @@ class MyBookingDetailsViewModel (
                     throw Exception("No se encontró la habitación")
                 }
             } catch (e: Exception) {
-                _errorMessage.value = e.message
-                println(_errorMessage.value)
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {
                 _isLoading.value = false
             }
@@ -134,7 +135,7 @@ class MyBookingDetailsViewModel (
                 )
                 _booking.value = updated
             } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al actualizar la reserva"
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {
                 _isLoading.value = false
             }
@@ -150,7 +151,7 @@ class MyBookingDetailsViewModel (
                 bookingRepository.cancelBooking(bookingId)
                 _booking.value = _booking.value?.copy(status = "Cancelada")
             } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al cancelar la reserva"
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {
                 _isLoading.value = false
             }

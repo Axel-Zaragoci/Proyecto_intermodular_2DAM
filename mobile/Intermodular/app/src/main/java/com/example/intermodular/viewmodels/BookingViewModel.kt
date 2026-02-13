@@ -8,6 +8,7 @@ import androidx.compose.material3.SnackbarData
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
@@ -105,7 +106,7 @@ class BookingViewModel(
                 _showFilters.value = false
             }
             catch (e: Exception) {
-                _errorMessage.value = e.message
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             }
             finally {
                 _isLoading.value = false
