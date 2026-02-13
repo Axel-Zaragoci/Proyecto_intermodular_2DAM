@@ -3,7 +3,20 @@
 import org.json.JSONObject
 import retrofit2.HttpException
 
+/**
+ * Objeto para el manejo de los diferentes errores que pueden ocurrir en la API.
+ * Permite obtener el mensaje de error proveniente de la API de los diferentes errores
+ *
+ * @author Axel Zaragoci
+ */
 object ApiErrorHandler {
+
+    /**
+     * Devuelve un mensaje de error listo para ser visto por el usuario desde una excepción
+     *
+     * @param throwable - Excepción capturada en los métodos que mandan solicitudes a la API
+     * @return [String] - Mensaje de error legible para el usuario
+     */
     fun getErrorMessage(throwable: Throwable) : String {
         return when (throwable) {
             is HttpException -> handleHttpException(throwable)
@@ -13,6 +26,14 @@ object ApiErrorHandler {
         }
     }
 
+    /**
+     * Procesa una excepción HTTP de Retrofit para conseguir el mensaje de error
+     * Intenta obtener el cuerpo del error y convertirlo. En caso de falla devuelve el mensaje de error según el código
+     *
+     *
+     * @param e - Excepción HTTP de Retrofit
+     * @return [String] - Mensaje de error legible para el usuario
+     */
     private fun handleHttpException(e: HttpException): String {
         return try {
             val errorBody = e.response()?.errorBody()?.string()
@@ -21,11 +42,20 @@ object ApiErrorHandler {
             } else {
                 getDefaultMessageForCode(e.code())
             }
-        } catch (jsonException: Exception) {
+        } catch (_: Exception) {
             getDefaultMessageForCode(e.code())
         }
     }
 
+    /**
+     * Parsea el cuerpo de la respuesta HTTP en formato JSON
+     * Busca el campo "error" y en caso de no encontrarlo devuelve la cadena para su código de error
+     *
+     * @param errorBody - Cuerpo del error de la respuesta en formato String
+     * @param httpCode - Código de la respuesta para usar en caso de no haber campo "error"
+     *
+     * @return [String] - Mensaje de error sacado del JSON o mensaje para el código de error
+     */
     private fun parseApiError(errorBody: String, httpCode: Int): String {
         return try {
             val jsonObject = JSONObject(errorBody)
@@ -41,6 +71,13 @@ object ApiErrorHandler {
         }
     }
 
+    /**
+     * Obtiene un mensaje de error basado en el código de la respuesta
+     * Devuelve mensajes entendibles para mostrar a los usuarios
+     *
+     * @param code - Código de la respuesta HTTP
+     * @return [String] - Cadena con el mensaje correspondiente a su código
+     */
     private fun getDefaultMessageForCode(code: Int): String {
         return when (code) {
             400 -> "Datos incorrectos"
