@@ -302,7 +302,8 @@ export async function updateBooking(req, res) {
         bookingData.fromDocument(booking);
 
         const room = await roomDatabaseModel.findById(booking.room);
-
+        if (guests > room.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
+        
         try {
             await bookingData.validate()
         }
