@@ -22,10 +22,36 @@ import coil.request.ImageRequest
 import com.example.intermodular.BuildConfig
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
+import com.example.intermodular.viewmodels.MyBookingsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.views.components.BookingDataForm
 import com.example.intermodular.views.components.PaymentPopup
 
+/**
+ * Pantalla de crear nueva reserva
+ *
+ * Componentes externos:
+ * - **Formulario de actualizar**: [BookingDataForm] para editar fechas y huéspedes
+ * - **Popup de pago**: [PaymentPopup] para simular una pasarela de pago
+ *
+ *@author Axel Zaragoci
+ *
+ * @param loading - Estado de carga de datos
+ * @param error - Mensaje de error a mostrar (null si no hay error)
+ * @param room - Habitación seleccionada para reservar
+ * @param guests - Número de huéspedes como String
+ * @param startDate - Fecha de inicio seleccionada (en milisegundos)
+ * @param endDate - Fecha de fin seleccionada (en milisegundos)
+ * @param totalPrice - Precio total calculado para la reserva
+ * @param newBooking - Flag para saber si se ha creado la reserva
+ * @param showPopup - Controla la visibilidad del popup de pago
+ * @param popupMessage - Mensaje a mostrar en el popup
+ * @param onPopupDismiss - Callback al cerrar el popup
+ * @param onFormButtonClick - Callback al hacer clic en el botón del formulario (crear reserva)
+ * @param onStartDateChange - Callback al cambiar la fecha de entrada
+ * @param onEndDateChange - Callback al cambiar la fecha de salida
+ * @param onGuestsChange - Callback al cambiar el número de huéspedes
+ */
 @Composable
 fun NewBookingScreen(
     loading : Boolean,
@@ -36,8 +62,8 @@ fun NewBookingScreen(
     endDate : Long?,
     totalPrice: Int?,
     newBooking: Boolean,
-    mostrarPopup : Boolean,
-    mensajePopup : String,
+    showPopup : Boolean,
+    popupMessage : String,
     onPopupDismiss: () -> Unit,
     onFormButtonClick: () -> Unit,
     onStartDateChange: (Long?) -> Unit,
@@ -50,6 +76,7 @@ fun NewBookingScreen(
             .padding(20.dp)
     ) {
         if (!newBooking) {
+            // ESTADO DE CARGAR
             if (loading) {
                 Box (
                     modifier = Modifier
@@ -61,6 +88,7 @@ fun NewBookingScreen(
                 }
             }
 
+            // MENSAJE DE ERROR
             error?.let {
                 Text(
                     text = it,
@@ -69,6 +97,7 @@ fun NewBookingScreen(
                 )
             }
 
+            // Creación de la ruta de la imagen
             val relativePath = if (room?.mainImage?.startsWith("/") == true)
                 room.mainImage.substring(1)
             else
@@ -79,6 +108,7 @@ fun NewBookingScreen(
             else
                 "${BuildConfig.BASE_URL}$relativePath"
 
+            // IMAGEN PRINCIPAL DE LA HABITACIÓN
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(imageUrl)
@@ -92,6 +122,7 @@ fun NewBookingScreen(
                 error = ColorPainter(MaterialTheme.colorScheme.errorContainer)
             )
 
+            // FORMULARIO DE CREAR RESERVA
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,6 +142,7 @@ fun NewBookingScreen(
             }
         }
 
+        // SI HAY RESERVA CREADA
         if (newBooking) {
             Text(
                 text = "Nueva reserva creada",
@@ -120,13 +152,22 @@ fun NewBookingScreen(
         }
 
         PaymentPopup(
-            mostrar = mostrarPopup,
-            mensaje = mensajePopup,
+            show = showPopup,
+            message = popupMessage,
             onDismiss = onPopupDismiss
         )
     }
 }
 
+/**
+ * Versión de [NewBookingScreen] con estado y conexión al ViewModel
+ *
+ * Funciones:
+ * 1. Recolectar estados del [NewBookingViewModel] usando [collectAsStateWithLifecycle]
+ * 2. Pasar los estados a [NewBookingScreen]
+ *
+ * @author Axel Zaragoci
+ */
 @Composable
 fun NewBookingState(
     viewModel: NewBookingViewModel
@@ -139,8 +180,8 @@ fun NewBookingState(
     val selectedEndDate by viewModel.EndDate.collectAsStateWithLifecycle()
     val totalPrice by viewModel.totalPrice.collectAsStateWithLifecycle()
     val newBooking by viewModel.bookingCreated.collectAsStateWithLifecycle()
-    val mostrarPopup by viewModel.mostrarPopup.collectAsStateWithLifecycle()
-    val mensajePopup by viewModel.mensajePopup.collectAsStateWithLifecycle()
+    val showPopup by viewModel.showPopup.collectAsStateWithLifecycle()
+    val popupMessage by viewModel.popupMessage.collectAsStateWithLifecycle()
     val room by viewModel.Room.collectAsStateWithLifecycle()
 
     NewBookingScreen(
@@ -152,8 +193,8 @@ fun NewBookingState(
         endDate = selectedEndDate,
         totalPrice = totalPrice,
         newBooking = newBooking,
-        mostrarPopup = mostrarPopup,
-        mensajePopup = mensajePopup,
+        showPopup = showPopup,
+        popupMessage = popupMessage,
         onPopupDismiss = {},
         onFormButtonClick = viewModel::createBooking,
         onStartDateChange = viewModel::onStartDateChange,

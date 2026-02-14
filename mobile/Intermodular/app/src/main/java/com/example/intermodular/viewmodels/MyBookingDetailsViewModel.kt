@@ -17,33 +17,79 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.let
 
+/**
+ * ViewModel para la vista que permite ver detalles, modificar y cancelar una reserva ya existente
+ * @author Axel Zaragoci
+ *
+ * @property bookingId - ID de la reserva sobre la que se van a aplicar las funciones
+ * @property bookingRepository - Repositorio para obtener datos de reservas de la API
+ * @property roomRepository - Repositorio para obtener datos de habitaciones de la API
+ */
 class MyBookingDetailsViewModel (
     private val bookingId : String,
     private val bookingRepository: BookingRepository,
     private val roomRepository: RoomRepository
 ) : ViewModel() {
+
+    // ==================== ESTADOS DE LA UI ====================
+    /**
+     * Reserva que se ha de mostrar
+     */
     private val _booking = MutableStateFlow<Booking?>(null)
     val booking: StateFlow<Booking?> = _booking
 
+    /**
+     * Habitación reservada
+     */
     private val _room = MutableStateFlow<Room?>(null)
     val room : StateFlow<Room?> = _room
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
+    /**
+     * Mensaje de error a mostrar al usuario
+     */
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    private val _mostrarPopup = MutableStateFlow(false)
-    val mostrarPopup: StateFlow<Boolean> = _mostrarPopup
+    /**
+     * Indicador de carga para funciones asíncronas
+     */
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _mensajePopup = MutableStateFlow("")
-    val mensajePopup: StateFlow<String> = _mensajePopup
+    /**
+     * Controlador de visibilidad del popup de pago
+     */
+    private val _showPopup = MutableStateFlow(false)
+    val showPopup: StateFlow<Boolean> = _showPopup
 
+    /**
+     * Mensaje a mostrar en el popup de pago
+     */
+    private val _popupMessage = MutableStateFlow("")
+    val popupMessage: StateFlow<String> = _popupMessage
+
+    // ==================== MÉTODOS PÚBLICOS ====================
+    /**
+     * Bloque de inicio del ViewModel
+     * Se encarga de cargar los datos de la habitación y la reserva
+     */
     init {
         loadBooking()
     }
 
+    /**
+     * Carga la información de la habitación y de la reserva
+     *
+     * Flujo principal:
+     * 1. Obtiene la reserva por el ID
+     * 2. Obtiene toda la lista de habitaciones
+     * 3. Saca la habitación reservada de la lista
+     *
+     * Errores lanzados:
+     * - En caso de no encontrar la reserva
+     * - En caso de no encontrar la habitación
+     * Al ocurrir un error se muestra un mensaje descriptivo de [ApiErrorHandler]
+     */
     fun loadBooking() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -68,26 +114,25 @@ class MyBookingDetailsViewModel (
         }
     }
 
-    private fun localDateToUtcMillis(date: LocalDate): Long {
-        return date.atStartOfDay()
-            .toInstant(ZoneOffset.UTC)
-            .toEpochMilli()
-    }
-
-    private fun utcMillisToLocalDate(millis: Long): LocalDate {
-        return Instant.ofEpochMilli(millis)
-            .atZone(ZoneOffset.UTC)
-            .toLocalDate()
-    }
-
+    /**
+     * Devuelve la fecha de inicio de la reserva en milisegundos
+     */
     fun checkInDateToMilliseconds(): Long? {
         return _booking.value?.checkInDate?.let { localDateToUtcMillis(it) }
     }
 
+    /**
+     * Devuelve la fecha de fin de la reserva en milisegundos
+     */
     fun checkOutDateToMilliseconds(): Long? {
         return _booking.value?.checkOutDate?.let { localDateToUtcMillis(it) }
     }
 
+    /**
+     * Actualiza la fecha de inicio
+     *
+     * @param newMillis - Fecha nueva de inicio en milisegundos
+     */
     fun onStartDateChange(newMillis: Long?) {
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
@@ -95,6 +140,11 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    /**
+     * Actualiza la fecha de fin
+     *
+     * @param newMillis - Fecha nueva de fin en milisegundos
+     */
     fun onEndDateChange(newMillis: Long?) {
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
@@ -102,6 +152,11 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    /**
+     * Actualiza la cantidad de huéspedes
+     *
+     * @param guests - Cantidad de huéspedes seleccionados como [String]
+     */
     fun onGuestsChange(guests: String) {
         val intGuests = guests.toIntOrNull()
         if (intGuests != null && intGuests > 0) {
@@ -109,6 +164,16 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    /**
+     * Actualiza los datos de la reserva
+     *
+     * Flujo principal:
+     * 1. Verifica que los datos sean válidos
+     * 2. Actualiza la reserva en la API
+     * 3. Si ha cambiado el precio total, simula un pago
+     *
+     * En caso de error muestra un mensaje descriptivo o el acorde a [ApiErrorHandler]
+     */
     fun updateBooking() {
         val currentBooking = _booking.value ?: run {
             _errorMessage.value = "No hay datos de reserva para actualizar"
@@ -140,7 +205,7 @@ class MyBookingDetailsViewModel (
                     checkOut = endMillis,
                     guests = currentBooking.guests
                 )
-                if (_booking.value?.totalPrice != updated.totalPrice) procesarPago()
+                if (_booking.value?.totalPrice != updated.totalPrice) processPay()
 
                 _booking.value = updated
             } catch (e: Exception) {
@@ -151,7 +216,15 @@ class MyBookingDetailsViewModel (
         }
     }
 
-
+    /**
+     * Cancela la reserva
+     *
+     * Flujo principal:
+     * 1. Cancela la reserva actual en la API
+     * 2. Cambia la reserva actual a una igual con el estado "Cancelada"
+     *
+     * En caso de error muestra un mensaje descriptivo o el acorde a [ApiErrorHandler]
+     */
     fun cancelBooking() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -167,23 +240,60 @@ class MyBookingDetailsViewModel (
         }
     }
 
-    fun procesarPago() {
+    /**
+     * Simula un proceso de pago
+     *
+     * Flujo principal:
+     * 1. Muestra un mensaje "Procesando pago..."
+     * 2. Tras 3 segundos cambia el mensaje a "Pago completado"
+     * 3. Tras 1 segundo cierra el popup
+     */
+    fun processPay() {
         viewModelScope.launch {
-            _mensajePopup.value = "Procesando pago..."
-            _mostrarPopup.value = true
+            _popupMessage.value = "Procesando pago..."
+            _showPopup.value = true
 
             delay(3000)
 
-            _mensajePopup.value = "Pago completado"
+            _popupMessage.value = "Pago completado"
 
             delay(1000)
 
-            cerrarPopup()
+            closePopup()
         }
     }
 
-    private fun cerrarPopup() {
-        _mostrarPopup.value = false
-        _mensajePopup.value = ""
+
+    // ==================== MÉTODOS PRIVADOS ====================
+    /**
+     * Cierra el popup y vacía el mensaje a mostrar en el popup
+     */
+    private fun closePopup() {
+        _showPopup.value = false
+        _popupMessage.value = ""
+    }
+
+    /**
+     * Devuelve la hora en zona UTC en milisegundos
+     *
+     * @param date - Fecha a transformar en [LocalDate]
+     * @return [Long] - Milisegundos respectivos a la fecha
+     */
+    private fun localDateToUtcMillis(date: LocalDate): Long {
+        return date.atStartOfDay()
+            .toInstant(ZoneOffset.UTC)
+            .toEpochMilli()
+    }
+
+    /**
+     * Devuelve la hora en zona UTC en formato [LocalDate]
+     *
+     * @param millis - Milisegundos respectivos a una fecha
+     * @return [LocalDate] - Fecha en formato [LocalDate] respectiva a los milisegundos
+     */
+    private fun utcMillisToLocalDate(millis: Long): LocalDate {
+        return Instant.ofEpochMilli(millis)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
     }
 }
