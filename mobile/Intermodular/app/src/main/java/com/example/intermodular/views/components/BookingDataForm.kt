@@ -1,13 +1,18 @@
 ﻿package com.example.intermodular.views.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun BookingDataForm(
@@ -27,7 +32,9 @@ fun BookingDataForm(
         Row( )
         {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 10.dp)
             ) {
                 BookingDatePicker(
                     onDateSelected = onStartDateChange,
@@ -37,7 +44,9 @@ fun BookingDataForm(
             }
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp)
             ) {
                 BookingDatePicker(
                     onDateSelected = onEndDateChange,
@@ -53,14 +62,29 @@ fun BookingDataForm(
             NumericTextBox(
                 number = guests,
                 onValueChanged = onGuestsDataChange,
-                label = "Cantidad de huéspedes:"
+                label = "Cantidad de huéspedes:",
+                numbers = listOf("1", "2", "3", "4", "5")
             )
         }
 
-        InformationComponent(
-            title = "Precio total: ",
-            value = "$totalPrice €"
-        )
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Precio total:",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = "$totalPrice €",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
 
         Button(
             onClick = onButtonClick,

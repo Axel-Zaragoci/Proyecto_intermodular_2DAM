@@ -17,9 +17,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
+import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.viewmodels.MyBookingsViewModel
 import com.example.intermodular.views.components.BookingCard
 
+/**
+ * Pantalla de ver todas las reservas del usuario autenticado
+ *
+ * Flujo de UI:
+ * 1. Muestra indicador de carga mientras se obtienen datos
+ * 2. Muestra mensaje de error si ocurre algún problema
+ *
+ * @author Axel Zaragoci
+ *
+ * @param loading - Estado de carga de datos
+ * @param error - Mensaje de error a mostrar (null si no hay error)
+ * @param bookings - Lista de todas las reservas
+ * @param rooms - Lista de todas las habitaciones
+ * @param onDetailsButtonClick - Callback para evento click en el botón "Ver detalles"
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyBookingsScreen(
@@ -33,6 +49,7 @@ fun MyBookingsScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // ESTADO DE CARGA
         if (loading) {
             Box (
                 modifier = Modifier
@@ -44,6 +61,7 @@ fun MyBookingsScreen(
             }
         }
 
+        // MENSAJE DE ERROR
         error?.let {
             Text(
                 text = it,
@@ -52,6 +70,7 @@ fun MyBookingsScreen(
             )
         }
 
+        // MENSAJE DE AUSENCIA DE RESERVAS
         if (bookings.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -65,6 +84,7 @@ fun MyBookingsScreen(
             }
         }
 
+        // LISTA DE RESERVAS
         LazyColumn {
             items(bookings.size) { i ->
                 BookingCard(
@@ -77,6 +97,20 @@ fun MyBookingsScreen(
     }
 }
 
+/**
+ * Versión de [MyBookingsScreen] con estado y conexión al ViewModel
+ *
+ * Funciones:
+ * 1. Recolectar estados del [MyBookingsViewModel] usando [collectAsStateWithLifecycle]
+ * 2. Pasar los estados a [MyBookingsScreen]
+ * 3. Manejar la navegación al hacer click en "Reservar"
+ *
+ * Navegación:
+ * Al hacer click en "Ver detalles", navega a la pantalla de reservar habitación y se pasa el ID de la reserva con la ruta:
+ * "details/$bookingdId"
+ *
+ * @author Axel Zaragoci
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyBookingsScreenState(
