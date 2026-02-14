@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -32,18 +33,19 @@ fun RoomDetailScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val averageRating by viewModel.averageRating.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Detalles de la Habitación") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
-                    }
-                }
-            )
+    // List of all images to show
+    val allImages = remember(room) {
+        if (room != null) {
+            (listOf(room!!.mainImage) + room!!.extraImages).filter { it.isNotBlank() }
+        } else {
+            emptyList()
         }
-    ) { padding ->
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         if (room == null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -53,22 +55,52 @@ fun RoomDetailScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
+                modifier = Modifier.fillMaxSize()
             ) {
                 item {
-                    val relativePath = if (room!!.mainImage.startsWith("/")) room!!.mainImage.substring(1) else room!!.mainImage
-                    val imageUrl = if (room!!.mainImage.startsWith("http")) room!!.mainImage else "${BuildConfig.BASE_URL}$relativePath"
-                    
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "Imagen principal",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(250.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                    if (allImages.isNotEmpty()) {
+                        val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { allImages.size })
+                        
+                        Box {
+                            androidx.compose.foundation.pager.HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp)
+                            ) { page ->
+                                val imagePath = allImages[page]
+                                val relativePath = if (imagePath.startsWith("/")) imagePath.substring(1) else imagePath
+                                val imageUrl = if (imagePath.startsWith("http")) imagePath else "${BuildConfig.BASE_URL}$relativePath"
+                                
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = "Imagen de la habitación",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            
+                            // Optional: Add page indicator if needed, but not explicitly requested. 
+                            // Keeping it simple as requested: "carrusel con la mainImage y etxtraImages"
+                            
+                            // Page indicator (simple text 1/N)
+                            if (allImages.size > 1) {
+                                Surface(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(8.dp),
+                                    shape = MaterialTheme.shapes.small,
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)
+                                ) {
+                                    Text(
+                                        text = "${pagerState.currentPage + 1}/${allImages.size}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
             item {
