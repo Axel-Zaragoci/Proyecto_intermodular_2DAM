@@ -81,7 +81,7 @@ fun RoomCard(
                 ) {
                     Column() {
                         Text(
-                            text = "$${room.pricePerNight}/noche",
+                            text = "${room.pricePerNight}€/noche",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary
                         )

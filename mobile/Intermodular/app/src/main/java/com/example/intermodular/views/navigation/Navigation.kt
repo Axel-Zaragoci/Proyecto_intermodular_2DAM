@@ -63,7 +63,10 @@ fun Navigation(
             )
 
             RoomScreen(
-                roomViewModel = viewModel
+                roomViewModel = viewModel,
+                onRoomClick = { roomId ->
+                    navigationController.navigate(Routes.RoomDetail.createRoute(roomId))
+                }
             )
         }
 
@@ -133,6 +136,30 @@ fun Navigation(
             )
 
             MyBookingDetailsState(viewModel)
+        }
+        
+        composable(
+            route = Routes.RoomDetail.route,
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId")!!
+            
+            val api = RetrofitProvider.api
+            val roomRepository = RoomRepository(api)
+            val reviewRepository = com.example.intermodular.data.repository.ReviewRepository(api)
+            
+            val viewModel = com.example.intermodular.viewmodels.RoomDetailViewModel(
+                roomId = roomId,
+                roomRepository = roomRepository,
+                reviewRepository = reviewRepository
+            )
+            
+            com.example.intermodular.views.screens.RoomDetailScreen(
+                viewModel = viewModel,
+                onBackClick = { navigationController.popBackStack() }
+            )
         }
     }
 }

@@ -18,4 +18,8 @@ sealed class Routes(
                         endDate : Long,
                         guests : String) = "bookRoom/$roomId?startDate=$startDate&endDate=$endDate&guests=$guests"
     }
+    
+    object RoomDetail : Routes("roomDetail/{roomId}") {
+        fun createRoute(roomId: String) = "roomDetail/$roomId"
+    }
 }

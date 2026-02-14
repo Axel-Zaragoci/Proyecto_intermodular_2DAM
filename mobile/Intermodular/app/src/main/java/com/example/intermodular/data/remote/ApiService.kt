@@ -3,6 +3,7 @@
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.LoginDto
+import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import com.example.intermodular.data.remote.dto.UpdateBookingDto
 import retrofit2.http.Body
@@ -102,6 +103,9 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = null,
         @Query("sortOrder") sortOrder: String? = null
     ) : RoomsResponseDto
+
+    @GET("review/room/{roomID}")
+    suspend fun getReviewsByRoom(@Path("roomID") roomId: String): List<ReviewDto>
 
     @POST("auth/login")
     suspend fun login(
