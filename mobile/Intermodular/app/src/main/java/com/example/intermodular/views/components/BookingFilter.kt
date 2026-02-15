@@ -30,6 +30,39 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.Alignment
 
+/**
+ * Componente de formulario para filtrar las reservas
+ *
+ * Este formulario contiene:
+ * - 2 [BookingDatePicker] para las fechas de inicio y de fin
+ * - 1 [Slider] para seleccionar el precio máximo
+ * - 1 [ComboBox] para seleccionar la cantidad de huéspedes
+ * - 2 [Checkbox] para seleccionar opciones extra
+ * - 2 [Button] para filtrar o filtrar ofertas
+ *
+ * Este componente se puede mostrar de las siguientes maneras:
+ * - Desplegado (mostrando los filtros y un mensaje de ocultar filtros)
+ * - Contraido (mostrando solo un mensaje de mostrar filtros)
+ *
+ * @author Axel Zaragoci
+ *
+ * @param showFilters - Controlador de visibilidad de los filtros
+ * @param changeVisibility - Callback para cambiar la visibilidad de los filtros
+ * @param selectedStartDate - Fecha para el [BookingDatePicker] de inicio de reserva
+ * @param selectedEndDate - Fecha para el [BookingDatePicker] de fin de reserva
+ * @param onStartDateSelected - Callback al modificar [selectedStartDate]
+ * @param onEndDateSelected - Callback al modificar [selectedEndDate]
+ * @param maxPrice - Valor para el [Slider] de precio máximo
+ * @param onMaxPriceChanged - Callback al modificar el valor de [maxPrice]
+ * @param guests - Valor para el [ComboBox] de huéspedes
+ * @param onGuestsChanged - Callback al cambiar el valor de [guests]
+ * @param extraBed - Valor para el [Checkbox] de cama extra
+ * @param onExtraBedCheckChanged - Callback al cambiar el valor de [extraBed]
+ * @param cradle - Valor para el [Checkbox] de cuna
+ * @param onCradleCheckChanged - Callback al cambiar el valor de [cradle]
+ * @param filter - Callback al hacer click en el botón de "Filtrar"
+ * @param filterOffer - Callback al hacer click en el botón de "Filtrar ofertas"
+ */
 @Composable
 fun FilterList(
     showFilters: Boolean,
@@ -150,11 +183,11 @@ fun FilterList(
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
             ) {
-                NumericTextBox(
-                    number = guests,
+                ComboBox(
+                    default = guests,
                     onValueChanged = onGuestsChanged,
                     label = "Cantidad de huéspedes",
-                    numbers = listOf("1", "2", "3", "4", "5")
+                    options = listOf("1", "2", "3", "4", "5")
                 )
             }
 

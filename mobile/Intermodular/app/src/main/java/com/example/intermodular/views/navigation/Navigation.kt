@@ -28,6 +28,19 @@ import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
 
+/**
+ * Componente de navegación de la aplicación
+ *
+ * Inyección de dependencias:
+ * Cada composable crea las dependencias necesarias:
+ * 1. Obtiene la instancia de API de [RetrofitProvider]
+ * 2. Crea los repositorios correspondientes
+ * 3. Crea las fábricas de ViewModels con las dependencias
+ * 4. Instancia los ViewModels usando las fábricas
+ *
+ * @param navigationController - Controlador de navegación para manejar las transiciones
+ * @param modifier - Modificador para adaptar el padding al Scaffold
+ */
 @Composable
 fun Navigation(
     navigationController: NavHostController,
@@ -39,6 +52,16 @@ fun Navigation(
         modifier = modifier
     ) {
 
+        /**
+         * Pantalla principal de búsqueda y filtrado de habitaciones.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.Bookings]
+         * - **ViewModel** - [BookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a BookRoom
+         */
         composable(Routes.Bookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -71,6 +94,16 @@ fun Navigation(
             UserScreen(navigationController)
         }
 
+        /**
+         * Pantalla que lista todas las reservas del usuario actual.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.MyBookings]
+         * - **ViewModel** - [MyBookingsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a MyBookingDetails
+         */
         composable(Routes.MyBookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -86,6 +119,21 @@ fun Navigation(
             )
         }
 
+        /**
+         * Pantalla para crear una nueva reserva.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **roomId** - ID de la habitación a reservar (requerido)
+         * - **startDate** - Fecha de entrada (timestamp)
+         * - **endDate** - Fecha de salida (timestamp)
+         * - **guests** - Número de huéspedes
+         *
+         * - **Ruta** - [Routes.BookRoom]
+         * - **ViewModel** - [NewBookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         */
         composable(
             route = Routes.BookRoom.route,
             arguments = listOf(
@@ -112,6 +160,18 @@ fun Navigation(
             NewBookingState(viewModel)
         }
 
+        /**
+         * Pantalla de detalle y actualización de una reserva existente.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **bookingId** - ID de la reserva a mostrar (requerido)
+         *
+         * - **Ruta** - [Routes.MyBookingDetails]
+         * - **ViewModel** - [MyBookingDetailsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         */
         composable(
             route = Routes.MyBookingDetails.route,
             arguments = listOf(

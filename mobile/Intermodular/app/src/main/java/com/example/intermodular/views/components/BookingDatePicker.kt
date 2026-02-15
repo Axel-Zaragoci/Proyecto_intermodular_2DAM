@@ -22,6 +22,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Componente que sirve como DatePicker personalizado y con los estilos acordes al resto del programa
+ *
+ * Permite mostrar una fecha seleccionada por defecto y cambiar el texto de label
+ *
+ * @author Axel Zaragoci
+ *
+ * @param selectedDateMillis - Fecha seleccionada en milisegundos
+ * @param onDateSelected - Callback a ejecutar al seleccionar una fecha
+ * @param label - Texto a mostrar para el DatePicker con el texto por defecto "Selecciona fecha"
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookingDatePicker(
