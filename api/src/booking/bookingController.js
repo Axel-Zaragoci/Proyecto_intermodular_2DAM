@@ -191,25 +191,21 @@ export async function createBooking(req, res) {
         
         const booking = new BookingEntryData(room, client, checkInDate, checkOutDate, guests);
         
+        if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
+        
+        booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
         try {
             await booking.validate()
         }
         catch(err) {
             return res.status(400).json({ error: err.message });
         }
-        if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
-        booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
-        
+
         const user = await userDatabaseModel.findById(booking.clientID);
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado' })
 
         const bdBooking = await booking.save()
         const populated = await bdBooking.poblar()
-
-        bdBooking.totalPrice = Math.round(populated.totalPrice);
-        bdBooking.pricePerNight = Math.round(populated.pricePerNight);
-        bdBooking.offer = Math.round(populated.offer);
-        bdBooking.guests = Math.round(populated.guests);
-        bdBooking.totalNights = Math.round(populated.totalNights);
 
         sendEmail(user.email, "Reserva confirmada", "newBooking", populated)
         return res.status(201).json(bdBooking)
