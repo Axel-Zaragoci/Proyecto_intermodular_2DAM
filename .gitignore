@@ -1,6 +1,6 @@
 *.env
 api/package-lock.json
-./documentation/*
+documentation/*
 
 .vs/
 .idea/
