@@ -12,6 +12,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel encargado de gestionar la lógica de negocio y el estado de la pantalla de detalle de habitación.
+ *
+ * @property roomId Identificador de la habitación que se está visualizando.
+ * @property roomRepository Repositorio para acceder a los datos de las habitaciones.
+ * @property reviewRepository Repositorio para acceder a las reseñas.
+ */
 class RoomDetailViewModel(
     private val roomId: String,
     private val roomRepository: RoomRepository,
@@ -19,18 +26,33 @@ class RoomDetailViewModel(
 ) : ViewModel() {
     
     private val _room = MutableStateFlow<Room?>(null)
+    /**
+     * Estado que contiene la información de la habitación.
+     */
     val room: StateFlow<Room?> = _room
     
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
+    /**
+     * Estado que contiene la lista de reseñas asociadas a la habitación.
+     */
     val reviews: StateFlow<List<Review>> = _reviews
     
     private val _isLoading = MutableStateFlow(false)
+    /**
+     * Estado que indica si se está realizando una operación de carga de datos.
+     */
     val isLoading: StateFlow<Boolean> = _isLoading
     
     private val _errorMessage = MutableStateFlow<String?>(null)
+    /**
+     * Estado que contiene un mensaje de error en caso de fallo, o null si no hay error.
+     */
     val errorMessage: StateFlow<String?> = _errorMessage
     
-    // Calculate average rating from reviews
+    /**
+     * Estado calculado que representa la calificación promedio de la habitación basada en las reseñas cargadas.
+     * Retorna null si no hay reseñas.
+     */
     val averageRating: StateFlow<Double?> = _reviews.map { reviewList ->
         if (reviewList.isEmpty()) {
             null
@@ -44,6 +66,10 @@ class RoomDetailViewModel(
         loadReviews()
     }
     
+    /**
+     * Carga los datos de la habitación desde el repositorio utilizando el [roomId].
+     * Actualiza el estado [_room] o [_errorMessage] según el resultado.
+     */
     private fun loadRoomData() {
         viewModelScope.launch {
             try {
@@ -59,6 +85,10 @@ class RoomDetailViewModel(
         }
     }
     
+    /**
+     * Carga las reseñas asociadas a la habitación desde el repositorio.
+     * Gestiona el estado de carga [_isLoading] y actualiza [_reviews] o [_errorMessage].
+     */
     fun loadReviews() {
         viewModelScope.launch {
             _isLoading.value = true

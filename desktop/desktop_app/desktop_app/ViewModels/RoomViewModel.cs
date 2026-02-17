@@ -183,7 +183,8 @@ namespace desktop_app.ViewModels
             GoUpdateRoomCommand = new RelayCommand(param =>
             {
                 if (param is not RoomModel room) return;
-                NavigationService.Instance.NavigateTo(() => new UpdateRoomWindow(room));
+                NavigationService.Instance.NavigateTo<UpdateRoomWindow>();
+                desktop_app.ViewModels.Room.UpdateRoomViewModel.Instance.Room = room;
             });
 
             BackToRoomsCommand = new RelayCommand(_ =>
