@@ -89,20 +89,10 @@ namespace desktop_app.ViewModels
             }
         }
 
-        public async void ChangeRoomData(String roomNumber)
+        public void ChangeRoomData(String roomNumber)
         {
-            String id = "";
-            foreach (var room in _rooms)
-            {
-                if (room.RoomNumber == roomNumber)
-                {
-                    id = room.Id;
-                }
-            }
-
-            RoomModel Room = await RoomService.GetRoomByIdAsync(id);
-            PricePerNight = Room.PricePerNight ?? 0;
-            Offer = Room.Offer ?? 0;
+            PricePerNight = _rooms.First(room => room.RoomNumber == roomNumber).PricePerNight ?? 0;
+            Offer = _rooms.First(room => room.RoomNumber == roomNumber).Offer ?? 0;
         }
 
         public DateTime CheckInDate
@@ -181,7 +171,6 @@ namespace desktop_app.ViewModels
 
         public ICommand SaveCommand { get; }
         public ICommand CancelCommand { get; }
-        public ICommand ShowCommand { get; }
 
         public ICommand ReturnCommand { get; } =
             new RelayCommand(_ =>
@@ -194,7 +183,6 @@ namespace desktop_app.ViewModels
 
             SaveCommand = new RelayCommand(async _ => await Save());
             CancelCommand = new RelayCommand(async _ => await Cancel());
-            ShowCommand = new RelayCommand(_ => ShowData());
 
             LoadClients();
             LoadRooms();
@@ -239,25 +227,31 @@ namespace desktop_app.ViewModels
 
         private async Task Save()
         {
-            if (string.IsNullOrEmpty(Booking.Id))
+            try
             {
-                var userId = await UserService.GetUserIdByDniAsync(ClientDni);
-                Booking.Client = userId;
+                if (string.IsNullOrEmpty(Booking.Id))
+                {
+                    var userId = await UserService.GetUserIdByDniAsync(ClientDni);
+                    Booking.Client = userId;
 
-                var filter = new RoomsFilter { RoomNumber = RoomNumber };
-                Booking.Room =
-                    (await RoomService.GetRoomsFilteredAsync(filter))
-                    ?.Items.First().Id;
-                
-                await BookingService.CreateBookingAsync(Booking);
+                    var filter = new RoomsFilter { RoomNumber = RoomNumber };
+                    Booking.Room =
+                        (await RoomService.GetRoomsFilteredAsync(filter))
+                        ?.Items.First().Id;
+
+                    await BookingService.CreateBookingAsync(Booking);
+                }
+                else
+                {
+                    await BookingService.UpdateBookingAsync(Booking);
+                }
+                await BookingEvents.RaiseBookingChanged();
+                NavigationService.Instance.NavigateTo<BookingView>();
             }
-            else
+            catch (Exception e)
             {
-                await BookingService.UpdateBookingAsync(Booking);
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            await BookingEvents.RaiseBookingChanged();
-            NavigationService.Instance.NavigateTo<BookingView>();
         }
 
         private async Task Cancel()
@@ -274,18 +268,16 @@ namespace desktop_app.ViewModels
                     MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
 
-            await BookingService.CancelBookingAsync(Booking.Id);
-            await BookingEvents.RaiseBookingChanged();
-            NavigationService.Instance.NavigateTo<BookingView>();
-        }
-
-        private void ShowData()
-        {
-            MessageBox.Show(
-                Booking.ToString(),
-                "Información completa",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            try
+            {
+                await BookingService.CancelBookingAsync(Booking.Id);
+                await BookingEvents.RaiseBookingChanged();
+                NavigationService.Instance.NavigateTo<BookingView>();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

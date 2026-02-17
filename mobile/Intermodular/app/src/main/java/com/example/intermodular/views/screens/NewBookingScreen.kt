@@ -60,7 +60,7 @@ fun NewBookingScreen(
     guests : String,
     startDate : Long?,
     endDate : Long?,
-    totalPrice: Int?,
+    totalPrice: Double?,
     newBooking: Boolean,
     showPopup : Boolean,
     popupMessage : String,

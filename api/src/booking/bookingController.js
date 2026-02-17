@@ -311,7 +311,7 @@ export async function updateBooking(req, res) {
             bookingData.completeBookingData(room.pricePerNight, room.offer);
         }
         else {
-            bookingData.completeBookingData(booking.pricePerNight, booking.offer);
+            bookingData.completeBookingData(room.pricePerNight, booking.offer);
         }
 
         const updatedBooking = await bookingData.save();

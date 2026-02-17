@@ -107,6 +107,5 @@ namespace desktop_app.Services
             OnPropertyChanged(nameof(CurrentView));
             ScrollToTopRequested?.Invoke();
         }
-
     }
 }

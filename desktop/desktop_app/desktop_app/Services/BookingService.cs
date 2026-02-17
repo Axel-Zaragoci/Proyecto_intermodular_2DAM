@@ -16,7 +16,10 @@ namespace desktop_app.Services
         /// </returns>
         public static async Task<List<BookingModel>> GetAllBookingsAsync()
         {
-            return (await (await CreateResponse("", new Object(), HttpMethod.Get)).Content.ReadFromJsonAsync<List<BookingModel>>()) ?? new List<BookingModel>();
+            return (
+                await (
+                    await CreateResponse("", new Object(), HttpMethod.Get)).Content.ReadFromJsonAsync<List<BookingModel>>()
+                ) ?? new List<BookingModel>();
         }
 
         
@@ -35,7 +38,9 @@ namespace desktop_app.Services
         /// </returns>
         public static async Task<bool> DeleteBooking(string bookingId)
         {
-            return (await CreateResponse(bookingId, new Object(), HttpMethod.Delete)).IsSuccessStatusCode;
+            return (
+                await CreateResponse(bookingId, new Object(), HttpMethod.Delete)
+                ).IsSuccessStatusCode;
         }
 
         
@@ -177,10 +182,10 @@ namespace desktop_app.Services
                 if (value != null)
                 {
                     var errors = value["error"];
-                    throw new Exception(errors);
+                    string errString = String.Join("\n", errors.Split(", "));
+                    throw new Exception(errString);
                 }
-                string errString = String.Join("\n", error.Split(", "));
-                throw new Exception(errString);
+                throw new Exception(error);
             }
             return Task.CompletedTask;
         }

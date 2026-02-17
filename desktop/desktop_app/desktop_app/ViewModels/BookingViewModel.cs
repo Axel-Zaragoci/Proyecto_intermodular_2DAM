@@ -40,12 +40,6 @@ namespace desktop_app.ViewModels
         /// </summary>
         public ICommand ReloadBookingCommand { get; }
         
-        
-        /// <summary>
-        /// Comando para el botón de ver detalles
-        /// </summary>
-        public ICommand ShowBookingDetailsCommand { get; }
-        
         /// <summary>
         /// Constructor del ViewModel
         /// Se encarga de
@@ -61,7 +55,6 @@ namespace desktop_app.ViewModels
             EditBookingCommand = new RelayCommand(EditBooking);
             CreateBookingCommand = new RelayCommand(CreateBooking);
             ReloadBookingCommand = new AsyncRelayCommand(LoadBookingsAsync);
-            ShowBookingDetailsCommand = new RelayCommand<BookingModel>(ViewBookingData);
             BookingEvents.OnBookingChanged += async () => await LoadBookingsAsync();
         }
 
@@ -156,19 +149,6 @@ namespace desktop_app.ViewModels
         {
             NavigationService.Instance.NavigateTo<FormBookingView>();
             FormBookingViewModel.Instance.Booking = new BookingModel();
-        }
-
-        
-        /// <summary>
-        /// Método al que hace referencia el comando de crear
-        /// </summary>
-        /// 
-        /// <param name="booking">
-        /// Reserva de la que se desea ver los detalles
-        /// </param>
-        private void ViewBookingData(BookingModel booking)
-        {
-            MessageBox.Show(booking.ToString(), "Información completa", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

@@ -20,7 +20,7 @@ fun BookingDataForm(
     startDate: Long,
     endDate: Long,
     guests: String,
-    totalPrice: Int?,
+    totalPrice: Double?,
     onButtonClick: () -> Unit,
     onStartDateChange: (Long?) -> Unit,
     onEndDateChange: (Long?) -> Unit,
