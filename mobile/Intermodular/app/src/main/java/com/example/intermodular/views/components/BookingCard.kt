@@ -26,6 +26,16 @@ import com.example.intermodular.models.Booking
 import com.example.intermodular.models.Room
 import java.util.Locale
 
+/**
+ * Tarjeta para mostrar la información básica de una reserva utilizada en [com.example.intermodular.views.screens.MyBookingsScreen]
+ * Utiliza el objeto de reserva y el de habitación para mostrar todos los datos y cargar la imagen de la habitación reservada
+ *
+ * @author Axel Zaragoci
+ *
+ * @param booking - Reserva que se quiere mostrar
+ * @param room - Habitación reservada
+ * @param onDetailsButtonClick - Callback al hacer click en el botón de "Mostrar detalles"
+ */
 @Composable
 fun BookingCard(
     booking: Booking,
