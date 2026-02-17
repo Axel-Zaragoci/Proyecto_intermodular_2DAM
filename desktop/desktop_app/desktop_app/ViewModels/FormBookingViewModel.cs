@@ -12,19 +12,32 @@ namespace desktop_app.ViewModels
     public class FormBookingViewModel : ViewModelBase
     {
         private static FormBookingViewModel? _instance;
-        public static FormBookingViewModel Instance =>
-            _instance ??= new FormBookingViewModel();
+        /// <summary>
+        /// Obtiene la instancia única del ViewModel (patrón Singleton).
+        /// </summary>
+        public static FormBookingViewModel Instance => _instance ??= new FormBookingViewModel();
 
-        public string Title =>
-            string.IsNullOrEmpty(Booking.Id)
-                ? "Crear reserva"
-                : "Actualizar reserva";
+        /// <summary>
+        /// Obtiene el título de la ventana basado en si la reserva es nueva o existente.
+        /// </summary>
+        public string Title => string.IsNullOrEmpty(Booking.Id) ? "Crear reserva" : "Actualizar reserva";
 
+        /// <summary>
+        /// Indica si los campos del formulario deben estar habilitados.
+        /// Devuelve true para nuevas reservas, false para reservas existentes.
+        /// </summary>
         public bool Enabled => string.IsNullOrEmpty(Booking.Id);
+        
+        /// <summary>
+        /// Indica si los campos del formulario deben estar deshabilitados.
+        /// </summary>
         public bool Disabled => !Enabled;
 
 
         private BookingModel _booking;
+        /// <summary>
+        /// Obtiene o establece el modelo de reserva actual.
+        /// </summary>
         public BookingModel Booking
         {
             get => _booking;
@@ -38,12 +51,18 @@ namespace desktop_app.ViewModels
 
 
         private ObservableCollection<UserModel> _clients = new();
+        /// <summary>
+        /// Colección observable de clientes disponibles para seleccionar en el formulario.
+        /// </summary>
         public ObservableCollection<UserModel> Clients
         {
             get => _clients;
             set => SetProperty(ref _clients, value);
         }
 
+        /// <summary>
+        /// Carga asincrónicamente la lista de clientes desde el servicio de usuarios.
+        /// </summary>
         private async void LoadClients()
         {
             Clients.Clear();
@@ -52,6 +71,9 @@ namespace desktop_app.ViewModels
                 Clients.Add(user);
         }
 
+        /// <summary>
+        /// Obtiene o establece el DNI del cliente asociado a la reserva.
+        /// </summary>
         public string ClientDni
         {
             get => Booking.ClientDni;
@@ -64,12 +86,18 @@ namespace desktop_app.ViewModels
 
 
         private ObservableCollection<RoomModel> _rooms = new();
+        /// <summary>
+        /// Colección observable de habitaciones disponibles para seleccionar en el formulario.
+        /// </summary>
         public ObservableCollection<RoomModel> Rooms
         {
             get => _rooms;
             set => SetProperty(ref _rooms, value);
         }
 
+        /// <summary>
+        /// Carga asincrónicamente la lista de habitaciones filtradas desde el servicio de habitaciones.
+        /// </summary>
         private async void LoadRooms()
         {
             Rooms.Clear();
@@ -78,6 +106,9 @@ namespace desktop_app.ViewModels
                 Rooms.Add(room);
         }
 
+        /// <summary>
+        /// Obtiene o establece el número de habitación seleccionado.
+        /// </summary>
         public string RoomNumber
         {
             get => Booking.RoomNumber;
@@ -89,6 +120,13 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos de la habitación seleccionada (precio por noche y oferta).
+        /// </summary>
+        /// 
+        /// <param name="roomNumber">
+        /// Número de habitación seleccionada.
+        /// </param>
         public async void ChangeRoomData(String roomNumber)
         {
             String id = "";
@@ -105,6 +143,9 @@ namespace desktop_app.ViewModels
             Offer = Room.Offer ?? 0;
         }
 
+        /// <summary>
+        /// Obtiene o establece la fecha de inicio de la reserva.
+        /// </summary>
         public DateTime CheckInDate
         {
             get => Booking.CheckInDate;
@@ -116,6 +157,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece la fecha de fin de la reserva.
+        /// </summary>
         public DateTime CheckOutDate
         {
             get => Booking.CheckOutDate;
@@ -127,6 +171,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece la fecha de pago de la reserva.
+        /// </summary>
         public DateTime PayDate
         {
             get => Booking.PayDate;
@@ -137,6 +184,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece el precio por noche de la habitación seleccionada.
+        /// </summary>
         public decimal PricePerNight
         {
             get => Booking.PricePerNight ?? 0;
@@ -148,6 +198,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece el porcentaje de oferta aplicado a la reserva.
+        /// </summary>
         public decimal Offer
         {
             get => Booking.Offer ?? 0;
@@ -159,6 +212,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene el precio total calculado de la reserva.
+        /// </summary>
         public decimal TotalPrice
         {
             get => Booking.TotalPrice;
@@ -169,6 +225,9 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Obtiene el número total de noches calculado de la reserva.
+        /// </summary>
         public int TotalNights
         {
             get => Booking.TotalNights;
@@ -179,28 +238,39 @@ namespace desktop_app.ViewModels
             }
         }
 
+        /// <summary>
+        /// Comando para guardar la reserva.
+        /// </summary>
         public ICommand SaveCommand { get; }
+        
+        /// <summary>
+        /// Comando para cancelar la reserva.
+        /// </summary>
         public ICommand CancelCommand { get; }
-        public ICommand ShowCommand { get; }
 
-        public ICommand ReturnCommand { get; } =
-            new RelayCommand(_ =>
-                NavigationService.Instance.NavigateTo<BookingView>());
+        /// <summary>
+        /// Comando para regresar a la vista de reservas.
+        /// </summary>
+        public ICommand ReturnCommand { get; } = new RelayCommand(_ => NavigationService.Instance.NavigateTo<BookingView>());
 
-
+        /// <summary>
+        /// Constructor privado que inicializa una nueva instancia del ViewModel.
+        /// Configura los comandos y carga los datos iniciales.
+        /// </summary>
         private FormBookingViewModel()
         {
             Booking = new BookingModel();
 
             SaveCommand = new RelayCommand(async _ => await Save());
             CancelCommand = new RelayCommand(async _ => await Cancel());
-            ShowCommand = new RelayCommand(_ => ShowData());
 
             LoadClients();
             LoadRooms();
         }
 
-
+        /// <summary>
+        /// Recalcula el precio total y el número de noches basado en las fechas seleccionadas.
+        /// </summary>
         private void RecalculateTotal()
         {
             if (CheckOutDate <= CheckInDate)
@@ -217,7 +287,10 @@ namespace desktop_app.ViewModels
 
             TotalPrice = basePrice - discount;
         }
-
+        
+        /// <summary>
+        /// Actualiza todas las propiedades del ViewModel notificando cambios en la UI.
+        /// </summary>
         private void RefreshAll()
         {
             OnPropertyChanged(nameof(Title));
@@ -237,6 +310,9 @@ namespace desktop_app.ViewModels
             OnPropertyChanged(nameof(TotalNights));
         }
 
+        /// <summary>
+        /// Guarda la reserva actual (crea una nueva o actualiza una existente).
+        /// </summary>
         private async Task Save()
         {
             if (string.IsNullOrEmpty(Booking.Id))
@@ -245,9 +321,7 @@ namespace desktop_app.ViewModels
                 Booking.Client = userId;
 
                 var filter = new RoomsFilter { RoomNumber = RoomNumber };
-                Booking.Room =
-                    (await RoomService.GetRoomsFilteredAsync(filter))
-                    ?.Items.First().Id;
+                Booking.Room = (await RoomService.GetRoomsFilteredAsync(filter)) ?.Items.First().Id;
                 
                 await BookingService.CreateBookingAsync(Booking);
             }
@@ -259,7 +333,10 @@ namespace desktop_app.ViewModels
             await BookingEvents.RaiseBookingChanged();
             NavigationService.Instance.NavigateTo<BookingView>();
         }
-
+        
+        /// <summary>
+        /// Cancela la reserva actual después de la confirmación del usuario.
+        /// </summary>
         private async Task Cancel()
         {
             if (Booking.Status == "Cancelada")
@@ -268,24 +345,12 @@ namespace desktop_app.ViewModels
                 return;
             }
 
-            if (MessageBox.Show("¿Cancelar reserva?",
-                    "Confirmación",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            if (MessageBox.Show("¿Cancelar reserva?", "Confirmación", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
 
             await BookingService.CancelBookingAsync(Booking.Id);
             await BookingEvents.RaiseBookingChanged();
             NavigationService.Instance.NavigateTo<BookingView>();
-        }
-
-        private void ShowData()
-        {
-            MessageBox.Show(
-                Booking.ToString(),
-                "Información completa",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
         }
     }
 }
