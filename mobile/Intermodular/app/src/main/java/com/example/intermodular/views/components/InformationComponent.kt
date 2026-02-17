@@ -9,6 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/**
+ * Componente utilizado para desplegar información en 2 líneas
+ * La primera línea sirve de titulo indicando que información se va a mostrar
+ * La segunda línea muestra la información
+ *
+ * @author Axel Zaragoci
+ */
 @Composable
 fun InformationComponent(
     title: String,

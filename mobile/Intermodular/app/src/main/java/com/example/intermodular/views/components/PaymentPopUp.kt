@@ -21,6 +21,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+/**
+ * Componente de diálogo modal para simular un proceso de pago
+ * Según el contenido muestra un [CircularProgressIndicator] para indicar que está en proceso o lo oculta si se ha completado el pago simulado
+ *
+ * Al ejecutarse empezará mostrando que está cargando y luego pasará a mostrar que se ha completado
+ *
+ * @author Axel Zaragoci
+ *
+ * @param show - Controlador de visibilidad del diálogo
+ * @param message - Mensaje a mostrar, que determina algunos comportamientos como la capacidad de cierre
+ * @param onDismiss - Callback a ejecutar al intentar cerrar el diálogo
+ */
 @Composable
 fun PaymentPopup(
     show: Boolean,

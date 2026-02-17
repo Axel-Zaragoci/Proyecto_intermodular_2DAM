@@ -8,6 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.intermodular.views.navigation.Navigation
 
+/**
+ * Componente principal de la aplicación
+ * Define el espacio para la barra superior, barra inferior y el espacio para la navegación
+ *
+ * @author Axel Zaragoci
+ *
+ * @param darkMode - Estado actual del tema, siendo `true` si está en modo oscuro y `false` en caso contrario
+ * @param onToggleDarkMode - Callback para cambiar de modo oscuro a modo claro
+ */
 @Composable
 fun MyApp(
     darkMode : Boolean,

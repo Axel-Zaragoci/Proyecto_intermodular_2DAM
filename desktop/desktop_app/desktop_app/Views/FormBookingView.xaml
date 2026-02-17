@@ -107,7 +107,7 @@
             
             <StackPanel Grid.Row="0">
                 <Label Content="Fecha de pago: " Target="PayDateTextBox" Style="{StaticResource LabelForm}"/>
-                <TextBox x:Name="PayDateTextBox" Text="{Binding PayDate, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
+                <DatePicker x:Name="PayDateTextBox" Text="{Binding PayDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" IsEnabled="false"/>
             </StackPanel>
             
             <StackPanel Grid.Row="1">

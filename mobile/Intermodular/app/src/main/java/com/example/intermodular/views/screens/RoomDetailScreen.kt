@@ -21,6 +21,13 @@ import com.example.intermodular.BuildConfig
 import com.example.intermodular.models.Review
 import com.example.intermodular.viewmodels.RoomDetailViewModel
 
+/**
+ * Pantalla que muestra el detalle de una habitación específica, incluyendo información detallada,
+ * imágenes, características y reseñas asociadas.
+ *
+ * @param viewModel ViewModel que proporciona los datos y el estado de la pantalla.
+ * @param onBackClick Función lambda que se ejecuta al pulsar la acción de volver (aunque la navegación actual es por sistema).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomDetailScreen(
@@ -32,7 +39,7 @@ fun RoomDetailScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val averageRating by viewModel.averageRating.collectAsStateWithLifecycle()
-
+    
     // List of all images to show
     val allImages = remember(room) {
         if (room != null) {
@@ -244,6 +251,12 @@ fun RoomDetailScreen(
     }
 }
 
+/**
+ * Composable que muestra un item de característica de la habitación (etiqueta y valor).
+ *
+ * @param label Etiqueta descriptiva de la característica.
+ * @param value Valor de la característica.
+ */
 @Composable
 fun CharacteristicItem(label: String, value: String) {
     Row(
@@ -265,6 +278,11 @@ fun CharacteristicItem(label: String, value: String) {
     }
 }
 
+/**
+ * Composable que muestra la información de una reseña individual en una tarjeta.
+ *
+ * @param review Objeto [Review] que contiene los datos de la reseña a mostrar.
+ */
 @Composable
 fun ReviewCard(review: Review) {
     Card(
