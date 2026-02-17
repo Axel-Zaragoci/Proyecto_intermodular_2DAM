@@ -19,6 +19,11 @@ namespace desktop_app.ViewModels.Room
     /// </summary>
     public class UpdateRoomViewModel : ViewModelBase
     {
+        private static UpdateRoomViewModel? _instance;
+        /// <summary>Instancia Singleton del ViewModel.</summary>
+        public static UpdateRoomViewModel Instance =>
+            _instance ??= new UpdateRoomViewModel();
+
         /// <summary>Item de imagen para la galería.</summary>
         public class RoomImageItem
         {
@@ -37,7 +42,14 @@ namespace desktop_app.ViewModels.Room
         public RoomModel Room
         {
             get => _room;
-            set => SetProperty(ref _room, value);
+            set
+            {
+                SetProperty(ref _room, value);
+                ExtrasText = string.Join(", ", value?.Extras ?? new());
+                ExtraImagesText = string.Join(", ", value?.ExtraImages ?? new());
+                RefreshExistingImages();
+                _ = LoadReviewAverageAsync();
+            }
         }
 
         private string _extrasText = "";
@@ -110,15 +122,11 @@ namespace desktop_app.ViewModels.Room
         public AsyncRelayCommand<RoomImageItem> DeleteImageCommand { get; }
 
         /// <summary>
-        /// Inicializa el ViewModel con una habitación existente.
+        /// Constructor privado para el patrón Singleton.
         /// </summary>
-        /// <param name="room">Habitación a editar.</param>
-        public UpdateRoomViewModel(RoomModel room)
+        private UpdateRoomViewModel()
         {
-            _room = room;
-
-            ExtrasText = string.Join(", ", room.Extras ?? new());
-            ExtraImagesText = string.Join(", ", room.ExtraImages ?? new());
+            _room = new RoomModel();
 
             SaveCommand = new AsyncRelayCommand(SaveAsync);
             CancelCommand = new RelayCommand(_ => NavigationService.Instance.NavigateTo<RoomView>());
@@ -129,9 +137,6 @@ namespace desktop_app.ViewModels.Room
                 DeleteImageAsync,
                 (img) => img != null && !string.IsNullOrWhiteSpace(img.Url)
             );
-
-            RefreshExistingImages();
-            _ = LoadReviewAverageAsync();
         }
 
         /// <summary>
