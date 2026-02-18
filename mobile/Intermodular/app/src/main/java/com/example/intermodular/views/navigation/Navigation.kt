@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.BookingViewModelFactory
 import com.example.intermodular.viewmodels.MyBookingsViewModel
@@ -187,12 +188,14 @@ fun Navigation(
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
             val roomRepository = RoomRepository(api)
+            val reviewRepository = ReviewRepository(api)
 
             val viewModel: MyBookingDetailsViewModel = viewModel(
                 factory = MyBookingDetailsViewModelFactory(
                     bookingId,
                     bookingRepository,
-                    roomRepository
+                    roomRepository,
+                    reviewRepository
                 )
             )
 

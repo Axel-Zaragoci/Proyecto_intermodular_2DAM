@@ -21,7 +21,11 @@ export async function createReview(req, res) {
         });
 
         const saved = await review.save();
-        return res.status(201).json(saved);
+        const populated = await reviewDatabaseModel.findById(saved._id)
+            .populate("user", "firstName lastName email")
+            .populate("booking", "checkInDate checkOutDate");
+
+        return res.status(201).json(populated);
     } catch (err) {
         console.error("Error al crear reseña:", err.message);
         return res.status(500).json({ message: "Error interno del servidor" });

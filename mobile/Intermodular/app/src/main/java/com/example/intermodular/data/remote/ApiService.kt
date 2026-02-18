@@ -2,6 +2,7 @@
 
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
+import com.example.intermodular.data.remote.dto.CreateReviewDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
@@ -106,6 +107,11 @@ interface ApiService {
 
     @GET("review/room/{roomID}")
     suspend fun getReviewsByRoom(@Path("roomID") roomId: String): List<ReviewDto>
+
+    @POST("review")
+    suspend fun createReview(
+        @Body body: CreateReviewDto
+    ): ReviewDto
 
     @POST("auth/login")
     suspend fun login(

@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
+import com.example.intermodular.models.Review
 import com.example.intermodular.models.Room
 import com.example.intermodular.models.RoomFilter
 import kotlinx.coroutines.delay
@@ -18,17 +20,19 @@ import java.time.ZoneOffset
 import kotlin.let
 
 /**
- * ViewModel para la vista que permite ver detalles, modificar y cancelar una reserva ya existente
+ * ViewModel para la vista que permite ver detalles, modificar y cancelar una reserva ya existente. Además, permite agregar una reseña
  * @author Axel Zaragoci
  *
  * @property bookingId - ID de la reserva sobre la que se van a aplicar las funciones
  * @property bookingRepository - Repositorio para obtener datos de reservas de la API
  * @property roomRepository - Repositorio para obtener datos de habitaciones de la API
+ * @property reviewRepository - 
  */
 class MyBookingDetailsViewModel (
     private val bookingId : String,
     private val bookingRepository: BookingRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val reviewRepository: ReviewRepository
 ) : ViewModel() {
 
     // ==================== ESTADOS DE LA UI ====================
@@ -43,6 +47,16 @@ class MyBookingDetailsViewModel (
      */
     private val _room = MutableStateFlow<Room?>(null)
     val room : StateFlow<Room?> = _room
+
+
+    private val _reviewRating = MutableStateFlow(0)
+    val reviewRating: StateFlow<Int> = _reviewRating
+
+    private val _reviewDescription = MutableStateFlow("")
+    val reviewDescription: StateFlow<String> = _reviewDescription
+
+    private val _reviewCreated = MutableStateFlow(false)
+    val reviewCreated: StateFlow<Boolean> = _reviewCreated
 
     /**
      * Mensaje de error a mostrar al usuario
@@ -166,6 +180,14 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    fun onRatingChange(rating: Int) {
+        _reviewRating.value = rating
+    }
+
+    fun onReviewDescriptionChange(description: String) {
+        _reviewDescription.value = description
+    }
+
     /**
      * Actualiza los datos de la reserva
      *
@@ -234,6 +256,45 @@ class MyBookingDetailsViewModel (
             try {
                 bookingRepository.cancelBooking(bookingId)
                 _booking.value = _booking.value?.copy(status = "Cancelada")
+            } catch (e: Exception) {
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun createReview() {
+        val currentBooking = _booking.value ?: run {
+            _errorMessage.value = "No hay datos de reserva"
+            return
+        }
+
+        val roomId = currentBooking.roomId
+        val rating = _reviewRating.value
+        val description = _reviewDescription.value
+
+        if (rating <= 0) {
+            _errorMessage.value = "Debes seleccionar una calificación"
+            return
+        }
+
+        if (description.isBlank()) {
+            _errorMessage.value = "Debes escribir una descripción"
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                reviewRepository.createReview(
+                    roomId = roomId,
+                    bookingId = bookingId,
+                    rating = rating,
+                    description = description
+                )
+                _reviewCreated.value = true
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {
