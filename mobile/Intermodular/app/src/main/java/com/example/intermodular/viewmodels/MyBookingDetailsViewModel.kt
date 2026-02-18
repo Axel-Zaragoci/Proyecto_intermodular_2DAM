@@ -26,7 +26,7 @@ import kotlin.let
  * @property bookingId - ID de la reserva sobre la que se van a aplicar las funciones
  * @property bookingRepository - Repositorio para obtener datos de reservas de la API
  * @property roomRepository - Repositorio para obtener datos de habitaciones de la API
- * @property reviewRepository - 
+ * @property reviewRepository - Repositorio para crear una reseña
  */
 class MyBookingDetailsViewModel (
     private val bookingId : String,
@@ -48,15 +48,17 @@ class MyBookingDetailsViewModel (
     private val _room = MutableStateFlow<Room?>(null)
     val room : StateFlow<Room?> = _room
 
-
+    /**
+     * Calificación de la reseña
+     */
     private val _reviewRating = MutableStateFlow(0)
     val reviewRating: StateFlow<Int> = _reviewRating
 
+    /**
+     * Descripción de la reseña
+     */
     private val _reviewDescription = MutableStateFlow("")
     val reviewDescription: StateFlow<String> = _reviewDescription
-
-    private val _reviewCreated = MutableStateFlow(false)
-    val reviewCreated: StateFlow<Boolean> = _reviewCreated
 
     /**
      * Mensaje de error a mostrar al usuario
@@ -180,10 +182,20 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    /**
+     * Actualiza la calificación de la reseña
+     *
+     * @param rating - Calificación seleccionada
+     */
     fun onRatingChange(rating: Int) {
         _reviewRating.value = rating
     }
 
+    /**
+     * Actualiza la descripción de la reseña
+     *
+     * @param description - Descripción escrita
+     */
     fun onReviewDescriptionChange(description: String) {
         _reviewDescription.value = description
     }
@@ -264,6 +276,15 @@ class MyBookingDetailsViewModel (
         }
     }
 
+    /**
+     * Crea una nueva reseña
+     *
+     * Flujo principal:
+     * 1. Valida la existencia de los datos
+     * 2. Lanza corrutina para la creación de la reseña en la API
+     *
+     * En caso de error, muestra el error con un mensaje acorde a [ApiErrorHandler]
+     */
     fun createReview() {
         val currentBooking = _booking.value ?: run {
             _errorMessage.value = "No hay datos de reserva"
@@ -294,7 +315,6 @@ class MyBookingDetailsViewModel (
                     rating = rating,
                     description = description
                 )
-                _reviewCreated.value = true
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {

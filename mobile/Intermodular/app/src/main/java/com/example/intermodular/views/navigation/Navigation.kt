@@ -166,7 +166,7 @@ fun Navigation(
         }
 
         /**
-         * Pantalla de detalle y actualización de una reserva existente.
+         * Pantalla de detalle y actualización de una reserva existente y creación de reseña.
          *
          * @author Axel Zaragoci
          *
@@ -175,7 +175,7 @@ fun Navigation(
          *
          * - **Ruta** - [Routes.MyBookingDetails]
          * - **ViewModel** - [MyBookingDetailsViewModel]
-         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Repositorios** - BookingRepository, RoomRepository, ReviewRepository
          */
         composable(
             route = Routes.MyBookingDetails.route,

@@ -15,6 +15,7 @@ import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
  * @param bookingId - ID de la reserva de la que se quieren ver los detalles
  * @param bookingRepository - Repositorio de reservas
  * @param roomRepository - Repositorio de habitaciones
+ * @param reviewRepository - Repositorio de reseñas
  */
 class MyBookingDetailsViewModelFactory(
     private val bookingId: String,

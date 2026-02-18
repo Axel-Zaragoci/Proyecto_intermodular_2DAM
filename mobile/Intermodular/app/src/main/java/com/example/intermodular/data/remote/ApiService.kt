@@ -108,6 +108,13 @@ interface ApiService {
     @GET("review/room/{roomID}")
     suspend fun getReviewsByRoom(@Path("roomID") roomId: String): List<ReviewDto>
 
+    /**
+     * Añade una nueva reseña
+     * @author Axel Zaragoci
+     *
+     * @param body - Objeto con la información para crear la reseña
+     * @return [ReviewDto] - Objeto con la información completa de la reseña creada
+     */
     @POST("review")
     suspend fun createReview(
         @Body body: CreateReviewDto
