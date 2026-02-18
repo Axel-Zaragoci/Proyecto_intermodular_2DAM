@@ -262,9 +262,9 @@ class BookingViewModel(
         endDate: LocalDate
     ): Boolean {
 
-        val roomBookings = _bookings.filter { it.roomId == room.id }
+        val roomBookings = _bookings.filter { it.roomId == room.id && it.status == "Abierta" }
 
-        return roomBookings.filter { it.status == "Abierta" }.none { booking ->
+        return roomBookings.none { booking ->
             booking.checkInDate < endDate &&
                     booking.checkOutDate > startDate
         }

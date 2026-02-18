@@ -137,6 +137,7 @@ class MyBookingDetailsViewModel (
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
             _booking.value = _booking.value?.copy(checkInDate = newDate)
+            calculateTotalPrice()
         }
     }
 
@@ -149,6 +150,7 @@ class MyBookingDetailsViewModel (
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
             _booking.value = _booking.value?.copy(checkOutDate = newDate)
+            calculateTotalPrice()
         }
     }
 
@@ -295,5 +297,31 @@ class MyBookingDetailsViewModel (
         return Instant.ofEpochMilli(millis)
             .atZone(ZoneOffset.UTC)
             .toLocalDate()
+    }
+
+    /**
+     * Calcula el precio total de la reserva
+     *
+     * Flujo principal:
+     * 1. Calcula la cantidad de noches
+     * 2. Calcula el coste de la reserva
+     * 3. Si hay oferta, descuenta del coste la parte correspondiente
+     *
+     * En caso de no haber habitación, fecha de inicio, fecha de fin o de que la cantidad de noches sea 0 o negativa, para el cálculo del precio para no causar un error
+     */
+    private fun calculateTotalPrice() {
+        val room = _room.value ?: return
+        val start = _booking.value?.checkInDate ?: return
+        val end = _booking.value?.checkOutDate ?: return
+
+        val nights = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt()
+        if (nights <= 0) {
+            _booking.value = _booking.value?.copy(totalPrice = 0.0)
+            return
+        }
+
+        val base = nights * room.pricePerNight
+        val discount = room.offer?.let { base * (it / 100) } ?: 0.0
+        _booking.value = _booking.value?.copy(totalPrice = (base - discount))
     }
 }

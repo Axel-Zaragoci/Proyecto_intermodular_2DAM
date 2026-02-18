@@ -27,6 +27,7 @@ import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelF
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
+import com.example.intermodular.viewmodels.RoomDetailViewModel
 
 /**
  * Componente de navegación de la aplicación
@@ -210,7 +211,7 @@ fun Navigation(
             val roomRepository = RoomRepository(api)
             val reviewRepository = com.example.intermodular.data.repository.ReviewRepository(api)
             
-            val viewModel = com.example.intermodular.viewmodels.RoomDetailViewModel(
+            val viewModel = RoomDetailViewModel(
                 roomId = roomId,
                 roomRepository = roomRepository,
                 reviewRepository = reviewRepository

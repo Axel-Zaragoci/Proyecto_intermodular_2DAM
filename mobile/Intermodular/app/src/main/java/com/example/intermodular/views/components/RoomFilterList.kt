@@ -169,11 +169,11 @@ fun RoomFilterList(
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
             ) {
-                NumericTextBox(
-                    number = guests,
+                ComboBox(
+                    default = guests,
                     onValueChanged = onGuestsChanged,
                     label = "Cantidad de huéspedes",
-                    numbers = listOf("1","2","3","4","5"))
+                    options = listOf("1","2","3","4","5"))
             }
 
             Row(

@@ -264,7 +264,10 @@ class NewBookingViewModel(
         val end = endDateAsLocalDate() ?: return
 
         val nights = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt()
-        if (nights <= 0) return
+        if (nights <= 0) {
+            _totalPrice.value = 0.0
+            return
+        }
 
         val base = nights * room.pricePerNight
         val discount = room.offer?.let { base * (it / 100) } ?: 0.0
