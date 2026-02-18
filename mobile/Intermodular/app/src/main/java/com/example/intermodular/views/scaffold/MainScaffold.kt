@@ -21,7 +21,7 @@ fun MyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBars = currentRoute != Routes.Login.route
+    val showBars = currentRoute != Routes.Login.route && currentRoute != Routes.Register.route
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

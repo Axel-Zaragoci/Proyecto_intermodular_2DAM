@@ -32,7 +32,8 @@ import com.example.intermodular.viewmodels.LoginViewModelFactory
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onNavToRegister: () -> Unit
 ) {
 
     val isLoading by viewModel.isLoading.collectAsState()
@@ -149,7 +150,7 @@ fun LoginScreen(
             Column(
             ) {
                 TextButton(
-                    onClick = onLoginSuccess,
+                    onClick = onNavToRegister,
                     enabled = !isLoading,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {

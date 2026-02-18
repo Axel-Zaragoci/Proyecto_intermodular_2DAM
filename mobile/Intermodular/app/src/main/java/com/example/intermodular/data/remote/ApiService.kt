@@ -2,6 +2,7 @@
 
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.LoginDto
+import com.example.intermodular.data.remote.dto.RegisterDto
 import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import retrofit2.http.Body
@@ -31,5 +32,10 @@ interface ApiService {
     @POST("auth/login")
     suspend fun login(
         @Body body: Map<String, String>
+    ): LoginDto
+
+    @POST("user/registerApp")
+    suspend fun register(
+        @Body body: RegisterDto
     ): LoginDto
 }

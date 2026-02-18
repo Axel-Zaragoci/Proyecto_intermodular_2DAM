@@ -7,4 +7,5 @@ sealed class Routes(
     object Rooms : Routes("rooms")
     object User : Routes("user")
     object  Login : Routes("login")
+    object Register : Routes("register")
 }
