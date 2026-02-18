@@ -9,12 +9,15 @@ import androidx.navigation.compose.composable
 import com.example.intermodular.data.remote.ApiService
 import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.viewmodels.BookingViewModelFactory
 import com.example.intermodular.views.screens.BookingScreen
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
+import com.example.intermodular.viewmodels.LoginViewModel
+import com.example.intermodular.viewmodels.LoginViewModelFactory
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.RoomViewModelFactory
 import com.example.intermodular.views.screens.LoginScreen
@@ -57,7 +60,18 @@ fun Navigation(
             UserScreen()
         }
         composable(Routes.Login.route) {
+            val api = RetrofitProvider.api
+            val repository = LoginRepository(api)
+            val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(repository))
+
+
             LoginScreen(
+                viewModel = viewModel,
+                onLoginSuccess = {
+                    navigationController.navigate(Routes.Bookings.route) {
+                        popUpTo(Routes.Login.route) { inclusive = true }
+                    }
+                }
             )
         }
     }
