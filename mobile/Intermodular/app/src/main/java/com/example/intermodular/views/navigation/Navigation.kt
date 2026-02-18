@@ -17,6 +17,7 @@ import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.RoomViewModelFactory
+import com.example.intermodular.views.screens.LoginScreen
 
 @Composable
 fun Navigation(
@@ -25,7 +26,7 @@ fun Navigation(
 ) {
     NavHost (
         navController = navigationController,
-        startDestination = Routes.Bookings.route,
+        startDestination = Routes.Login.route,
         modifier = modifier
     ) {
         composable(Routes.Bookings.route) {
@@ -54,6 +55,10 @@ fun Navigation(
         }
         composable(Routes.User.route) {
             UserScreen()
+        }
+        composable(Routes.Login.route) {
+            LoginScreen(
+            )
         }
     }
 }

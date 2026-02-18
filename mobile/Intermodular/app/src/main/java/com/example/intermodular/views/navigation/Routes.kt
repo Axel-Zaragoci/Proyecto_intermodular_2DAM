@@ -6,4 +6,5 @@ sealed class Routes(
     object Bookings : Routes("bookings")
     object Rooms : Routes("rooms")
     object User : Routes("user")
+    object  Login : Routes("login")
 }

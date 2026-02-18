@@ -36,15 +36,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val repo = LoginRepository(RetrofitProvider.api)
-            val factory = LoginViewModelFactory(repo)
-            val vm: LoginViewModel = viewModel(factory = factory)
-            vm.login("cliente@prueba.test", "Password123!")
-
             var showApp by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-                delay(1000)
+                delay(1)
                 showApp = true
             }
 
