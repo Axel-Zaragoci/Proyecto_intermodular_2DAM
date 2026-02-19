@@ -1,5 +1,6 @@
 ﻿package com.example.intermodular.views.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -84,6 +86,7 @@ fun MyBookingDetailsScreen(
     popupMessage : String,
     reviewDescription: String,
     rating: Int,
+    created: Boolean,
     onPopupDismiss: () -> Unit,
     onUpdateClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -186,45 +189,64 @@ fun MyBookingDetailsScreen(
                         Text("Cancelar reserva")
                     }
 
-                    // AGREGAR RESEÑA
-                    Text(
-                        text = "Dejar una reseña",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Spacer(modifier = Modifier.height(30.dp))
 
-                    // SELECTOR DE ESTRELLAS
-                    Row {
-                        for (i in 1..5) {
-                            IconButton(onClick = { onRatingChange(i) }) {
-                                Icon(
-                                    Icons.Default.Star,
-                                    contentDescription = "Estrella $i",
-                                    tint = if (i <= rating)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.outlineVariant
-                                )
+
+                    if (!created) {
+                        // AGREGAR RESEÑA
+                        Text(
+                            text = "Dejar una reseña",
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        // SELECTOR DE ESTRELLAS
+                        Row (
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ){
+                            for (i in 1..5) {
+                                IconButton(onClick = { onRatingChange(i) }) {
+                                    Icon(
+                                        Icons.Default.Star,
+                                        contentDescription = "Estrella $i",
+                                        tint = if (i <= rating)
+                                            MaterialTheme.colorScheme.primary
+                                        else
+                                            MaterialTheme.colorScheme.outlineVariant
+                                    )
+                                }
                             }
                         }
+
+                        // Campo de descripción
+                        OutlinedTextField(
+                            value = reviewDescription,
+                            onValueChange = onReviewDescriptionChange,
+                            label = { Text("Tu opinión") },
+                            modifier = Modifier.fillMaxWidth(),
+                            maxLines = 4
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Botón enviar
+                        Button(
+                            onClick = onCreateReviewClick,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Enviar reseña")
+                        }
                     }
-
-                    // Campo de descripción
-                    OutlinedTextField(
-                        value = reviewDescription,
-                        onValueChange = onReviewDescriptionChange,
-                        label = { Text("Tu opinión") },
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 4
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Botón enviar
-                    Button(
-                        onClick = onCreateReviewClick,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Enviar reseña")
+                    else {
+                        Text(
+                            text = "Ya se ha añadido una reseña",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     // POPUP DE PAGO
@@ -260,6 +282,7 @@ fun MyBookingDetailsState(
     val booking by viewModel.booking.collectAsStateWithLifecycle()
     val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
     val reviewRate by viewModel.reviewRating.collectAsStateWithLifecycle()
+    val reviewCreated by viewModel.reviewCreated.collectAsStateWithLifecycle()
     val showPopup by viewModel.showPopup.collectAsStateWithLifecycle()
     val popupMessage by viewModel.popupMessage.collectAsStateWithLifecycle()
 
@@ -274,6 +297,7 @@ fun MyBookingDetailsState(
         onPopupDismiss = {},
         reviewDescription = reviewDescription,
         rating = reviewRate,
+        created = reviewCreated,
         startDate = viewModel.checkInDateToMilliseconds(),
         endDate = viewModel.checkOutDateToMilliseconds(),
         onUpdateClick = viewModel::updateBooking,

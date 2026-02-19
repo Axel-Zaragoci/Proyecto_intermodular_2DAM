@@ -48,6 +48,9 @@ class MyBookingDetailsViewModel (
     private val _room = MutableStateFlow<Room?>(null)
     val room : StateFlow<Room?> = _room
 
+    private val _reviewCreated = MutableStateFlow<Boolean>(false)
+    val reviewCreated : StateFlow<Boolean> = _reviewCreated
+
     /**
      * Calificación de la reseña
      */
@@ -100,6 +103,7 @@ class MyBookingDetailsViewModel (
      * 1. Obtiene la reserva por el ID
      * 2. Obtiene toda la lista de habitaciones
      * 3. Saca la habitación reservada de la lista
+     * 4. Carga las reseñas y determina si ya se ha creado una para esta reserva
      *
      * Errores lanzados:
      * - En caso de no encontrar la reserva
@@ -121,6 +125,13 @@ class MyBookingDetailsViewModel (
                 }
                 else {
                     throw Exception("No se encontró la habitación")
+                }
+
+                val roomReviews = reviewRepository.getReviewsByRoom(_booking.value?.roomId!!);
+                roomReviews.forEach{
+                    if (it.bookingId == _booking.value?.id) {
+                        _reviewCreated.value = true
+                    }
                 }
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
@@ -315,6 +326,8 @@ class MyBookingDetailsViewModel (
                     rating = rating,
                     description = description
                 )
+
+                _reviewCreated.value = true;
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
             } finally {
