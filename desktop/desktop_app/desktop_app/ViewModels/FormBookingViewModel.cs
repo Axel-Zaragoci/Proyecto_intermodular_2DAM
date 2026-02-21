@@ -68,7 +68,7 @@ namespace desktop_app.ViewModels
             Clients.Clear();
             var users = await UserService.GetAllUsersAsync();
             foreach (var user in users)
-                Clients.Add(user);
+                if (user.Rol == "Usuario") Clients.Add(user);
         }
 
         /// <summary>
