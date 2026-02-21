@@ -41,6 +41,37 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 import androidx.compose.material3.FilterChip
 
+/**
+ * Componente interactivo que despliega un formulario completo de filtros para el catálogo de habitaciones.
+ *
+ * Contiene controles granulares (Sliders, Checkboxes, Dropdowns, Chips) que se enlazan mediante 
+ * elevación de estado (State Hoisting) a los valores individuales almacenados en el `RoomViewModel`.
+ *
+ * @param showFilters Controla la visibilidad del panel de filtros de forma expandible.
+ * @param changeVisibility Callback para alternar u ocultar la visibilidad del panel.
+ * @param type Filtro seleccionado de tipo de habitación.
+ * @param onTypeChanged Callback cuando se selecciona un nuevo tipo.
+ * @param minPrice Valor inferior seleccionado en el rango de precio.
+ * @param onMinPriceChanged Callback al modificar el precio mínimo.
+ * @param maxPrice Valor superior seleccionado en el rango de precio.
+ * @param onMaxPriceChanged Callback al modificar el precio máximo.
+ * @param guests Número de huéspedes introducido.
+ * @param onGuestsChanged Callback al cambiar el texto de huéspedes.
+ * @param isAvailable Estado del checkbox "Solo disponibles".
+ * @param onIsAvailableChanged Callback al cambiar el checkbox de disponibilidad.
+ * @param hasExtraBed Estado del checkbox "Cama supletoria".
+ * @param onExtraBedChanged Callback al cambiar el checkbox de cama extra.
+ * @param hasCrib Estado del checkbox "Cuna".
+ * @param onCribChanged Callback al cambiar el checkbox de cuna.
+ * @param hasOffer Estado del checkbox "Ofertas especiales".
+ * @param onOfferChanged Callback al cambiar el checkbox de ofertas.
+ * @param sortBy Campo actual por el que se ordenarán los resultados.
+ * @param onSortByChanged Callback al seleccionar un nuevo campo de ordenación.
+ * @param sortOrder Dirección actual de la ordenación ("asc" o "desc").
+ * @param onSortOrderChanged Callback al invertir la dirección de ordenación.
+ * @param filter Función ejecutada al pulsar el botón "Buscar" (aplica los valores al DTO y repinta listado).
+ * @param clearFilters Función ejecutada al pulsar el botón "Limpiar Filtros".
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomFilterList(

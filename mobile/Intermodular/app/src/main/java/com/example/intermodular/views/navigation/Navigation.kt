@@ -22,27 +22,16 @@ import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
+import com.example.intermodular.viewmodels.RoomDetailViewModel
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.RoomDetailViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
-import com.example.intermodular.viewmodels.RoomDetailViewModel
+import com.example.intermodular.views.screens.RoomDetailScreen
 
-/**
- * Componente de navegación de la aplicación
- *
- * Inyección de dependencias:
- * Cada composable crea las dependencias necesarias:
- * 1. Obtiene la instancia de API de [RetrofitProvider]
- * 2. Crea los repositorios correspondientes
- * 3. Crea las fábricas de ViewModels con las dependencias
- * 4. Instancia los ViewModels usando las fábricas
- *
- * @param navigationController - Controlador de navegación para manejar las transiciones
- * @param modifier - Modificador para adaptar el padding al Scaffold
- */
 @Composable
 fun Navigation(
     navigationController: NavHostController,
@@ -212,15 +201,17 @@ fun Navigation(
             
             val api = RetrofitProvider.api
             val roomRepository = RoomRepository(api)
-            val reviewRepository = com.example.intermodular.data.repository.ReviewRepository(api)
+            val reviewRepository = ReviewRepository(api)
             
-            val viewModel = RoomDetailViewModel(
-                roomId = roomId,
-                roomRepository = roomRepository,
-                reviewRepository = reviewRepository
+            val viewModel: RoomDetailViewModel = viewModel(
+                factory = RoomDetailViewModelFactory(
+                    roomId,
+                    roomRepository,
+                    reviewRepository
+                )
             )
             
-            com.example.intermodular.views.screens.RoomDetailScreen(
+            RoomDetailScreen(
                 viewModel = viewModel,
                 onBackClick = { navigationController.popBackStack() }
             )

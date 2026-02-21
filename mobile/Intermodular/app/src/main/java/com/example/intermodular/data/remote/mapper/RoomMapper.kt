@@ -3,6 +3,15 @@ package com.example.intermodular.data.remote.mapper
 import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.models.Room
 
+/**
+ * Función de extensión que convierte un Data Transfer Object [RoomDto] proveniente de la API
+ * en un modelo de dominio [Room], que es el objeto limpio utilizado por la interfaz de usuario
+ * y los ViewModels.
+ *
+ * Mapea las propiedades devolviendo un objeto inmutable listo para la UI de Android.
+ *
+ * @return El modelo de dominio [Room].
+ */
 fun RoomDto.toDomain(): Room {
     return Room(
         id = _id,
