@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.models.Booking
+import com.example.intermodular.models.Review
 import com.example.intermodular.models.Room
 import com.example.intermodular.models.RoomFilter
 import kotlinx.coroutines.delay
@@ -18,17 +20,19 @@ import java.time.ZoneOffset
 import kotlin.let
 
 /**
- * ViewModel para la vista que permite ver detalles, modificar y cancelar una reserva ya existente
+ * ViewModel para la vista que permite ver detalles, modificar y cancelar una reserva ya existente. Además, permite agregar una reseña
  * @author Axel Zaragoci
  *
  * @property bookingId - ID de la reserva sobre la que se van a aplicar las funciones
  * @property bookingRepository - Repositorio para obtener datos de reservas de la API
  * @property roomRepository - Repositorio para obtener datos de habitaciones de la API
+ * @property reviewRepository - Repositorio para crear una reseña
  */
 class MyBookingDetailsViewModel (
     private val bookingId : String,
     private val bookingRepository: BookingRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val reviewRepository: ReviewRepository
 ) : ViewModel() {
 
     // ==================== ESTADOS DE LA UI ====================
@@ -43,6 +47,21 @@ class MyBookingDetailsViewModel (
      */
     private val _room = MutableStateFlow<Room?>(null)
     val room : StateFlow<Room?> = _room
+
+    private val _reviewCreated = MutableStateFlow<Boolean>(false)
+    val reviewCreated : StateFlow<Boolean> = _reviewCreated
+
+    /**
+     * Calificación de la reseña
+     */
+    private val _reviewRating = MutableStateFlow(0)
+    val reviewRating: StateFlow<Int> = _reviewRating
+
+    /**
+     * Descripción de la reseña
+     */
+    private val _reviewDescription = MutableStateFlow("")
+    val reviewDescription: StateFlow<String> = _reviewDescription
 
     /**
      * Mensaje de error a mostrar al usuario
@@ -84,6 +103,7 @@ class MyBookingDetailsViewModel (
      * 1. Obtiene la reserva por el ID
      * 2. Obtiene toda la lista de habitaciones
      * 3. Saca la habitación reservada de la lista
+     * 4. Carga las reseñas y determina si ya se ha creado una para esta reserva
      *
      * Errores lanzados:
      * - En caso de no encontrar la reserva
@@ -105,6 +125,13 @@ class MyBookingDetailsViewModel (
                 }
                 else {
                     throw Exception("No se encontró la habitación")
+                }
+
+                val roomReviews = reviewRepository.getReviewsByRoom(_booking.value?.roomId!!);
+                roomReviews.forEach{
+                    if (it.bookingId == _booking.value?.id) {
+                        _reviewCreated.value = true
+                    }
                 }
             } catch (e: Exception) {
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
@@ -137,6 +164,7 @@ class MyBookingDetailsViewModel (
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
             _booking.value = _booking.value?.copy(checkInDate = newDate)
+            calculateTotalPrice()
         }
     }
 
@@ -149,6 +177,7 @@ class MyBookingDetailsViewModel (
         if (newMillis != null) {
             val newDate = utcMillisToLocalDate(newMillis)
             _booking.value = _booking.value?.copy(checkOutDate = newDate)
+            calculateTotalPrice()
         }
     }
 
@@ -162,6 +191,24 @@ class MyBookingDetailsViewModel (
         if (intGuests != null && intGuests > 0) {
             _booking.value = _booking.value?.copy(guests = intGuests)
         }
+    }
+
+    /**
+     * Actualiza la calificación de la reseña
+     *
+     * @param rating - Calificación seleccionada
+     */
+    fun onRatingChange(rating: Int) {
+        _reviewRating.value = rating
+    }
+
+    /**
+     * Actualiza la descripción de la reseña
+     *
+     * @param description - Descripción escrita
+     */
+    fun onReviewDescriptionChange(description: String) {
+        _reviewDescription.value = description
     }
 
     /**
@@ -241,6 +288,55 @@ class MyBookingDetailsViewModel (
     }
 
     /**
+     * Crea una nueva reseña
+     *
+     * Flujo principal:
+     * 1. Valida la existencia de los datos
+     * 2. Lanza corrutina para la creación de la reseña en la API
+     *
+     * En caso de error, muestra el error con un mensaje acorde a [ApiErrorHandler]
+     */
+    fun createReview() {
+        val currentBooking = _booking.value ?: run {
+            _errorMessage.value = "No hay datos de reserva"
+            return
+        }
+
+        val roomId = currentBooking.roomId
+        val rating = _reviewRating.value
+        val description = _reviewDescription.value
+
+        if (rating <= 0) {
+            _errorMessage.value = "Debes seleccionar una calificación"
+            return
+        }
+
+        if (description.isBlank()) {
+            _errorMessage.value = "Debes escribir una descripción"
+            return
+        }
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                reviewRepository.createReview(
+                    roomId = roomId,
+                    bookingId = bookingId,
+                    rating = rating,
+                    description = description
+                )
+
+                _reviewCreated.value = true;
+            } catch (e: Exception) {
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    /**
      * Simula un proceso de pago
      *
      * Flujo principal:
@@ -295,5 +391,31 @@ class MyBookingDetailsViewModel (
         return Instant.ofEpochMilli(millis)
             .atZone(ZoneOffset.UTC)
             .toLocalDate()
+    }
+
+    /**
+     * Calcula el precio total de la reserva
+     *
+     * Flujo principal:
+     * 1. Calcula la cantidad de noches
+     * 2. Calcula el coste de la reserva
+     * 3. Si hay oferta, descuenta del coste la parte correspondiente
+     *
+     * En caso de no haber habitación, fecha de inicio, fecha de fin o de que la cantidad de noches sea 0 o negativa, para el cálculo del precio para no causar un error
+     */
+    private fun calculateTotalPrice() {
+        val room = _room.value ?: return
+        val start = _booking.value?.checkInDate ?: return
+        val end = _booking.value?.checkOutDate ?: return
+
+        val nights = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt()
+        if (nights <= 0) {
+            _booking.value = _booking.value?.copy(totalPrice = 0.0)
+            return
+        }
+
+        val base = nights * room.pricePerNight
+        val discount = room.offer?.let { base * (it / 100) } ?: 0.0
+        _booking.value = _booking.value?.copy(totalPrice = (base - discount))
     }
 }

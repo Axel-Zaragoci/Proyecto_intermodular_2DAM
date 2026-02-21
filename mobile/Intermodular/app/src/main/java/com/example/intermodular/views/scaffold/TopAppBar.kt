@@ -17,6 +17,12 @@ import androidx.compose.ui.graphics.Color
 import com.example.intermodular.ui.theme.BluePrimary
 import com.example.intermodular.ui.theme.BluePrimaryDark
 
+/**
+ * Componente de barra superior personalizada
+ *
+ * @param darkMode - Estado actual del tema (true = modo oscuro, false = modo claro)
+ * @param onChangeModeClick - Callback que se ejecuta al hacer clic en el botón de cambio de tema
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarView(
@@ -54,6 +60,15 @@ fun TopAppBarView(
     )
 }
 
+/**
+ * Versión del [TopAppBarView] con estado
+ * Funciona de separación entre el estado y la vista
+ *
+ * @author Axel Zaragoci
+ *
+ * @param darkMode - Estado actual del tema
+ * @param onToggleDarkMode - Función para cambiar el tema
+ */
 @Composable
 fun TopAppBarState(
     darkMode: Boolean,

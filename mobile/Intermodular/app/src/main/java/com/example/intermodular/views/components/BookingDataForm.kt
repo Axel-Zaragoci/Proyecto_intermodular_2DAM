@@ -1,7 +1,5 @@
 ﻿package com.example.intermodular.views.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,21 +12,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Formulario para crear y/o actualizar una reserva
+ *
+ * En caso de actualizar utiliza los datos de la reserva existente
+ * En caso de actualizar utiliza datos recibidos en la vista [com.example.intermodular.views.screens.NewBookingScreen] desde [com.example.intermodular.views.screens.BookingScreen]
+ *
+ * Este formulario contiene:
+ * - 2 [BookingDatePicker] para la fecha de inicio y de fin
+ * - 1 [ComboBox] para seleccionar la cantidad de huéspedes
+ * - 1 texto para mostrar el precio total
+ * - 1 [Button] para ejecutar la función del formulario
+ *
+ * @author Axel Zaragoci
+ *
+ * @param create - Variable para indicar si el formulario se utiliza para crear o para actualizar una reserva
+ * @param startDate - Fecha de inicio de la reserva
+ * @param endDate - Fecha de fin de la reserva
+ * @param guests - Cantidad de huéspedes de la reserva
+ * @param totalPrice - Precio total de la reserva
+ * @param onButtonClick - Callback para ejecutar la función de crear o actualizar
+ * @param onStartDateChange - Callback al cambiar la fecha de inicio
+ * @param onEndDateChange - Callback al cambiar la fecha de fin
+ * @param onGuestsDataChange - Callback al cambiar la cantidad de huéspedes
+ */
 @Composable
 fun BookingDataForm(
     create : Boolean,
     startDate: Long,
     endDate: Long,
     guests: String,
-    totalPrice: Int?,
+    totalPrice: Double?,
     onButtonClick: () -> Unit,
     onStartDateChange: (Long?) -> Unit,
     onEndDateChange: (Long?) -> Unit,
     onGuestsDataChange: (String) -> Unit
 ) {
-    Column(
-
-    ) {
+    Column() {
         Row( )
         {
             Column(
@@ -59,11 +79,11 @@ fun BookingDataForm(
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            NumericTextBox(
-                number = guests,
+            ComboBox(
+                default = guests,
                 onValueChanged = onGuestsDataChange,
                 label = "Cantidad de huéspedes:",
-                numbers = listOf("1", "2", "3", "4", "5")
+                options = listOf("1", "2", "3", "4", "5")
             )
         }
 

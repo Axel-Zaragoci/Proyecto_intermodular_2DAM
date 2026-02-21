@@ -106,7 +106,7 @@ export async function connectEmail() {
         })
 
         await transporter.verify();
-        console.log("Conectado la servicio de correo")
+        console.log("Conectado al servicio de correo")
     } catch (err) {
         console.error("Error al conectar con el servicio de correo:", err)
     }

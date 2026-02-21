@@ -94,8 +94,8 @@ class NewBookingViewModel(
     /**
      * Precio total de la reserva
      */
-    private val _totalPrice = MutableStateFlow<Int?>(null)
-    val totalPrice : StateFlow<Int?> = _totalPrice
+    private val _totalPrice = MutableStateFlow<Double?>(null)
+    val totalPrice : StateFlow<Double?> = _totalPrice
 
     // ==================== MÉTODOS PÚBLICOS ====================
     /**
@@ -264,10 +264,13 @@ class NewBookingViewModel(
         val end = endDateAsLocalDate() ?: return
 
         val nights = java.time.temporal.ChronoUnit.DAYS.between(start, end).toInt()
-        if (nights <= 0) return
+        if (nights <= 0) {
+            _totalPrice.value = 0.0
+            return
+        }
 
         val base = nights * room.pricePerNight
         val discount = room.offer?.let { base * (it / 100) } ?: 0.0
-        _totalPrice.value = (base - discount).toInt()
+        _totalPrice.value = (base - discount)
     }
 }

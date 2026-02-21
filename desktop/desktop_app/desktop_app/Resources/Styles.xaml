@@ -569,6 +569,12 @@
                             <Popup x:Name="PART_Popup" StaysOpen="False" AllowsTransparency="True" />
                         </Grid>
                     </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="OuterBorder" Property="Background" Value="#EBEEFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

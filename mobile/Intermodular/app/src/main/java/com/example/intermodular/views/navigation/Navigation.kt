@@ -43,6 +43,16 @@ fun Navigation(
         modifier = modifier
     ) {
 
+        /**
+         * Pantalla principal de búsqueda y filtrado de habitaciones.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.Bookings]
+         * - **ViewModel** - [BookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a BookRoom
+         */
         composable(Routes.Bookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -78,6 +88,16 @@ fun Navigation(
             UserScreen(navigationController)
         }
 
+        /**
+         * Pantalla que lista todas las reservas del usuario actual.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.MyBookings]
+         * - **ViewModel** - [MyBookingsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a MyBookingDetails
+         */
         composable(Routes.MyBookings.route) {
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
@@ -93,6 +113,21 @@ fun Navigation(
             )
         }
 
+        /**
+         * Pantalla para crear una nueva reserva.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **roomId** - ID de la habitación a reservar (requerido)
+         * - **startDate** - Fecha de entrada (timestamp)
+         * - **endDate** - Fecha de salida (timestamp)
+         * - **guests** - Número de huéspedes
+         *
+         * - **Ruta** - [Routes.BookRoom]
+         * - **ViewModel** - [NewBookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         */
         composable(
             route = Routes.BookRoom.route,
             arguments = listOf(
@@ -119,6 +154,18 @@ fun Navigation(
             NewBookingState(viewModel)
         }
 
+        /**
+         * Pantalla de detalle y actualización de una reserva existente y creación de reseña.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **bookingId** - ID de la reserva a mostrar (requerido)
+         *
+         * - **Ruta** - [Routes.MyBookingDetails]
+         * - **ViewModel** - [MyBookingDetailsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository, ReviewRepository
+         */
         composable(
             route = Routes.MyBookingDetails.route,
             arguments = listOf(
@@ -130,12 +177,14 @@ fun Navigation(
             val api = RetrofitProvider.api
             val bookingRepository = BookingRepository(api)
             val roomRepository = RoomRepository(api)
+            val reviewRepository = ReviewRepository(api)
 
             val viewModel: MyBookingDetailsViewModel = viewModel(
                 factory = MyBookingDetailsViewModelFactory(
                     bookingId,
                     bookingRepository,
-                    roomRepository
+                    roomRepository,
+                    reviewRepository
                 )
             )
 

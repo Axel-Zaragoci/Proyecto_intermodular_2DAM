@@ -2,6 +2,7 @@
 
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
+import com.example.intermodular.data.remote.dto.CreateReviewDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
@@ -106,6 +107,18 @@ interface ApiService {
 
     @GET("review/room/{roomID}")
     suspend fun getReviewsByRoom(@Path("roomID") roomId: String): List<ReviewDto>
+
+    /**
+     * Añade una nueva reseña
+     * @author Axel Zaragoci
+     *
+     * @param body - Objeto con la información para crear la reseña
+     * @return [ReviewDto] - Objeto con la información completa de la reseña creada
+     */
+    @POST("review")
+    suspend fun createReview(
+        @Body body: CreateReviewDto
+    ): ReviewDto
 
     @POST("auth/login")
     suspend fun login(
