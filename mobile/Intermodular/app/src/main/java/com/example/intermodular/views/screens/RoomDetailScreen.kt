@@ -8,15 +8,19 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.intermodular.BuildConfig
 import com.example.intermodular.models.Review
 import com.example.intermodular.viewmodels.RoomDetailViewModel
@@ -34,18 +38,33 @@ fun RoomDetailScreen(
     viewModel: RoomDetailViewModel,
     onBackClick: () -> Unit
 ) {
-    val room by viewModel.room.collectAsStateWithLifecycle()
+    val roomState by viewModel.room.collectAsStateWithLifecycle()
+    val currentRoom = roomState
     val reviews by viewModel.reviews.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val averageRating by viewModel.averageRating.collectAsStateWithLifecycle()
     
     // List of all images to show
-    val allImages = remember(room) {
-        if (room != null) {
-            (listOf(room!!.mainImage) + room!!.extraImages).filter { it.isNotBlank() }
+    val allImages = remember(currentRoom) {
+        if (currentRoom != null) {
+            (listOf(currentRoom.mainImage) + currentRoom.extraImages).filter { it.isNotBlank() }
         } else {
             emptyList()
+        }
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(allImages) {
+        allImages.forEach { imagePath ->
+            val relativePath = if (imagePath.startsWith("/")) imagePath.substring(1) else imagePath
+            val imageUrl = if (imagePath.startsWith("http")) imagePath else "${BuildConfig.BASE_URL}$relativePath"
+            
+            val request = ImageRequest.Builder(context)
+                .data(imageUrl)
+                // Optional: You can set diskCachePolicy/memoryCachePolicy if you want to be explicit, but defaults are usually fine
+                .build()
+            ImageLoader(context).enqueue(request)
         }
     }
 
@@ -53,7 +72,7 @@ fun RoomDetailScreen(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (room == null) {
+        if (currentRoom == null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -117,7 +136,7 @@ fun RoomDetailScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Habitación ${room!!.roomNumber}",
+                        text = "Habitación ${currentRoom.roomNumber}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -125,7 +144,7 @@ fun RoomDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
-                        text = room!!.type,
+                        text = currentRoom.type,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -137,7 +156,7 @@ fun RoomDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${room!!.pricePerNight}€/noche",
+                            text = "${currentRoom.pricePerNight}€/noche",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -173,7 +192,7 @@ fun RoomDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
-                        text = room!!.description,
+                        text = currentRoom.description,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     
@@ -187,14 +206,14 @@ fun RoomDetailScreen(
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    CharacteristicItem("Máximo de huéspedes", "${room!!.maxGuests} personas")
-                    CharacteristicItem("Cama extra", if (room!!.extraBed) "Disponible" else "No disponible")
-                    CharacteristicItem("Cuna", if (room!!.crib) "Disponible" else "No disponible")
+                    CharacteristicItem("Máximo de huéspedes", "${currentRoom.maxGuests} personas")
+                    CharacteristicItem("Cama extra", if (currentRoom.extraBed) "Disponible" else "No disponible")
+                    CharacteristicItem("Cuna", if (currentRoom.crib) "Disponible" else "No disponible")
                     
-                    if (room!!.extras.isNotEmpty()) {
+                    if (currentRoom.extras.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Extras: ${room!!.extras.joinToString(", ")}",
+                            text = "Extras: ${currentRoom.extras.joinToString(", ")}",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

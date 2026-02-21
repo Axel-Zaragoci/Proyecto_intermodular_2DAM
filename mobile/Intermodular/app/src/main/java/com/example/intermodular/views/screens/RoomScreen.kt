@@ -22,6 +22,17 @@ import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.views.components.RoomCard
 import com.example.intermodular.views.components.RoomFilterList
 
+/**
+ * Pantalla principal del catálogo de habitaciones.
+ *
+ * Muestra el listado de habitaciones disponibles de forma paginada/flexible mediante un `LazyColumn`.
+ * Permite desplegar un panel de filtros avanzados ([RoomFilterList]) y observar
+ * en tiempo real el estado de carga y error provistos por el [RoomViewModel].
+ *
+ * @param roomViewModel Instancia del ViewModel inyectada que gestiona la lógica de pantalla.
+ * @param onRoomClick Callback invocado cuando el usuario pulsa sobre la tarjeta de una habitación específica, 
+ * pasando como argumento el ID único (`String`) de la habitación seleccionada para la navegación.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoomScreen(

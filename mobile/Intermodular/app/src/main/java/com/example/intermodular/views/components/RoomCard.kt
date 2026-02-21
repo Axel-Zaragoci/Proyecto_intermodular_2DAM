@@ -21,6 +21,17 @@ import com.example.intermodular.models.Room
 import com.example.intermodular.BuildConfig
 import kotlin.math.roundToInt
 
+/**
+ * Componente reutilizable que muestra el resumen visual de una habitación en formato tarjeta.
+ *
+ * Incluye la imagen principal (usando Coil para carga asíncrona), detalles básicos como precio, 
+ * número, tipo de habitación, disponibilidad, una pequeña descripción truncada y un botón de acción.
+ *
+ * @param room Modelo de datos de la habitación a visualizar ([Room]).
+ * @param modifier Modificador opcional para personalizar la apariencia o disposición de la tarjeta entera.
+ * @param buttonText Texto a mostrar dentro del botón de acción (por defecto "Ver detalles").
+ * @param onButtonClick Callback ejecutado cuando el usuario hace clic en el botón, devolviendo el objeto [Room] asociado.
+ */
 @Composable
 fun RoomCard(
     room: Room,

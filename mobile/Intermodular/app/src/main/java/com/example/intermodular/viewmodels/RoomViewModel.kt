@@ -9,6 +9,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel que gestiona el estado y la lógica de negocio para la pantalla del catálogo de habitaciones ([RoomScreen]).
+ *
+ * Mantiene de forma reactiva la lista de habitaciones, los estados de carga y errores,
+ * así como los valores individuales de cada filtro aplicado en la interfaz de usuario.
+ *
+ * @property repository El repositorio de datos ([RoomRepository]) encargado de servir las habitaciones.
+ */
 class RoomViewModel(
     private val repository: RoomRepository
 ) : ViewModel() {
@@ -107,6 +115,11 @@ class RoomViewModel(
         _sortOrder.value = value
     }
 
+    /**
+     * Recopila todos los valores actuales de los StateFlow de filtros, 
+     * construye un objeto [RoomFilter] y desencadena una nueva carga de datos
+     * llamando a [loadRooms]. Oculta el panel de filtros tras aplicar.
+     */
     fun filter() {
         _currentFilter.value = RoomFilter(
             type = _type.value.ifBlank { null },
@@ -124,6 +137,11 @@ class RoomViewModel(
         loadRooms()
     }
 
+    /**
+     * Restablece todos los filtros visuales a sus valores por defecto,
+     * limpia el [RoomFilter] actual, oculta el panel de filtros y recarga 
+     * la lista completa de habitaciones sin filtrado.
+     */
     fun clearFilters() {
         _type.value = ""
         _minPrice.value = 0
@@ -141,6 +159,11 @@ class RoomViewModel(
         loadRooms()
     }
 
+    /**
+     * Realiza una petición asíncrona al repositorio para cargar la lista de habitaciones
+     * aplicando el filtro actual ([_currentFilter]).
+     * Gestiona automáticamente los estados [_isLoading] y [_errorMessage].
+     */
     fun loadRooms() {
         viewModelScope.launch {
             _isLoading.value = true
