@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -90,6 +91,12 @@ fun UserScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.height(18.dp))
+
+                ProfileAvatar(
+                    initials = "${user.firstName.take(1)}${user.lastName.take(1)}".uppercase(),
+                    isVip = user.vipStatus
+                )
 
                 Spacer(Modifier.height(14.dp))
 
@@ -164,6 +171,27 @@ fun UserScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileAvatar(
+    initials: String,
+    isVip: Boolean
+) {
+    Box(contentAlignment = Alignment.BottomEnd) {
+        Surface(
+            shape = CircleShape,
+            tonalElevation = 6.dp,
+            modifier = Modifier.size(84.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = initials,
+                    style = MaterialTheme.typography.headlineMedium
+                )
             }
         }
     }
