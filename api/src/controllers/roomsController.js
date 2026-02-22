@@ -1,5 +1,5 @@
 
-import { roomDatabaseModel, RoomEntryData } from "./roomsModel.js";
+import { roomDatabaseModel, RoomEntryData } from "../models/roomsModel.js";
 
 /**
  * Crea una nueva habitación.
@@ -210,7 +210,7 @@ export const deleteRoom = async (req, res) => {
     const { roomID } = req.params;
 
     // Primero eliminar todas las reservas de esta habitación
-    const { bookingDatabaseModel } = await import("../booking/bookingModel.js");
+    const { bookingDatabaseModel } = await import("../models/bookingModel.js");
     await bookingDatabaseModel.deleteMany({ room: roomID });
 
     const deleted = await roomDatabaseModel.findByIdAndDelete(roomID);

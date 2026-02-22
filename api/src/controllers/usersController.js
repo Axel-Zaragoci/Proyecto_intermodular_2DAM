@@ -1,4 +1,4 @@
-import { userDatabaseModel, UserEntryData, UserUpdateData, UserAdminUpdateData } from "./usersModel.js";
+import { userDatabaseModel, UserEntryData, UserUpdateData, UserAdminUpdateData } from "../models/usersModel.js";
 import mongoose from "mongoose";
 import { comparePassword, hashPassword } from "../services/password.service.js";
 import e from "express";

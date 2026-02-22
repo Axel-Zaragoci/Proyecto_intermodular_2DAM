@@ -7,7 +7,7 @@ import { getOneBookingById,
     cancelBooking,
     updateBooking,
     deleteBooking} from "./bookingController.js";
-import { verifyToken, authorizeRoles } from "../auth/authMiddleware.js";
+import { verifyToken, authorizeRoles } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 

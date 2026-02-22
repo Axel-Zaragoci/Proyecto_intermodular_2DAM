@@ -1,4 +1,4 @@
-import { bookingDatabaseModel, BookingEntryData } from "./bookingModel.js";
+import { bookingDatabaseModel, BookingEntryData } from "../models/bookingModel.js";
 import { roomDatabaseModel } from "../rooms/roomsModel.js"
 import mongoose from "mongoose";
 import { userDatabaseModel } from "../users/usersModel.js";

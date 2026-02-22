@@ -1,4 +1,4 @@
-import { reviewDatabaseModel } from "./reviewsModel.js";
+import { reviewDatabaseModel } from "../models/reviewsModel.js";
 
 /**
  * Crea una nueva reseña

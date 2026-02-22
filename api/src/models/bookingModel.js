@@ -1,5 +1,5 @@
 import { Schema, Types, model, isValidObjectId } from 'mongoose';
-import { roomDatabaseModel } from '../rooms/roomsModel.js';
+import { roomDatabaseModel } from './roomsModel.js';
 import { userDatabaseModel } from '../users/usersModel.js';
 
 /**

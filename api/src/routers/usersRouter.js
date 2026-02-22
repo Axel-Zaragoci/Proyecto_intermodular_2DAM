@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser, deleteUserById, getMe, changeMyPassword} from './usersController.js';
-import { verifyToken ,authorizeRoles } from '../auth/authMiddleware.js';    
+import { verifyToken ,authorizeRoles } from '../middlewares/authMiddleware.js';    
 const usersRouter = Router();
 
 usersRouter.get('/', verifyToken, authorizeRoles(["Admin", "Trabajador"]), getAllUsers);
