@@ -61,6 +61,8 @@ import com.example.intermodular.data.remote.utils.uriToMultipart
 import com.example.intermodular.models.UserModel
 import com.example.intermodular.viewmodels.UserViewModel
 import com.example.intermodular.views.components.ChangePasswordDialog
+import com.example.intermodular.views.components.ProfileAvatar
+import com.example.intermodular.views.components.ProfileRow
 import com.example.intermodular.views.navigation.Routes
 import java.time.format.DateTimeFormatter
 
@@ -148,7 +150,7 @@ fun UserScreen(
                 Spacer(Modifier.height(18.dp))
 
                 // Avatar con opción de cambiar foto y badge VIP
-                ProfileAvatar(
+                ProfileAvatar (
                     imageRoute = user.imageRoute,
                     initials = "${user.firstName.take(1)}${user.lastName.take(1)}".uppercase(),
                     isVip = user.vipStatus,
@@ -246,159 +248,6 @@ fun UserScreen(
     }
 }
 
-/**
- * Avatar de perfil con:
- * - Imagen remota si existe ([AsyncImage])
- * - Iniciales como fallback si no hay imagen
- * - Botón flotante para editar/cambiar foto
- * - Badge VIP (estrella) si el usuario tiene estado VIP
- *
- * La URL final de la imagen se construye con [BuildConfig.BASE_URL] cuando la ruta es relativa.
- *
- * @author Ian Rodriguez
- *
- * @param imageRoute - Ruta/URL de la imagen del usuario (puede ser relativa o absoluta)
- * @param initials - Iniciales del usuario a mostrar cuando no hay imagen
- * @param isVip - Indica si se debe mostrar el distintivo VIP
- * @param onEditPhoto - Callback al pulsar el botón de editar foto
- */
-@Composable
-private fun ProfileAvatar(
-    imageRoute: String?,
-    initials: String,
-    isVip: Boolean,
-    onEditPhoto: () -> Unit
-) {
-    val context = LocalContext.current
-
-    // Construcción de la URL final (absoluta) para cargar la imagen
-    val imageUrl = imageRoute?.let { route ->
-        val cleanPath =
-            if (route.startsWith("/")) route.substring(1) else route
-
-        if (route.startsWith("http"))
-            route
-        else
-            "${BuildConfig.BASE_URL}$cleanPath"
-    }
-
-    Box(contentAlignment = Alignment.Center) {
-        // Contenedor del avatar (imagen o iniciales)
-        Surface(
-            shape = CircleShape,
-            tonalElevation = 6.dp,
-            modifier = Modifier.size(96.dp)
-        ) {
-            if (imageUrl != null) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Foto",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    error = ColorPainter(MaterialTheme.colorScheme.surfaceVariant)
-                )
-            } else {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = initials,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                }
-            }
-        }
-
-        // Botón flotante para editar/cambiar foto
-        Surface(
-            shape = CircleShape,
-            tonalElevation = 6.dp,
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier
-                .size(30.dp)
-                .align(Alignment.TopStart)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                IconButton(onClick = onEditPhoto, modifier = Modifier.size(30.dp)) {
-                    Icon(
-                        imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Cambiar foto",
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
-
-        // Badge VIP
-        if (isVip) {
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .size(28.dp)
-                    .align(Alignment.BottomEnd)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Outlined.Star,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * Fila reutilizable para mostrar un dato del perfil con icono, etiqueta y valor.
- *
- * Comportamiento:
- * - Si el [value] está vacío, se muestra "-" como fallback.
- *
- * @author Ian Rodriguez
- *
- * @param icon - Icono a mostrar a la izquierda
- * @param label - Etiqueta del campo (ej: "Email", "Ciudad")
- * @param value - Valor del campo a mostrar
- */
-@Composable
-private fun ProfileRow(
-    icon: ImageVector,
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            tonalElevation = 2.dp,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        Spacer(Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.labelMedium)
-            Text(
-                text = value.ifBlank { "-" },
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
-}
 
 /**
  * Versión con estado de [UserScreen] conectada a [UserViewModel].
