@@ -3,15 +3,22 @@
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.CreateReviewDto
+import com.example.intermodular.data.remote.dto.ImageDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import com.example.intermodular.data.remote.dto.UpdateBookingDto
+import com.example.intermodular.data.remote.dto.UpdateUserRequestDto
+import com.example.intermodular.data.remote.dto.UpdateUserResponseDto
 import com.example.intermodular.data.remote.dto.UserDto
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -128,4 +135,15 @@ interface ApiService {
 
     @GET("user/getMe")
     suspend fun getMe(): UserDto
+
+    @Multipart
+    @POST("image/")
+    suspend fun uploadPhoto(
+        @Part photo: MultipartBody.Part
+    ): ImageDto
+
+    @PUT("user/update")
+    suspend fun updateUser(
+        @Body body: UpdateUserRequestDto
+    ): UpdateUserResponseDto
 }

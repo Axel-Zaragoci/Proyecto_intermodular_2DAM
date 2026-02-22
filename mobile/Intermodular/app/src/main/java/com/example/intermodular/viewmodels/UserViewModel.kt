@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.example.intermodular.models.UserModel
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 data class UserUiState(
     val isLoading: Boolean = false,
@@ -45,6 +46,23 @@ class UserViewModel(
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 _errorMessage.value =
                     ApiErrorHandler.getErrorMessage(throwable)
+            }
+        }
+    }
+
+    fun updatePhoto(photoPart: MultipartBody.Part) {
+        val currentUser = _uiState.value.user ?: run {
+            _errorMessage.value = "No hay datos del usuario cargados"
+            return
+        }
+
+        viewModelScope.launch {
+            runCatching {
+                repository.updateProfilePhoto(currentUser, photoPart)
+            }.onSuccess { updatedUser ->
+                _uiState.value = _uiState.value.copy(user = updatedUser)
+            }.onFailure { throwable ->
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(throwable)
             }
         }
     }

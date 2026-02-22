@@ -1,5 +1,8 @@
 ﻿package com.example.intermodular.views.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
@@ -29,6 +33,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,6 +51,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.intermodular.BuildConfig
+import com.example.intermodular.data.remote.utils.uriToMultipart
 import com.example.intermodular.models.UserModel
 import com.example.intermodular.viewmodels.UserViewModel
 import com.example.intermodular.views.navigation.Routes
@@ -58,7 +64,8 @@ fun UserScreen(
     error: String?,
     onRetry: () -> Unit,
     onErrorShown: () -> Unit,
-    onViewMyBookings: () -> Unit
+    onViewMyBookings: () -> Unit,
+    onChangePhoto: () -> Unit
 ) {
     when {
         isLoading -> Box(
@@ -103,7 +110,8 @@ fun UserScreen(
                 ProfileAvatar(
                     imageRoute = user.imageRoute,
                     initials = "${user.firstName.take(1)}${user.lastName.take(1)}".uppercase(),
-                    isVip = user.vipStatus
+                    isVip = user.vipStatus,
+                    onChangePhoto
                 )
 
                 Spacer(Modifier.height(14.dp))
@@ -188,7 +196,8 @@ fun UserScreen(
 private fun ProfileAvatar(
     imageRoute: String?,
     initials: String,
-    isVip: Boolean
+    isVip: Boolean,
+    onEditPhoto: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -202,7 +211,7 @@ private fun ProfileAvatar(
             "${BuildConfig.BASE_URL}$cleanPath"
     }
 
-    Box(contentAlignment = Alignment.BottomEnd) {
+    Box(contentAlignment = Alignment.Center) {
         Surface(
             shape = CircleShape,
             tonalElevation = 6.dp,
@@ -229,11 +238,30 @@ private fun ProfileAvatar(
             }
         }
 
+        Surface(
+            shape = CircleShape,
+            tonalElevation = 6.dp,
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.size(30.dp)
+                .align(Alignment.TopStart)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                IconButton(onClick = onEditPhoto, modifier = Modifier.size(30.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Cambiar foto",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
         if (isVip) {
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(28.dp)
+                    .align(Alignment.BottomEnd)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
@@ -292,6 +320,16 @@ fun UserScreenState(
     val navigation = navController
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val pickImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            val part = uriToMultipart(context, uri, partName = "photo")
+            viewModel.updatePhoto(part)
+        }
+    }
+
 
     UserScreen(
         isLoading = uiState.isLoading,
@@ -299,6 +337,7 @@ fun UserScreenState(
         error = error,
         onRetry = { viewModel.refresh() },
         onErrorShown = { viewModel.clearError() },
-        onViewMyBookings = { navigation.navigate(Routes.MyBookings.route) }
+        onViewMyBookings = { navigation.navigate(Routes.MyBookings.route) },
+        onChangePhoto = { pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
     )
 }
