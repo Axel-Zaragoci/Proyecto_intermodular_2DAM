@@ -2,6 +2,7 @@
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -9,6 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.intermodular.data.remote.RetrofitProvider
+import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.viewmodels.BookingViewModel
@@ -20,17 +22,21 @@ import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
+import com.example.intermodular.data.repository.UserRepository
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomDetailViewModel
 import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.viewmodels.UserViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomDetailViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFactory.UserViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
 import com.example.intermodular.views.screens.RoomDetailScreen
+import com.example.intermodular.views.screens.UserScreenState
 
 @Composable
 fun Navigation(
@@ -85,7 +91,18 @@ fun Navigation(
         }
 
         composable(Routes.User.route) {
-            UserScreen(navigationController)
+            val api = RetrofitProvider.api
+            val repository = UserRepository(api)
+            val sessionManager = SessionManager
+
+            val viewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(repository, sessionManager)
+            )
+
+            UserScreenState(
+                viewModel = viewModel,
+                navController = navigationController
+            )
         }
 
         /**
