@@ -26,7 +26,7 @@ import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.ui.theme.AppTheme
 import com.example.intermodular.viewmodels.LoginViewModel
-import com.example.intermodular.viewmodels.LoginViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
 import com.example.intermodular.views.scaffold.MyApp
 import kotlinx.coroutines.delay
 

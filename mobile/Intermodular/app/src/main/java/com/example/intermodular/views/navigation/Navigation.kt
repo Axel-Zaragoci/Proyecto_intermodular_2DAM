@@ -23,9 +23,9 @@ import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.viewmodels.LoginViewModel
-import com.example.intermodular.viewmodels.LoginViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
 import com.example.intermodular.viewmodels.RegisterViewModel
-import com.example.intermodular.viewmodels.RegisterViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.RegisterViewModelFactory
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.views.screens.LoginScreen
 import com.example.intermodular.views.screens.RegisterScreen

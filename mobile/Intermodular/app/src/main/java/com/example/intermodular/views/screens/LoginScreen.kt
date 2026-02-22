@@ -21,14 +21,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.intermodular.R
-import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.remote.auth.SessionManager
-import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.viewmodels.LoginViewModel
-import com.example.intermodular.viewmodels.LoginViewModelFactory
 
+/**
+ * Pantalla de inicio de sesión.
+ *
+ * Permite al usuario:
+ * - Introducir email y contraseña.
+ * - Iniciar sesión en el sistema.
+ * - Navegar a la pantalla de registro si no tiene cuenta.
+ *
+ * Estados gestionados:
+ * 1. isLoading → Deshabilita los campos y muestra indicador de carga.
+ * 2. error → Muestra mensaje de error si el login falla.
+ * 3. Login exitoso → Detecta token válido en SessionManager y ejecuta [onLoginSuccess].
+ *
+ * Diseño:
+ * - Fondo con degradado radial.
+ * - Imagen de fondo semitransparente.
+ * - Tarjeta central con efecto glassmorphism.
+ *
+ * @author Ian Rodriguez
+ *
+ * @param viewModel - ViewModel encargado de la lógica de autenticación
+ * @param onLoginSuccess - Callback ejecutado cuando el login es exitoso
+ * @param onNavToRegister - Callback para navegar a la pantalla de registro
+ */
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
@@ -36,18 +56,26 @@ fun LoginScreen(
     onNavToRegister: () -> Unit
 ) {
 
+    // Estados observados desde el ViewModel
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()
 
+    // Estados locales para campos de entrada
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    /**
+     * Detecta cuándo el login ha finalizado correctamente.
+     * Si deja de estar cargando y existe un token válido en SessionManager,
+     * se ejecuta la navegación de éxito.
+     */
     LaunchedEffect(isLoading, error) {
         if (!isLoading && !SessionManager.getToken().isNullOrBlank()) {
             onLoginSuccess()
         }
     }
 
+    // Colores del fondo degradado
     val edge = Color(0xFF0F2854)
     val center = Color(0xFF1C4D8D)
 
@@ -62,21 +90,24 @@ fun LoginScreen(
                 )
             ),
         contentAlignment = Alignment.Center
-    )
-    {
+    ) {
+
+        // Imagen de fondo semitransparente
         Image(
             painter = painterResource(id = R.drawable.hotellogo),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.FillWidth,
             alpha = 0.25f
         )
+
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
+
+            // Tarjeta principal del login
             Column(
                 modifier = Modifier
                     .padding(25.dp)
@@ -98,6 +129,8 @@ fun LoginScreen(
                     .padding(25.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
+
+                // Icono superior
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Usuario",
@@ -107,6 +140,7 @@ fun LoginScreen(
                     tint = Color.White
                 )
 
+                // Campo Email
                 TextField(
                     value = email,
                     onValueChange = { email = it },
@@ -115,6 +149,7 @@ fun LoginScreen(
                     enabled = !isLoading
                 )
 
+                // Campo Contraseña
                 TextField(
                     value = password,
                     onValueChange = { password = it },
@@ -124,6 +159,7 @@ fun LoginScreen(
                     enabled = !isLoading
                 )
 
+                // Mostrar error si existe
                 if (error != null) {
                     Text(
                         text = error!!,
@@ -133,10 +169,13 @@ fun LoginScreen(
                     )
                 }
 
+                // Botón de login
                 Button(
                     onClick = { viewModel.login(email.trim(), password) },
                     enabled = !isLoading,
-                    modifier = Modifier.width(150.dp).align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .width(150.dp)
+                        .align(Alignment.CenterHorizontally)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(modifier = Modifier.size(18.dp))
@@ -147,8 +186,9 @@ fun LoginScreen(
                     }
                 }
             }
-            Column(
-            ) {
+
+            // Navegación a registro
+            Column {
                 TextButton(
                     onClick = onNavToRegister,
                     enabled = !isLoading,
@@ -158,6 +198,5 @@ fun LoginScreen(
                 }
             }
         }
-
     }
 }

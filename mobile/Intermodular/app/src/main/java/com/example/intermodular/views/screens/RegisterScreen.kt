@@ -31,6 +31,35 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
+/**
+ * Pantalla de registro de usuario.
+ *
+ * Permite crear una nueva cuenta introduciendo los datos personales:
+ * - Nombre y apellidos
+ * - Email y contraseña
+ * - DNI
+ * - Teléfono (opcional)
+ * - Fecha de nacimiento
+ * - Ciudad
+ * - Género
+ *
+ * Estados gestionados:
+ * 1. isLoading → Deshabilita los campos y muestra indicador de carga.
+ * 2. error → Muestra mensaje de error si ocurre algún problema.
+ * 3. Registro exitoso → Si existe token en SessionManager se ejecuta [onRegisterSuccess].
+ *
+ * Diseño:
+ * - Fondo con degradado radial.
+ * - Imagen de fondo semitransparente.
+ * - Tarjeta central con efecto glassmorphism.
+ *
+ * @author Ian Rodriguez
+ *
+ * @param viewModel - ViewModel encargado de la lógica de registro
+ * @param onRegisterSuccess - Callback ejecutado cuando el registro es exitoso
+ * @param onNavToLogin - Callback para navegar a la pantalla de login
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
@@ -263,6 +292,27 @@ fun RegisterScreen(
     }
 }
 
+/**
+ * Campo personalizado para seleccionar la fecha de nacimiento.
+ *
+ * Este componente:
+ * - Muestra un TextField en modo solo lectura.
+ * - Abre un DatePickerDialog al pulsar el icono de calendario.
+ * - Devuelve la fecha seleccionada en formato ISO (yyyy-MM-dd).
+ * - Puede deshabilitarse cuando el proceso de registro está en curso.
+ *
+ * Flujo:
+ * 1. Se convierte el valor actual a milisegundos.
+ * 2. Se inicializa el DatePicker con esa fecha.
+ * 3. Al confirmar, se formatea y devuelve mediante [onValueSelected].
+ *
+ * @author Ian Rodriguez
+ *
+ * @param value - Fecha actual en formato String (yyyy-MM-dd)
+ * @param onValueSelected - Callback que devuelve la nueva fecha seleccionada
+ * @param enabled - Indica si el campo está habilitado
+ * @param modifier - Modifier para personalización externa
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BirthDateField(
