@@ -9,6 +9,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.intermodular.data.remote.RetrofitProvider
+import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.data.repository.RegisterRepository
@@ -20,8 +21,15 @@ import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingsViewModelF
 import com.example.intermodular.views.screens.BookingScreenState
 import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
-import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
+<<<<<<< user-android
+import com.example.intermodular.data.repository.UserRepository
+import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
+import com.example.intermodular.viewmodels.NewBookingViewModel
+import com.example.intermodular.viewmodels.RoomDetailViewModel
+import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.viewmodels.UserViewModel
+=======
 import com.example.intermodular.viewmodels.LoginViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
 import com.example.intermodular.viewmodels.RegisterViewModel
@@ -32,13 +40,17 @@ import com.example.intermodular.views.screens.RegisterScreen
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomDetailViewModel
+>>>>>>> develop
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomDetailViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFactory.UserViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
 import com.example.intermodular.views.screens.RoomDetailScreen
+import com.example.intermodular.views.screens.UpdateProfileScreenState
+import com.example.intermodular.views.screens.UserScreenState
 
 @Composable
 fun Navigation(
@@ -92,8 +104,75 @@ fun Navigation(
             )
         }
 
+        /**
+         * Ruta de navegación hacia la pantalla de perfil de usuario.
+         *
+         * Flujo:
+         * 1. Se obtiene la instancia de la API desde [RetrofitProvider].
+         * 2. Se crea el repositorio [UserRepository] utilizando dicha API.
+         * 3. Se obtiene la instancia del [SessionManager] para la gestión de sesión.
+         * 4. Se construye el [UserViewModel] mediante su fábrica [UserViewModelFactory].
+         * 5. Se carga la pantalla con estado [UserScreenState].
+         *
+         * Esta pantalla permite:
+         * - Visualizar datos del perfil
+         * - Cambiar foto
+         * - Editar perfil
+         * - Cambiar contraseña
+         * - Navegar a reservas
+         *
+         * @author Ian Rodriguez
+         */
         composable(Routes.User.route) {
-            UserScreen(navigationController)
+
+            // Obtener dependencias necesarias
+            val api = RetrofitProvider.api
+            val repository = UserRepository(api)
+            val sessionManager = SessionManager
+
+            // Crear ViewModel con su factory personalizada
+            val viewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(repository, sessionManager)
+            )
+
+            // Cargar pantalla conectada al estado
+            UserScreenState(
+                viewModel = viewModel,
+                navController = navigationController
+            )
+        }
+
+        /**
+         * Ruta de navegación hacia la pantalla de edición de perfil.
+         *
+         * Flujo:
+         * 1. Se obtiene la API desde [RetrofitProvider].
+         * 2. Se crea el [UserRepository].
+         * 3. Se pasa el [SessionManager] al ViewModel.
+         * 4. Se instancia el [UserViewModel] mediante [UserViewModelFactory].
+         * 5. Se carga [UpdateProfileScreenState].
+         *
+         * Esta pantalla permite modificar y guardar los datos personales del usuario.
+         *
+         * @author Ian Rodriguez
+         */
+        composable(Routes.UpdateProfile.route) {
+
+            // Obtener dependencias necesarias
+            val api = RetrofitProvider.api
+            val repository = UserRepository(api)
+            val sessionManager = SessionManager
+
+            // Crear ViewModel con su factory personalizada
+            val viewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(repository, sessionManager)
+            )
+
+            // Cargar pantalla conectada al estado
+            UpdateProfileScreenState(
+                viewModel = viewModel,
+                navController = navigationController
+            )
         }
 
         /**

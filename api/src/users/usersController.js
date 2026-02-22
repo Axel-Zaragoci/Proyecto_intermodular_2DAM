@@ -1,6 +1,6 @@
 import { userDatabaseModel, UserEntryData, UserUpdateData, UserAdminUpdateData } from "./usersModel.js";
 import mongoose from "mongoose";
-import { hashPassword } from "../services/password.service.js";
+import { comparePassword, hashPassword } from "../services/password.service.js";
 import e from "express";
 
 /**
@@ -30,7 +30,7 @@ export async function register(req, res) {
         if(isPublic) {
             if (!password) return res.status(400).json({ error: "La contraseña no puede estar vacia." });
         } else {
-            password = "Password123!"; 
+            password = "Password123!";
         }
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
         if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
@@ -311,6 +311,55 @@ export async function deleteUserById(req, res) {
     return res.status(200).json({ message: "Usuario eliminado", id: deleted._id });
   } catch (err) {
     console.error("Error al borrar:", err);
+    return res.status(500).json({ error: "Error del servidor" });
+  }
+}
+
+export async function getMe(req, res) {
+    try {
+        const userId = req.user.id;
+
+        const user = await userDatabaseModel.findById(userId)
+
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        return res.status(200).json(user);
+
+    } catch (error) {
+        console.error("Error al obtener usuario:", error);
+        return res.status(500).json({ error: "Error del servidor" });
+    }
+}
+
+
+export async function changeMyPassword(req, res) {
+  try {
+    const userId = req.user.id;
+    const { oldPassword, newPassword, newPasswordR } = req.body;
+
+    if (!oldPassword) return res.status(400).json({ error: "La contraseña antigua no puede estar vacía." });
+    if (!newPassword) return res.status(400).json({ error: "La nueva contraseña no puede estar vacía." });
+    if (!newPasswordR) return res.status(400).json({ error: "Repite la nueva contraseña." });
+    if (newPassword !== newPasswordR) return res.status(400).json({ error: "Las nuevas contraseñas no coinciden." });
+
+    if (newPassword.length < 8) return res.status(400).json({ error: "La nueva contraseña debe tener al menos 8 caracteres." });
+
+    const user = await userDatabaseModel.findById(userId).select("+password");
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado." });
+
+    const ok = await comparePassword(oldPassword, user.password);
+    if (!ok) return res.status(401).json({ error: "La contraseña antigua no es correcta." });
+
+    const newHash = await hashPassword(newPassword);
+
+    user.password = newHash;
+    await user.save();
+
+    return res.status(200).json({ message: "Contraseña actualizada." });
+  } catch (error) {
+    console.error("Error al cambiar contraseña:", error);
     return res.status(500).json({ error: "Error del servidor" });
   }
 }

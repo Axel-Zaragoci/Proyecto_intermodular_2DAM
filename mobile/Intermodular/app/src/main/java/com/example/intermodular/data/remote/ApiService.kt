@@ -3,16 +3,24 @@
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.CreateReviewDto
+import com.example.intermodular.data.remote.dto.ImageDto
 import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.RegisterDto
 import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import com.example.intermodular.data.remote.dto.UpdateBookingDto
+import com.example.intermodular.data.remote.dto.UpdateUserRequestDto
+import com.example.intermodular.data.remote.dto.UpdateUserResponseDto
+import com.example.intermodular.data.remote.dto.UserDto
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -123,6 +131,13 @@ interface ApiService {
     ): ReviewDto
 
     /**
+<<<<<<< user-android
+     * Autentica un usuario.
+     * @author Ian Rodriguez
+     *
+     * @param body - Mapa con credenciales (email, password)
+     * @return Datos de autenticación como [LoginDto]
+=======
      * Autentica un usuario en el sistema.
      *
      * Recibe un mapa con las credenciales (normalmente email y password)
@@ -130,6 +145,7 @@ interface ApiService {
      *
      * @param body - Mapa con las credenciales de acceso
      * @return [LoginDto] con la información de autenticación
+>>>>>>> develop
      */
     @POST("auth/login")
     suspend fun login(
@@ -137,6 +153,53 @@ interface ApiService {
     ): LoginDto
 
     /**
+<<<<<<< user-android
+     * Obtiene los datos del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @return Usuario autenticado como [UserDto]
+     */
+    @GET("user/getMe")
+    suspend fun getMe(): UserDto
+
+    /**
+     * Sube una imagen al servidor.
+     * @author Ian Rodriguez
+     *
+     * @param photo - Imagen en formato multipart
+     * @return Información de la imagen subida como [ImageDto]
+     */
+    @Multipart
+    @POST("image/")
+    suspend fun uploadPhoto(
+        @Part photo: MultipartBody.Part
+    ): ImageDto
+
+    /**
+     * Actualiza los datos del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @param body - Datos actualizados del usuario
+     * @return Respuesta con usuario actualizado
+     */
+    @PUT("user/update")
+    suspend fun updateUser(
+        @Body body: UpdateUserRequestDto
+    ): UpdateUserResponseDto
+
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @param body - Mapa con:
+     *               - oldPassword
+     *               - newPassword
+     *               - repeatNewPassword
+     */
+    @PUT("user/changeMyPassword")
+    suspend fun changeMyPassword(
+        @Body body: Map<String, String>
+=======
      * Registra un nuevo usuario desde la aplicación.
      *
      * Envía un [RegisterDto] con todos los datos necesarios
@@ -149,5 +212,6 @@ interface ApiService {
     @POST("user/registerApp")
     suspend fun register(
         @Body body: RegisterDto
+>>>>>>> develop
     )
 }
