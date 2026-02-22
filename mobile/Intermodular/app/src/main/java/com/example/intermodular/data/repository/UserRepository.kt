@@ -41,4 +41,18 @@ class UserRepository(
         val updated = api.updateUser(body).user
         return updated.toUserModel()
     }
+
+    suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatNewPassword: String
+    ) {
+        val body = mapOf(
+            "oldPassword" to oldPassword,
+            "newPassword" to newPassword,
+            "repeatNewPassword" to repeatNewPassword
+        )
+
+        api.changeMyPassword(body)
+    }
 }

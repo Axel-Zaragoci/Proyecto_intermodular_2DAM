@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Star
@@ -39,6 +40,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -56,6 +60,7 @@ import com.example.intermodular.BuildConfig
 import com.example.intermodular.data.remote.utils.uriToMultipart
 import com.example.intermodular.models.UserModel
 import com.example.intermodular.viewmodels.UserViewModel
+import com.example.intermodular.views.components.ChangePasswordDialog
 import com.example.intermodular.views.navigation.Routes
 import java.time.format.DateTimeFormatter
 
@@ -68,7 +73,8 @@ fun UserScreen(
     onErrorShown: () -> Unit,
     onViewMyBookings: () -> Unit,
     onChangePhoto: () -> Unit,
-    onEditProfile: () -> Unit
+    onEditProfile: () -> Unit,
+    onChangePasswordClick: () -> Unit
 ) {
     when {
         isLoading -> Box(
@@ -145,6 +151,9 @@ fun UserScreen(
                                 text = "Informacion Personal",
                                 style = MaterialTheme.typography.titleMedium
                             )
+                            IconButton(onClick = { onChangePasswordClick() }) {
+                                Icon(Icons.Outlined.Lock, contentDescription = "Cambiar contraseña")
+                            }
                             IconButton(onClick = onEditProfile) {
                                 Icon(Icons.Outlined.Edit, contentDescription = "Editar perfil")
                             }
@@ -341,6 +350,17 @@ fun UserScreenState(
             viewModel.updatePhoto(part)
         }
     }
+    var showChangePassDialog by remember { mutableStateOf(false) }
+
+    if (showChangePassDialog) {
+        ChangePasswordDialog(
+            onBack = { showChangePassDialog = false },
+            onSave = { oldPass, newPass, repeatPass ->
+                showChangePassDialog = false
+                viewModel.changePassword(oldPass, newPass, repeatPass)
+            }
+        )
+    }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.refresh()
@@ -354,6 +374,7 @@ fun UserScreenState(
         onErrorShown = { viewModel.clearError() },
         onViewMyBookings = { navigation.navigate(Routes.MyBookings.route) },
         onChangePhoto = { pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-        onEditProfile = { navigation.navigate(Routes.UpdateProfile.route) }
+        onEditProfile = { navigation.navigate(Routes.UpdateProfile.route) },
+        onChangePasswordClick = { showChangePassDialog = true }
     )
 }

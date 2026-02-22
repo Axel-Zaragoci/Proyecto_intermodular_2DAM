@@ -146,4 +146,9 @@ interface ApiService {
     suspend fun updateUser(
         @Body body: UpdateUserRequestDto
     ): UpdateUserResponseDto
+
+    @PUT("user/changeMyPassword")
+    suspend fun changeMyPassword(
+        @Body body: Map<String, String>
+    )
 }

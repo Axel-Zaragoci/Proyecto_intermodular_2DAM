@@ -111,6 +111,24 @@ class UserViewModel(
         }
     }
 
+    fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatNewPassword: String
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            runCatching {
+                repository.changePassword(oldPassword, newPassword, repeatNewPassword)
+            }.onSuccess {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }.onFailure { throwable ->
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(throwable)
+            }
+        }
+    }
     fun clearError() {
         _errorMessage.value = null
     }
