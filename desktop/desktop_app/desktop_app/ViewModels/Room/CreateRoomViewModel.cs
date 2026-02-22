@@ -157,12 +157,27 @@ namespace desktop_app.ViewModels.Room
                 }
 
                 var created = await RoomService.CreateRoomAsync(Room);
+                Reset(); // Limpia el formulario para la próxima vez
                 NavigationService.Instance.NavigateTo<RoomView>();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>
+        /// Limpia las propiedades del ViewModel para el siguiente uso.
+        /// </summary>
+        private void Reset()
+        {
+            Room = new RoomModel { IsAvailable = true, Rate = 0 };
+            ExtrasText = "";
+            ExtraImagesText = "";
+            _mainImageLocalPath = null;
+            _extraImagesLocalPaths.Clear();
+            MainImageLabel = "Sin seleccionar";
+            ExtraImagesLabel = "0 seleccionadas";
         }
     }
 }
