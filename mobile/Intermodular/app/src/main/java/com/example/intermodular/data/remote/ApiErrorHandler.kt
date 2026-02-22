@@ -1,5 +1,6 @@
 ﻿package com.example.intermodular.data.remote
 
+import android.util.Log
 import org.json.JSONObject
 import retrofit2.HttpException
 
@@ -18,6 +19,7 @@ object ApiErrorHandler {
      * @return [String] - Mensaje de error legible para el usuario
      */
     fun getErrorMessage(throwable: Throwable) : String {
+        throwable.printStackTrace()
         return when (throwable) {
             is HttpException -> handleHttpException(throwable)
             is java.net.ConnectException -> "Error de conexión: No se pudo conectar al servidor"

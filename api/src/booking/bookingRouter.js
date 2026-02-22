@@ -14,7 +14,7 @@ const router = Router();
 router.get("/:id", verifyToken, getOneBookingById);
 router.get("/client/:id", verifyToken, getBookingsByClientId);
 router.get("/room/:id", verifyToken, authorizeRoles(["Admin", "Trabajador"]), getBookingsByRoomId);
-router.get("/", verifyToken, authorizeRoles(["Admin", "Trabajador"]), getBookings);
+router.get("/", verifyToken, getBookings);
 
 router.post("/", verifyToken, createBooking);
 
