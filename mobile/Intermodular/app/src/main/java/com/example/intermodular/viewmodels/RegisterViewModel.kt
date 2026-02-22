@@ -2,6 +2,7 @@ package com.example.intermodular.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.remote.dto.RegisterDto
 import com.example.intermodular.data.repository.RegisterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +25,8 @@ class RegisterViewModel(
             _errorMessage.value = null
             try {
                 repository.registerAndLogin(body)
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al registrarse"
+            } catch (t: Throwable) {
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(t)
             } finally {
                 _isLoading.value = false
             }

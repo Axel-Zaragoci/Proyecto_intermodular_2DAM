@@ -27,13 +27,11 @@ import com.example.intermodular.viewmodels.LoginViewModelFactory
 import com.example.intermodular.viewmodels.RegisterViewModel
 import com.example.intermodular.viewmodels.RegisterViewModelFactory
 import com.example.intermodular.viewmodels.RoomViewModel
-import com.example.intermodular.viewmodels.RoomViewModelFactory
 import com.example.intermodular.views.screens.LoginScreen
 import com.example.intermodular.views.screens.RegisterScreen
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomDetailViewModel
-import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory

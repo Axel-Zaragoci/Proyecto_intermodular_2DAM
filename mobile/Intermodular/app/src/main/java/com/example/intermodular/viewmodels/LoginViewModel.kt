@@ -2,6 +2,7 @@ package com.example.intermodular.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.repository.LoginRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,9 +23,9 @@ class LoginViewModel(
             _isLoading.value = true
             _errorMessage.value = null
             try {
-                val response = repository.login(email, password)
-            } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error al iniciar sesión"
+                repository.login(email, password)
+            } catch (t: Throwable) {
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(t)
             } finally {
                 _isLoading.value = false
             }
