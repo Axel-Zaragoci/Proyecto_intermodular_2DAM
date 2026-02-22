@@ -5,6 +5,8 @@ import com.example.intermodular.data.remote.dto.CreateBookingDto
 import com.example.intermodular.data.remote.dto.CreateReviewDto
 import com.example.intermodular.data.remote.dto.ImageDto
 import com.example.intermodular.data.remote.dto.LoginDto
+import com.example.intermodular.data.remote.dto.RegisterDto
+import com.example.intermodular.data.remote.dto.RoomDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import com.example.intermodular.data.remote.dto.UpdateBookingDto
@@ -129,11 +131,21 @@ interface ApiService {
     ): ReviewDto
 
     /**
+<<<<<<< user-android
      * Autentica un usuario.
      * @author Ian Rodriguez
      *
      * @param body - Mapa con credenciales (email, password)
      * @return Datos de autenticación como [LoginDto]
+=======
+     * Autentica un usuario en el sistema.
+     *
+     * Recibe un mapa con las credenciales (normalmente email y password)
+     * y devuelve un [LoginDto] con el token, rol e id del usuario.
+     *
+     * @param body - Mapa con las credenciales de acceso
+     * @return [LoginDto] con la información de autenticación
+>>>>>>> develop
      */
     @POST("auth/login")
     suspend fun login(
@@ -141,6 +153,7 @@ interface ApiService {
     ): LoginDto
 
     /**
+<<<<<<< user-android
      * Obtiene los datos del usuario autenticado.
      * @author Ian Rodriguez
      *
@@ -186,5 +199,19 @@ interface ApiService {
     @PUT("user/changeMyPassword")
     suspend fun changeMyPassword(
         @Body body: Map<String, String>
+=======
+     * Registra un nuevo usuario desde la aplicación.
+     *
+     * Envía un [RegisterDto] con todos los datos necesarios
+     * para crear la cuenta en el backend.
+     *
+     * Este endpoint no devuelve cuerpo en la respuesta.
+     *
+     * @param body - DTO con la información del nuevo usuario
+     */
+    @POST("user/registerApp")
+    suspend fun register(
+        @Body body: RegisterDto
+>>>>>>> develop
     )
 }

@@ -146,6 +146,10 @@ namespace desktop_app.ViewModels.Room
         {
             try
             {
+                // Limpiar siempre el estado anterior al cambiar de habitación
+                ReviewAverageText = "";
+                HasReviewAverage = false;
+                
                 if (string.IsNullOrWhiteSpace(Room.Id)) return;
 
                 var reviews = await ReviewService.GetReviewsByRoomAsync(Room.Id);

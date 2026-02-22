@@ -26,7 +26,7 @@ import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.ui.theme.AppTheme
 import com.example.intermodular.viewmodels.LoginViewModel
-import com.example.intermodular.viewmodels.LoginViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
 import com.example.intermodular.views.scaffold.MyApp
 import kotlinx.coroutines.delay
 
@@ -36,15 +36,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val repo = LoginRepository(RetrofitProvider.api)
-            val factory = LoginViewModelFactory(repo)
-            val vm: LoginViewModel = viewModel(factory = factory)
-            vm.login("cliente@prueba.test", "Password123!")
-
             var showApp by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
-                delay(1000)
+                delay(1)
                 showApp = true
             }
 

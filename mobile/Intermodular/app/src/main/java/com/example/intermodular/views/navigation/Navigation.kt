@@ -11,6 +11,8 @@ import androidx.navigation.navArgument
 import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.remote.auth.SessionManager
 import com.example.intermodular.data.repository.BookingRepository
+import com.example.intermodular.data.repository.LoginRepository
+import com.example.intermodular.data.repository.RegisterRepository
 import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.viewmodels.BookingViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.BookingViewModelFactory
@@ -20,12 +22,25 @@ import com.example.intermodular.views.screens.BookingScreenState
 import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.data.repository.RoomRepository
+<<<<<<< user-android
 import com.example.intermodular.data.repository.UserRepository
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomDetailViewModel
 import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.UserViewModel
+=======
+import com.example.intermodular.viewmodels.LoginViewModel
+import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
+import com.example.intermodular.viewmodels.RegisterViewModel
+import com.example.intermodular.viewmodels.viewModelFacotry.RegisterViewModelFactory
+import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.views.screens.LoginScreen
+import com.example.intermodular.views.screens.RegisterScreen
+import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
+import com.example.intermodular.viewmodels.NewBookingViewModel
+import com.example.intermodular.viewmodels.RoomDetailViewModel
+>>>>>>> develop
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
@@ -44,7 +59,7 @@ fun Navigation(
 ) {
     NavHost (
         navController = navigationController,
-        startDestination = Routes.Bookings.route,
+        startDestination = Routes.Login.route,
         modifier = modifier
     ) {
 
@@ -286,6 +301,47 @@ fun Navigation(
             RoomDetailScreen(
                 viewModel = viewModel,
                 onBackClick = { navigationController.popBackStack() }
+            )
+        }
+        composable(Routes.Login.route) {
+            val api = RetrofitProvider.api
+            val repository = LoginRepository(api)
+            val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(repository))
+
+
+            LoginScreen(
+                viewModel = viewModel,
+                onLoginSuccess = {
+                    navigationController.navigate(Routes.Bookings.route) {
+                        popUpTo(Routes.Login.route) { inclusive = true }
+                    }
+                },
+                onNavToRegister = {
+                    navigationController.navigate(Routes.Register.route)
+                }
+            )
+        }
+        composable(Routes.Register.route) {
+            val api = RetrofitProvider.api
+
+            val loginRepository = LoginRepository(api)
+            val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(loginRepository))
+            val registerRepository = RegisterRepository(api, loginRepository)
+
+            val viewModel: RegisterViewModel = viewModel(
+                factory = RegisterViewModelFactory(registerRepository)
+            )
+
+            RegisterScreen(
+                viewModel = viewModel,
+                onRegisterSuccess = {
+                    navigationController.navigate(Routes.Bookings.route) {
+                        popUpTo(Routes.Register.route) { inclusive = true }
+                    }
+                },
+                onNavToLogin = {
+                    navigationController.popBackStack()
+                }
             )
         }
     }
