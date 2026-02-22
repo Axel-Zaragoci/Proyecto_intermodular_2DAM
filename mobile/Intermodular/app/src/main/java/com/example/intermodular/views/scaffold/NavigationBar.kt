@@ -6,7 +6,6 @@ import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -16,10 +15,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.intermodular.models.NavItem
 import com.example.intermodular.ui.theme.BluePrimary
 import com.example.intermodular.ui.theme.BluePrimaryDark
 import com.example.intermodular.views.navigation.Routes
 
+/**
+ * Componente de barra de navegación inferior sin estado
+ *
+ * Comportamiento:
+ * - Muestra hasta 3 elementos de navegación
+ * - Resalta visualmente la ruta actual
+ * - Ejecuta callbacks al seleccionar diferentes items
+ *
+ * @author Axel Zaragoci
+ *
+ * @param items - Lista de elementos de navegación a mostrar
+ * @param currentRoute - Ruta actualmente activa para determinar el item seleccionado
+ * @param onItemSelected - Callback que se ejecuta al seleccionar un item
+ */
 @Composable
 fun NavigationBarView(
     items: List<NavItem>,
@@ -58,6 +72,14 @@ fun NavigationBarView(
     }
 }
 
+/**
+ * Versión con estado de [NavigationBarView]
+ * Separa el estado y la funcionalidad de la vista
+ *
+ * @author Axel Zaragoci
+ *
+ * @param navController Controlador de navegación para obtener la ruta actual y ejecutar las transiciones entre pantallas
+ */
 @Composable
 fun NavigationBarState(
     navController: NavController

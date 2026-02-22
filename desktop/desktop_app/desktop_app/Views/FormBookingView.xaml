@@ -79,13 +79,13 @@
                     </Grid.ColumnDefinitions>
                     
                     <StackPanel>
-                        <Label Content="Fecha de inicio: " Target="FirstNightDatePicker" Style="{StaticResource LabelForm}"/>
-                        <DatePicker x:Name="FirstNightDatePicker" SelectedDate="{Binding CheckInDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" Margin="0 0 10 0"/>
+                        <Label Content="Fecha de inicio: " Target="StartDatePicker" Style="{StaticResource LabelForm}"/>
+                        <DatePicker x:Name="StartDatePicker" SelectedDate="{Binding CheckInDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" Margin="0 0 10 0"/>
                     </StackPanel>
             
                     <StackPanel Grid.Column="1">
-                        <Label Content="Fecha de fin: " Target="LastNightDatePicker" Style="{StaticResource LabelForm}"/>
-                        <DatePicker x:Name="LastNightDatePicker" SelectedDate="{Binding CheckOutDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}"/>
+                        <Label Content="Fecha de fin: " Target="EndDatePicker" Style="{StaticResource LabelForm}"/>
+                        <DatePicker x:Name="EndDatePicker" SelectedDate="{Binding CheckOutDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -107,7 +107,7 @@
             
             <StackPanel Grid.Row="0">
                 <Label Content="Fecha de pago: " Target="PayDateTextBox" Style="{StaticResource LabelForm}"/>
-                <TextBox x:Name="PayDateTextBox" Text="{Binding PayDate, Mode=TwoWay}" Style="{StaticResource TextBoxForm}" IsEnabled="false"/>
+                <DatePicker x:Name="PayDateTextBox" Text="{Binding PayDate, Mode=TwoWay}" Language="es-Es" Style="{StaticResource DatePickerForm}" IsEnabled="false"/>
             </StackPanel>
             
             <StackPanel Grid.Row="1">

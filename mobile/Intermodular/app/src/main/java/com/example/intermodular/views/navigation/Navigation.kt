@@ -5,15 +5,20 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import com.example.intermodular.data.remote.ApiService
+import androidx.navigation.navArgument
 import com.example.intermodular.data.remote.RetrofitProvider
 import com.example.intermodular.data.repository.BookingRepository
 import com.example.intermodular.data.repository.LoginRepository
 import com.example.intermodular.data.repository.RegisterRepository
+import com.example.intermodular.data.repository.ReviewRepository
 import com.example.intermodular.viewmodels.BookingViewModel
-import com.example.intermodular.viewmodels.BookingViewModelFactory
-import com.example.intermodular.views.screens.BookingScreen
+import com.example.intermodular.viewmodels.viewModelFacotry.BookingViewModelFactory
+import com.example.intermodular.viewmodels.MyBookingsViewModel
+import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingsViewModelFactory
+import com.example.intermodular.views.screens.BookingScreenState
+import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
@@ -25,6 +30,17 @@ import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.RoomViewModelFactory
 import com.example.intermodular.views.screens.LoginScreen
 import com.example.intermodular.views.screens.RegisterScreen
+import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
+import com.example.intermodular.viewmodels.NewBookingViewModel
+import com.example.intermodular.viewmodels.RoomDetailViewModel
+import com.example.intermodular.viewmodels.RoomViewModel
+import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
+import com.example.intermodular.viewmodels.viewModelFacotry.RoomDetailViewModelFactory
+import com.example.intermodular.views.screens.MyBookingDetailsState
+import com.example.intermodular.views.screens.NewBookingState
+import com.example.intermodular.views.screens.RoomDetailScreen
 
 @Composable
 fun Navigation(
@@ -36,18 +52,32 @@ fun Navigation(
         startDestination = Routes.Login.route,
         modifier = modifier
     ) {
+
+        /**
+         * Pantalla principal de búsqueda y filtrado de habitaciones.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.Bookings]
+         * - **ViewModel** - [BookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a BookRoom
+         */
         composable(Routes.Bookings.route) {
             val api = RetrofitProvider.api
-            val repository = BookingRepository(api)
+            val bookingRepository = BookingRepository(api)
+            val roomRepository = RoomRepository(api)
 
             val viewModel: BookingViewModel = viewModel(
-                factory = BookingViewModelFactory(repository)
+                factory = BookingViewModelFactory(bookingRepository, roomRepository)
             )
 
-            BookingScreen(
-                viewModel = viewModel
+            BookingScreenState(
+                viewModel = viewModel,
+                navController = navigationController
             )
         }
+
         composable(Routes.Rooms.route) {
             val api = RetrofitProvider.api
             val repository = RoomRepository(api)
@@ -57,11 +87,144 @@ fun Navigation(
             )
 
             RoomScreen(
-                roomViewModel = viewModel
+                roomViewModel = viewModel,
+                onRoomClick = { roomId ->
+                    navigationController.navigate(Routes.RoomDetail.createRoute(roomId))
+                }
             )
         }
+
         composable(Routes.User.route) {
-            UserScreen()
+            UserScreen(navigationController)
+        }
+
+        /**
+         * Pantalla que lista todas las reservas del usuario actual.
+         *
+         * @author Axel Zaragoci
+         *
+         * - **Ruta** - [Routes.MyBookings]
+         * - **ViewModel** - [MyBookingsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         * - **Navegación** - Puede navegar a MyBookingDetails
+         */
+        composable(Routes.MyBookings.route) {
+            val api = RetrofitProvider.api
+            val bookingRepository = BookingRepository(api)
+            val roomRepository = RoomRepository(api)
+
+            val viewModel : MyBookingsViewModel = viewModel(
+                factory = MyBookingsViewModelFactory(bookingRepository, roomRepository)
+            )
+
+            MyBookingsScreenState(
+                viewModel = viewModel,
+                navController = navigationController
+            )
+        }
+
+        /**
+         * Pantalla para crear una nueva reserva.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **roomId** - ID de la habitación a reservar (requerido)
+         * - **startDate** - Fecha de entrada (timestamp)
+         * - **endDate** - Fecha de salida (timestamp)
+         * - **guests** - Número de huéspedes
+         *
+         * - **Ruta** - [Routes.BookRoom]
+         * - **ViewModel** - [NewBookingViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository
+         */
+        composable(
+            route = Routes.BookRoom.route,
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.StringType },
+                navArgument("startDate") { type = NavType.LongType },
+                navArgument("endDate") { type = NavType.LongType },
+                navArgument("guests") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+
+            val roomId = backStackEntry.arguments?.getString("roomId")!!
+            val startDate = backStackEntry.arguments?.getLong("startDate")
+            val endDate = backStackEntry.arguments?.getLong("endDate")
+            val guests = backStackEntry.arguments?.getString("guests")!!
+
+            val api = RetrofitProvider.api
+            val bookingRepository = BookingRepository(api)
+            val roomRepository = RoomRepository(api)
+
+            val viewModel: NewBookingViewModel = viewModel(
+                factory = NewBookingViewModelFactory(bookingRepository, roomRepository, roomId, startDate!!, endDate!!, guests)
+            )
+
+            NewBookingState(viewModel)
+        }
+
+        /**
+         * Pantalla de detalle y actualización de una reserva existente y creación de reseña.
+         *
+         * @author Axel Zaragoci
+         *
+         * ## Parámetros de ruta:
+         * - **bookingId** - ID de la reserva a mostrar (requerido)
+         *
+         * - **Ruta** - [Routes.MyBookingDetails]
+         * - **ViewModel** - [MyBookingDetailsViewModel]
+         * - **Repositorios** - BookingRepository, RoomRepository, ReviewRepository
+         */
+        composable(
+            route = Routes.MyBookingDetails.route,
+            arguments = listOf(
+                navArgument("bookingId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val bookingId = backStackEntry.arguments?.getString("bookingId")!!
+
+            val api = RetrofitProvider.api
+            val bookingRepository = BookingRepository(api)
+            val roomRepository = RoomRepository(api)
+            val reviewRepository = ReviewRepository(api)
+
+            val viewModel: MyBookingDetailsViewModel = viewModel(
+                factory = MyBookingDetailsViewModelFactory(
+                    bookingId,
+                    bookingRepository,
+                    roomRepository,
+                    reviewRepository
+                )
+            )
+
+            MyBookingDetailsState(viewModel)
+        }
+        
+        composable(
+            route = Routes.RoomDetail.route,
+            arguments = listOf(
+                navArgument("roomId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId")!!
+            
+            val api = RetrofitProvider.api
+            val roomRepository = RoomRepository(api)
+            val reviewRepository = ReviewRepository(api)
+            
+            val viewModel: RoomDetailViewModel = viewModel(
+                factory = RoomDetailViewModelFactory(
+                    roomId,
+                    roomRepository,
+                    reviewRepository
+                )
+            )
+            
+            RoomDetailScreen(
+                viewModel = viewModel,
+                onBackClick = { navigationController.popBackStack() }
+            )
         }
         composable(Routes.Login.route) {
             val api = RetrofitProvider.api

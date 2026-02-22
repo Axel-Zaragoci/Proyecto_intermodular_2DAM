@@ -9,9 +9,17 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-
+/**
+ * Objeto encargado de proporcionar una instancia del servicio de la API
+ *
+ * @author Axel Zaragoci y Ian Rodríguez
+ */
 object RetrofitProvider {
 
+    /**
+     * Configura y devuelve una instancia de Moshi para la conversión JSON
+     * Incluye el adaptador personalizado para tratar con fechas
+     */
     private fun moshi(): Moshi =
         Moshi.Builder()
             .add(InstantJsonAdapter())
@@ -23,6 +31,10 @@ object RetrofitProvider {
             .addInterceptor(AuthInterceptor(SessionManager))
             .build()
 
+    /**
+     * Configura y devuelve una instancia de Retrofit para la conexión a la API
+     * Incluye el cliente HTTP y la instancia de Moshi personalizadas
+     */
     private fun retrofit(): Retrofit =
         Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
@@ -30,6 +42,10 @@ object RetrofitProvider {
             .addConverterFactory(MoshiConverterFactory.create(moshi()))
             .build()
 
+
+    /**
+     * Crea y devuelve la instancia de ApiService a ser utilizada mediante el Retrofit configurado anteriormente
+     */
     val api: ApiService by lazy {
         retrofit().create(ApiService::class.java)
     }

@@ -191,19 +191,22 @@ export async function createBooking(req, res) {
         
         const booking = new BookingEntryData(room, client, checkInDate, checkOutDate, guests);
         
+        if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
+        
+        booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
         try {
             await booking.validate()
         }
         catch(err) {
             return res.status(400).json({ error: err.message });
         }
-        if (guests > dbRoom.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
-        booking.completeBookingData(dbRoom.pricePerNight, dbRoom.offer);
-        
+
         const user = await userDatabaseModel.findById(booking.clientID);
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado' })
 
         const bdBooking = await booking.save()
         const populated = await bdBooking.poblar()
+
         sendEmail(user.email, "Reserva confirmada", "newBooking", populated)
         return res.status(201).json(bdBooking)
     }
@@ -295,7 +298,8 @@ export async function updateBooking(req, res) {
         bookingData.fromDocument(booking);
 
         const room = await roomDatabaseModel.findById(booking.room);
-
+        if (guests > room.maxGuests) return res.status(400).json({ error: 'Se supera el límite de huéspedes de la habitación' })
+        
         try {
             await bookingData.validate()
         }
@@ -307,7 +311,7 @@ export async function updateBooking(req, res) {
             bookingData.completeBookingData(room.pricePerNight, room.offer);
         }
         else {
-            bookingData.completeBookingData(booking.pricePerNight, booking.offer);
+            bookingData.completeBookingData(room.pricePerNight, booking.offer);
         }
 
         const updatedBooking = await bookingData.save();

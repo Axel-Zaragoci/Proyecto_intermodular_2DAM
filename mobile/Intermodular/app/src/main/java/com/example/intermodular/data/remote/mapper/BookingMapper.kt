@@ -1,13 +1,17 @@
 ﻿package com.example.intermodular.data.remote.mapper
 
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.intermodular.data.remote.dto.BookingDto
 import com.example.intermodular.models.Booking
 import java.time.ZoneOffset
 
-
+/**
+ * Función de ampliación para la clase [BookingDto] para transformarlo a objeto del dominio
+ * Transforma los Instant a LocalDate usando UTC como zona horaria
+ * @author Axel Zaragoci
+ *
+ * @return [Booking] - Objeto del dominio con todos los datos mapeados desde el DTO
+ */
 fun BookingDto.toDomain() : Booking {
     return Booking(
         id = _id,

@@ -6,10 +6,10 @@ namespace desktop_app.Views
 {
     public partial class UpdateRoomWindow : UserControl
     {
-        public UpdateRoomWindow(RoomModel room)
+        public UpdateRoomWindow()
         {
             InitializeComponent();
-            DataContext = new desktop_app.ViewModels.Room.UpdateRoomViewModel(room);
+            DataContext = desktop_app.ViewModels.Room.UpdateRoomViewModel.Instance;
         }
 
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
