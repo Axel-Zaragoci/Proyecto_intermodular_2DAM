@@ -23,10 +23,10 @@ namespace desktop_app.Models
         public string Dni { get; set; }
 
         [JsonPropertyName("phoneNumber")]
-        public string PhoneNumber { get; set; }
+        public long? PhoneNumber { get; set; }
 
         [JsonIgnore]
-        public string PhoneDisplay => string.IsNullOrWhiteSpace(PhoneNumber) ? "Desconocido" : PhoneNumber;
+        public string PhoneDisplay => string.IsNullOrWhiteSpace(PhoneNumber + "") ? "Desconocido" : PhoneNumber + "";
 
         [JsonPropertyName("birthDate")]
         public DateTime BirthDate { get; set; }

@@ -105,7 +105,7 @@ namespace desktop_app.ViewModels
                 false => !isVip
             };
 
-            return Match(fullName, FilterName) && Match(u.Dni, FilterDni) && Match(u.Email, FilterEmail) && Match(u.PhoneNumber, FilterPhone) && roleOk && vipOk;
+            return Match(fullName, FilterName) && Match(u.Dni, FilterDni) && Match(u.Email, FilterEmail) && Match(u.PhoneNumber + "", FilterPhone) && roleOk && vipOk;
         }
 
         private void NavigateToUtilities(UserUtilitiesMode mode, UserModel? user)
