@@ -7,6 +7,7 @@ import com.example.intermodular.data.remote.dto.LoginDto
 import com.example.intermodular.data.remote.dto.ReviewDto
 import com.example.intermodular.data.remote.dto.RoomsResponseDto
 import com.example.intermodular.data.remote.dto.UpdateBookingDto
+import com.example.intermodular.data.remote.dto.UserDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -124,4 +125,7 @@ interface ApiService {
     suspend fun login(
         @Body body: Map<String, String>
     ): LoginDto
+
+    @GET("user/getMe")
+    suspend fun getMe(): UserDto
 }

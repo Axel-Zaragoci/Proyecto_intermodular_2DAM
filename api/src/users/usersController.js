@@ -30,11 +30,11 @@ export async function register(req, res) {
         if(isPublic) {
             if (!password) return res.status(400).json({ error: "La contraseña no puede estar vacia." });
         } else {
-            password = "Password123!"; 
+            password = "Password123!";
         }
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
         if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
-        if (!email) return res.status(400).json({errors: "El correo no puede estar vacio"});
+        if (!email) return res.status(400).json({error: "El correo no puede estar vacio"});
         if (!dni) return res.status(400).json({ error: "El dni no puede estar vacio." });
         if (Number.isNaN(birthDateObj.getTime())) return res.status(400).json({ error: "La fecha no puede estar vacia." });
         if (!cityName) return res.status(400).json({ error: "La ciudad no puede estar vacia." });
@@ -60,8 +60,11 @@ export async function register(req, res) {
         return res.status(200).json({massage: 'Usuario creado.'})
     } catch(error) {
         console.error('Error al registrar al usuario:', error);
+        if (error?.code === 11000) return res.status(400).json({ error: 'Ya existe un usuario con ese email o dni.' });
+        if (error instanceof Error) return res.status(400).json({ error: error.message });
         return res.status(500).json({ error: 'Error del servidor' })
     }
+    
 }
 
 /**
@@ -310,4 +313,22 @@ export async function deleteUserById(req, res) {
     console.error("Error al borrar:", err);
     return res.status(500).json({ error: "Error del servidor" });
   }
+}
+
+export async function getMe(req, res) {
+    try {
+        const userId = req.user.id;
+
+        const user = await userDatabaseModel.findById(userId)
+
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        return res.status(200).json(user);
+
+    } catch (error) {
+        console.error("Error al obtener usuario:", error);
+        return res.status(500).json({ error: "Error del servidor" });
+    }
 }
