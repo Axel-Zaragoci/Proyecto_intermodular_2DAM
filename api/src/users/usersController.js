@@ -34,7 +34,7 @@ export async function register(req, res) {
         }
         if (!firstName) return res.status(400).json({ error: "El nombre no puede estar vacio." });
         if (!lastName) return res.status(400).json({ error: "El apellido no puede estar vacio." });
-        if (!email) return res.status(400).json({errors: "El correo no puede estar vacio"});
+        if (!email) return res.status(400).json({error: "El correo no puede estar vacio"});
         if (!dni) return res.status(400).json({ error: "El dni no puede estar vacio." });
         if (Number.isNaN(birthDateObj.getTime())) return res.status(400).json({ error: "La fecha no puede estar vacia." });
         if (!cityName) return res.status(400).json({ error: "La ciudad no puede estar vacia." });
@@ -60,8 +60,11 @@ export async function register(req, res) {
         return res.status(200).json({massage: 'Usuario creado.'})
     } catch(error) {
         console.error('Error al registrar al usuario:', error);
+        if (error?.code === 11000) return res.status(400).json({ error: 'Ya existe un usuario con ese email o dni.' });
+        if (error instanceof Error) return res.status(400).json({ error: error.message });
         return res.status(500).json({ error: 'Error del servidor' })
     }
+    
 }
 
 /**
