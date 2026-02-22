@@ -64,6 +64,34 @@ import com.example.intermodular.views.components.ChangePasswordDialog
 import com.example.intermodular.views.navigation.Routes
 import java.time.format.DateTimeFormatter
 
+/**
+ * Pantalla de perfil de usuario.
+ *
+ * Esta pantalla muestra el estado del perfil del usuario y permite acceder a acciones típicas
+ * relacionadas con su cuenta:
+ * - Visualizar la información personal del usuario
+ * - Cambiar la foto de perfil (seleccionando una imagen de la galería)
+ * - Navegar al listado de reservas del usuario
+ * - Navegar a la pantalla de edición de perfil
+ * - Abrir el diálogo para cambiar la contraseña
+ *
+ * Estados gestionados en UI:
+ * 1. **Carga**: muestra un [CircularProgressIndicator]
+ * 2. **Error**: muestra el mensaje y un botón "Reintentar"
+ * 3. **Contenido**: muestra avatar, nombre y tarjeta con información personal
+ *
+ * @author Ian Rodriguez
+ *
+ * @param isLoading - Indica si se están cargando los datos del usuario
+ * @param user - Modelo del usuario a mostrar (null si aún no se ha cargado o hubo error)
+ * @param error - Mensaje de error a mostrar (null si no hay error)
+ * @param onRetry - Callback para reintentar la carga de datos
+ * @param onErrorShown - Callback para limpiar/confirmar el error una vez mostrado
+ * @param onViewMyBookings - Callback al pulsar "Ver mis reservas"
+ * @param onChangePhoto - Callback al pulsar el botón de editar foto (dispara la selección de imagen)
+ * @param onEditProfile - Callback al pulsar el botón de editar perfil
+ * @param onChangePasswordClick - Callback al pulsar el botón de cambiar contraseña
+ */
 @Composable
 fun UserScreen(
     isLoading: Boolean,
@@ -77,6 +105,7 @@ fun UserScreen(
     onChangePasswordClick: () -> Unit
 ) {
     when {
+        // Indicador de carga
         isLoading -> Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -84,8 +113,9 @@ fun UserScreen(
             CircularProgressIndicator()
         }
 
+        // Mostrar error + opción de reintentar
         error != null -> {
-            Column (
+            Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -101,6 +131,7 @@ fun UserScreen(
             }
         }
 
+        // Contenido principal cuando hay usuario cargado
         user != null -> {
 
             val formattedDate = user.birthDate.format(
@@ -116,6 +147,7 @@ fun UserScreen(
             ) {
                 Spacer(Modifier.height(18.dp))
 
+                // Avatar con opción de cambiar foto y badge VIP
                 ProfileAvatar(
                     imageRoute = user.imageRoute,
                     initials = "${user.firstName.take(1)}${user.lastName.take(1)}".uppercase(),
@@ -125,6 +157,7 @@ fun UserScreen(
 
                 Spacer(Modifier.height(14.dp))
 
+                // Nombre del usuario
                 Text(
                     text = "${user.firstName} ${user.lastName}".trim(),
                     style = MaterialTheme.typography.titleLarge
@@ -132,6 +165,7 @@ fun UserScreen(
 
                 Spacer(Modifier.height(18.dp))
 
+                // Tarjeta de información personal + accesos a editar/cambiar contraseña
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -151,6 +185,7 @@ fun UserScreen(
                                 text = "Informacion Personal",
                                 style = MaterialTheme.typography.titleMedium
                             )
+
                             IconButton(onClick = { onChangePasswordClick() }) {
                                 Icon(Icons.Outlined.Lock, contentDescription = "Cambiar contraseña")
                             }
@@ -161,6 +196,7 @@ fun UserScreen(
 
                         Divider()
 
+                        // Filas de datos personales
                         ProfileRow(
                             icon = Icons.Outlined.Email,
                             label = "Email",
@@ -195,17 +231,14 @@ fun UserScreen(
                 }
 
                 Spacer(Modifier.height(22.dp))
+
+                // CTA para navegar a las reservas del usuario
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Button(
-                        onClick = onViewMyBookings
-                    ) {
-                        Text(
-                            text = "Ver mis reservas"
-                        )
+                    Button(onClick = onViewMyBookings) {
+                        Text(text = "Ver mis reservas")
                     }
                 }
             }
@@ -213,6 +246,22 @@ fun UserScreen(
     }
 }
 
+/**
+ * Avatar de perfil con:
+ * - Imagen remota si existe ([AsyncImage])
+ * - Iniciales como fallback si no hay imagen
+ * - Botón flotante para editar/cambiar foto
+ * - Badge VIP (estrella) si el usuario tiene estado VIP
+ *
+ * La URL final de la imagen se construye con [BuildConfig.BASE_URL] cuando la ruta es relativa.
+ *
+ * @author Ian Rodriguez
+ *
+ * @param imageRoute - Ruta/URL de la imagen del usuario (puede ser relativa o absoluta)
+ * @param initials - Iniciales del usuario a mostrar cuando no hay imagen
+ * @param isVip - Indica si se debe mostrar el distintivo VIP
+ * @param onEditPhoto - Callback al pulsar el botón de editar foto
+ */
 @Composable
 private fun ProfileAvatar(
     imageRoute: String?,
@@ -222,6 +271,7 @@ private fun ProfileAvatar(
 ) {
     val context = LocalContext.current
 
+    // Construcción de la URL final (absoluta) para cargar la imagen
     val imageUrl = imageRoute?.let { route ->
         val cleanPath =
             if (route.startsWith("/")) route.substring(1) else route
@@ -233,6 +283,7 @@ private fun ProfileAvatar(
     }
 
     Box(contentAlignment = Alignment.Center) {
+        // Contenedor del avatar (imagen o iniciales)
         Surface(
             shape = CircleShape,
             tonalElevation = 6.dp,
@@ -259,11 +310,13 @@ private fun ProfileAvatar(
             }
         }
 
+        // Botón flotante para editar/cambiar foto
         Surface(
             shape = CircleShape,
             tonalElevation = 6.dp,
             color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier
+                .size(30.dp)
                 .align(Alignment.TopStart)
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -277,11 +330,13 @@ private fun ProfileAvatar(
             }
         }
 
+        // Badge VIP
         if (isVip) {
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier
+                    .size(28.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -297,13 +352,25 @@ private fun ProfileAvatar(
     }
 }
 
+/**
+ * Fila reutilizable para mostrar un dato del perfil con icono, etiqueta y valor.
+ *
+ * Comportamiento:
+ * - Si el [value] está vacío, se muestra "-" como fallback.
+ *
+ * @author Ian Rodriguez
+ *
+ * @param icon - Icono a mostrar a la izquierda
+ * @param label - Etiqueta del campo (ej: "Email", "Ciudad")
+ * @param value - Valor del campo a mostrar
+ */
 @Composable
 private fun ProfileRow(
     icon: ImageVector,
     label: String,
     value: String
 ) {
-    Row (
+    Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -333,15 +400,37 @@ private fun ProfileRow(
     }
 }
 
+/**
+ * Versión con estado de [UserScreen] conectada a [UserViewModel].
+ *
+ * Funciones principales:
+ * 1. Recolectar el estado de UI desde el ViewModel usando
+ * 2. Lanzar el selector de imagen para actualizar la foto y enviarla como multipart
+ * 3. Mostrar el diálogo de cambio de contraseña
+ * 4. Refrescar los datos del usuario al volver a primer plano
+ * 5. Gestionar navegación a pantallas de:
+ *    - Mis reservas
+ *    - Actualización de perfil
+ *
+ * @author Ian Rodriguez
+ *
+ * @param viewModel - ViewModel que expone el estado de perfil y operaciones (refresh, updatePhoto, changePassword, etc.)
+ * @param navController - Controlador de navegación para moverse entre pantallas
+ */
 @Composable
 fun UserScreenState(
     viewModel: UserViewModel,
     navController: NavController
 ) {
     val navigation = navController
+
+    // Estados expuestos por el ViewModel
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val error by viewModel.errorMessage.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
+
+    // Launcher para seleccionar una imagen de la galería y actualizar la foto del perfil
     val pickImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -350,6 +439,8 @@ fun UserScreenState(
             viewModel.updatePhoto(part)
         }
     }
+
+    // Control de visibilidad del diálogo de cambio de contraseña
     var showChangePassDialog by remember { mutableStateOf(false) }
 
     if (showChangePassDialog) {
@@ -362,10 +453,12 @@ fun UserScreenState(
         )
     }
 
+    // Refrescar datos al volver a la pantalla
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         viewModel.refresh()
     }
 
+    // Carga de la vista sin estado
     UserScreen(
         isLoading = uiState.isLoading,
         user = uiState.user,
@@ -373,7 +466,11 @@ fun UserScreenState(
         onRetry = { viewModel.refresh() },
         onErrorShown = { viewModel.clearError() },
         onViewMyBookings = { navigation.navigate(Routes.MyBookings.route) },
-        onChangePhoto = { pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+        onChangePhoto = {
+            pickImageLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
         onEditProfile = { navigation.navigate(Routes.UpdateProfile.route) },
         onChangePasswordClick = { showChangePassDialog = true }
     )

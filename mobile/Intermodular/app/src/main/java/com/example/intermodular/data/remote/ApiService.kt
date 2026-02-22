@@ -128,25 +128,61 @@ interface ApiService {
         @Body body: CreateReviewDto
     ): ReviewDto
 
+    /**
+     * Autentica un usuario.
+     * @author Ian Rodriguez
+     *
+     * @param body - Mapa con credenciales (email, password)
+     * @return Datos de autenticación como [LoginDto]
+     */
     @POST("auth/login")
     suspend fun login(
         @Body body: Map<String, String>
     ): LoginDto
 
+    /**
+     * Obtiene los datos del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @return Usuario autenticado como [UserDto]
+     */
     @GET("user/getMe")
     suspend fun getMe(): UserDto
 
+    /**
+     * Sube una imagen al servidor.
+     * @author Ian Rodriguez
+     *
+     * @param photo - Imagen en formato multipart
+     * @return Información de la imagen subida como [ImageDto]
+     */
     @Multipart
     @POST("image/")
     suspend fun uploadPhoto(
         @Part photo: MultipartBody.Part
     ): ImageDto
 
+    /**
+     * Actualiza los datos del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @param body - Datos actualizados del usuario
+     * @return Respuesta con usuario actualizado
+     */
     @PUT("user/update")
     suspend fun updateUser(
         @Body body: UpdateUserRequestDto
     ): UpdateUserResponseDto
 
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     * @author Ian Rodriguez
+     *
+     * @param body - Mapa con:
+     *               - oldPassword
+     *               - newPassword
+     *               - repeatNewPassword
+     */
     @PUT("user/changeMyPassword")
     suspend fun changeMyPassword(
         @Body body: Map<String, String>

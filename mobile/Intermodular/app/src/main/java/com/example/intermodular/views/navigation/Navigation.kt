@@ -89,31 +89,71 @@ fun Navigation(
             )
         }
 
+        /**
+         * Ruta de navegación hacia la pantalla de perfil de usuario.
+         *
+         * Flujo:
+         * 1. Se obtiene la instancia de la API desde [RetrofitProvider].
+         * 2. Se crea el repositorio [UserRepository] utilizando dicha API.
+         * 3. Se obtiene la instancia del [SessionManager] para la gestión de sesión.
+         * 4. Se construye el [UserViewModel] mediante su fábrica [UserViewModelFactory].
+         * 5. Se carga la pantalla con estado [UserScreenState].
+         *
+         * Esta pantalla permite:
+         * - Visualizar datos del perfil
+         * - Cambiar foto
+         * - Editar perfil
+         * - Cambiar contraseña
+         * - Navegar a reservas
+         *
+         * @author Ian Rodriguez
+         */
         composable(Routes.User.route) {
+
+            // Obtener dependencias necesarias
             val api = RetrofitProvider.api
             val repository = UserRepository(api)
             val sessionManager = SessionManager
 
+            // Crear ViewModel con su factory personalizada
             val viewModel: UserViewModel = viewModel(
                 factory = UserViewModelFactory(repository, sessionManager)
             )
 
+            // Cargar pantalla conectada al estado
             UserScreenState(
                 viewModel = viewModel,
                 navController = navigationController
             )
         }
 
+        /**
+         * Ruta de navegación hacia la pantalla de edición de perfil.
+         *
+         * Flujo:
+         * 1. Se obtiene la API desde [RetrofitProvider].
+         * 2. Se crea el [UserRepository].
+         * 3. Se pasa el [SessionManager] al ViewModel.
+         * 4. Se instancia el [UserViewModel] mediante [UserViewModelFactory].
+         * 5. Se carga [UpdateProfileScreenState].
+         *
+         * Esta pantalla permite modificar y guardar los datos personales del usuario.
+         *
+         * @author Ian Rodriguez
+         */
         composable(Routes.UpdateProfile.route) {
 
+            // Obtener dependencias necesarias
             val api = RetrofitProvider.api
             val repository = UserRepository(api)
             val sessionManager = SessionManager
 
+            // Crear ViewModel con su factory personalizada
             val viewModel: UserViewModel = viewModel(
                 factory = UserViewModelFactory(repository, sessionManager)
             )
 
+            // Cargar pantalla conectada al estado
             UpdateProfileScreenState(
                 viewModel = viewModel,
                 navController = navigationController
