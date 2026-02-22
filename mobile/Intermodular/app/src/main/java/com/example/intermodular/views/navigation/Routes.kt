@@ -18,6 +18,8 @@ sealed class Routes(
 
     object User : Routes("user")
 
+    object UpdateProfile : Routes("updateProfile")
+
     /**
      * Pantalla de reservas del usuario
      * @author Axel Zaragoci

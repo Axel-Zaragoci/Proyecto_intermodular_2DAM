@@ -37,4 +37,8 @@ class UserRepository(
         val updated = api.updateUser(body).user
         return updated.toUserModel()
     }
+    suspend fun updateUser(body: UpdateUserRequestDto): UserModel {
+        val updated = api.updateUser(body).user
+        return updated.toUserModel()
+    }
 }

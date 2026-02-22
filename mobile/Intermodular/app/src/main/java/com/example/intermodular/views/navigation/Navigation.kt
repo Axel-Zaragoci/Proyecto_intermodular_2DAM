@@ -2,7 +2,6 @@
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
@@ -20,7 +19,6 @@ import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingsViewModelF
 import com.example.intermodular.views.screens.BookingScreenState
 import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
-import com.example.intermodular.views.screens.UserScreen
 import com.example.intermodular.data.repository.RoomRepository
 import com.example.intermodular.data.repository.UserRepository
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
@@ -36,6 +34,7 @@ import com.example.intermodular.viewmodels.viewModelFactory.UserViewModelFactory
 import com.example.intermodular.views.screens.MyBookingDetailsState
 import com.example.intermodular.views.screens.NewBookingState
 import com.example.intermodular.views.screens.RoomDetailScreen
+import com.example.intermodular.views.screens.UpdateProfileScreenState
 import com.example.intermodular.views.screens.UserScreenState
 
 @Composable
@@ -100,6 +99,22 @@ fun Navigation(
             )
 
             UserScreenState(
+                viewModel = viewModel,
+                navController = navigationController
+            )
+        }
+
+        composable(Routes.UpdateProfile.route) {
+
+            val api = RetrofitProvider.api
+            val repository = UserRepository(api)
+            val sessionManager = SessionManager
+
+            val viewModel: UserViewModel = viewModel(
+                factory = UserViewModelFactory(repository, sessionManager)
+            )
+
+            UpdateProfileScreenState(
                 viewModel = viewModel,
                 navController = navigationController
             )

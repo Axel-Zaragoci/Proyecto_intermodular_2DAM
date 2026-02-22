@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.intermodular.data.remote.ApiErrorHandler
 import com.example.intermodular.data.remote.auth.SessionManager
+import com.example.intermodular.data.remote.dto.UpdateUserRequestDto
 import com.example.intermodular.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -64,6 +65,49 @@ class UserViewModel(
             }.onFailure { throwable ->
                 _errorMessage.value = ApiErrorHandler.getErrorMessage(throwable)
             }
+        }
+    }
+
+    fun updateUser(
+        firstName: String,
+        lastName: String,
+        email: String,
+        dni: String,
+        phoneNumber: Long?,
+        birthDateIso: String,
+        cityName: String,
+        gender: String
+    ) {
+        val current = _uiState.value.user ?: run {
+            _errorMessage.value = "No hay usuario cargado"
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            val body = UpdateUserRequestDto(
+                id = SessionManager.getUserId(),
+                firstName = firstName,
+                lastName = lastName,
+                email = email,
+                dni = dni,
+                phoneNumber = phoneNumber,
+                birthDate = birthDateIso,
+                cityName = cityName,
+                gender = gender,
+                imageRoute = current.imageRoute
+            )
+
+            runCatching {
+                repository.updateUser(body)
+            }.onSuccess { updated ->
+                _uiState.value = _uiState.value.copy(isLoading = false, user = updated)
+            }.onFailure { throwable ->
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                _errorMessage.value = ApiErrorHandler.getErrorMessage(throwable)
+            }
+
         }
     }
 

@@ -46,6 +46,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -65,7 +67,8 @@ fun UserScreen(
     onRetry: () -> Unit,
     onErrorShown: () -> Unit,
     onViewMyBookings: () -> Unit,
-    onChangePhoto: () -> Unit
+    onChangePhoto: () -> Unit,
+    onEditProfile: () -> Unit
 ) {
     when {
         isLoading -> Box(
@@ -133,10 +136,19 @@ fun UserScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text(
-                            text = "Informacion Personal",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Informacion Personal",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            IconButton(onClick = onEditProfile) {
+                                Icon(Icons.Outlined.Edit, contentDescription = "Editar perfil")
+                            }
+                        }
 
                         Divider()
 
@@ -330,6 +342,9 @@ fun UserScreenState(
         }
     }
 
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.refresh()
+    }
 
     UserScreen(
         isLoading = uiState.isLoading,
@@ -338,6 +353,7 @@ fun UserScreenState(
         onRetry = { viewModel.refresh() },
         onErrorShown = { viewModel.clearError() },
         onViewMyBookings = { navigation.navigate(Routes.MyBookings.route) },
-        onChangePhoto = { pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+        onChangePhoto = { pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+        onEditProfile = { navigation.navigate(Routes.UpdateProfile.route) }
     )
 }
