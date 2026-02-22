@@ -12,10 +12,10 @@ class RegisterRepository(
     private val api: ApiService,
     private val loginRepository: LoginRepository
 ) {
-    suspend fun registerAndLogin(body: RegisterDto): LoginDto {
+    suspend fun registerAndLogin(body: RegisterDto) {
         try {
             api.register(body)
-            return loginRepository.login(body.email, body.password)
+            loginRepository.login(body.email, body.password)
         } catch (e: HttpException) {
             val errorJson = e.response()?.errorBody()?.string()
             val backendMessage = try {

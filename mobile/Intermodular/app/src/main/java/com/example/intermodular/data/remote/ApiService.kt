@@ -37,5 +37,5 @@ interface ApiService {
     @POST("user/registerApp")
     suspend fun register(
         @Body body: RegisterDto
-    ): LoginDto
+    )
 }

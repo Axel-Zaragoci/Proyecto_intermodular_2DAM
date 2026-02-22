@@ -85,6 +85,7 @@ fun Navigation(
             val api = RetrofitProvider.api
 
             val loginRepository = LoginRepository(api)
+            val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(loginRepository))
             val registerRepository = RegisterRepository(api, loginRepository)
 
             val viewModel: RegisterViewModel = viewModel(
@@ -94,7 +95,7 @@ fun Navigation(
             RegisterScreen(
                 viewModel = viewModel,
                 onRegisterSuccess = {
-                    navigationController.navigate(Routes.Rooms.route) {
+                    navigationController.navigate(Routes.Bookings.route) {
                         popUpTo(Routes.Register.route) { inclusive = true }
                     }
                 },
