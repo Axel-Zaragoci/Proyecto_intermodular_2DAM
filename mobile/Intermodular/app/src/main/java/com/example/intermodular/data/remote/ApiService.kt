@@ -131,21 +131,11 @@ interface ApiService {
     ): ReviewDto
 
     /**
-<<<<<<< user-android
      * Autentica un usuario.
      * @author Ian Rodriguez
      *
      * @param body - Mapa con credenciales (email, password)
      * @return Datos de autenticación como [LoginDto]
-=======
-     * Autentica un usuario en el sistema.
-     *
-     * Recibe un mapa con las credenciales (normalmente email y password)
-     * y devuelve un [LoginDto] con el token, rol e id del usuario.
-     *
-     * @param body - Mapa con las credenciales de acceso
-     * @return [LoginDto] con la información de autenticación
->>>>>>> develop
      */
     @POST("auth/login")
     suspend fun login(
@@ -153,7 +143,6 @@ interface ApiService {
     ): LoginDto
 
     /**
-<<<<<<< user-android
      * Obtiene los datos del usuario autenticado.
      * @author Ian Rodriguez
      *
@@ -199,7 +188,9 @@ interface ApiService {
     @PUT("user/changeMyPassword")
     suspend fun changeMyPassword(
         @Body body: Map<String, String>
-=======
+    )
+
+    /**
      * Registra un nuevo usuario desde la aplicación.
      *
      * Envía un [RegisterDto] con todos los datos necesarios
@@ -212,6 +203,5 @@ interface ApiService {
     @POST("user/registerApp")
     suspend fun register(
         @Body body: RegisterDto
->>>>>>> develop
     )
 }

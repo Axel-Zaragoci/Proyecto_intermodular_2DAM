@@ -22,14 +22,8 @@ import com.example.intermodular.views.screens.BookingScreenState
 import com.example.intermodular.views.screens.MyBookingsScreenState
 import com.example.intermodular.views.screens.RoomScreen
 import com.example.intermodular.data.repository.RoomRepository
-<<<<<<< user-android
 import com.example.intermodular.data.repository.UserRepository
-import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
-import com.example.intermodular.viewmodels.NewBookingViewModel
-import com.example.intermodular.viewmodels.RoomDetailViewModel
-import com.example.intermodular.viewmodels.RoomViewModel
 import com.example.intermodular.viewmodels.UserViewModel
-=======
 import com.example.intermodular.viewmodels.LoginViewModel
 import com.example.intermodular.viewmodels.viewModelFacotry.LoginViewModelFactory
 import com.example.intermodular.viewmodels.RegisterViewModel
@@ -40,7 +34,6 @@ import com.example.intermodular.views.screens.RegisterScreen
 import com.example.intermodular.viewmodels.MyBookingDetailsViewModel
 import com.example.intermodular.viewmodels.NewBookingViewModel
 import com.example.intermodular.viewmodels.RoomDetailViewModel
->>>>>>> develop
 import com.example.intermodular.viewmodels.viewModelFacotry.MyBookingDetailsViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.NewBookingViewModelFactory
 import com.example.intermodular.viewmodels.viewModelFacotry.RoomViewModelFactory
