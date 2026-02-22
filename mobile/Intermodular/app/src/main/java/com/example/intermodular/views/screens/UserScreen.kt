@@ -36,10 +36,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.intermodular.BuildConfig
 import com.example.intermodular.models.UserModel
 import com.example.intermodular.viewmodels.UserViewModel
 import com.example.intermodular.views.navigation.Routes
@@ -95,6 +101,7 @@ fun UserScreen(
                 Spacer(Modifier.height(18.dp))
 
                 ProfileAvatar(
+                    imageRoute = user.imageRoute,
                     initials = "${user.firstName.take(1)}${user.lastName.take(1)}".uppercase(),
                     isVip = user.vipStatus
                 )
@@ -179,20 +186,46 @@ fun UserScreen(
 
 @Composable
 private fun ProfileAvatar(
+    imageRoute: String?,
     initials: String,
     isVip: Boolean
 ) {
+    val context = LocalContext.current
+
+    val imageUrl = imageRoute?.let { route ->
+        val cleanPath =
+            if (route.startsWith("/")) route.substring(1) else route
+
+        if (route.startsWith("http"))
+            route
+        else
+            "${BuildConfig.BASE_URL}$cleanPath"
+    }
+
     Box(contentAlignment = Alignment.BottomEnd) {
         Surface(
             shape = CircleShape,
             tonalElevation = 6.dp,
-            modifier = Modifier.size(84.dp)
+            modifier = Modifier.size(96.dp)
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(
-                    text = initials,
-                    style = MaterialTheme.typography.headlineMedium
+            if (imageUrl != null) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Foto",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    error = ColorPainter(MaterialTheme.colorScheme.surfaceVariant)
                 )
+            } else {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = initials,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
             }
         }
 
@@ -200,7 +233,7 @@ private fun ProfileAvatar(
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(26.dp)
+                modifier = Modifier.size(28.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
