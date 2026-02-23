@@ -5,6 +5,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using static desktop_app.Services.UsersService;
@@ -77,8 +78,7 @@ namespace desktop_app.ViewModels
             ViewUserCommand = new RelayCommand<UserModel>(u => NavigateToUtilities(UserUtilitiesMode.View, u));
             EditUserCommand = new RelayCommand<UserModel>(u => NavigateToUtilities(UserUtilitiesMode.Edit, CloneUser(u)));
 
-            DeleteUserCommand = new AsyncRelayCommand<UserModel>(u => _usersService.DeleteAndRemoveAsync(u, Users, UsersView));
-
+            DeleteUserCommand = new AsyncRelayCommand<UserModel>(DeleteUserAsync);
             _ = _usersService.ReloadIntoAsync(Users, UsersView);
         }
 
@@ -133,6 +133,27 @@ namespace desktop_app.ViewModels
                 BirthDate = user.BirthDate,
                 Gender = user.Gender
             };
+        }
+        private async Task DeleteUserAsync(UserModel? u)
+        {
+            if (u is null) return;
+
+            var fullName = $"{u.FirstName} {u.LastName}".Trim();
+            var text = $"¿Seguro que quieres eliminar al usuario " + fullName + "?";
+
+            var result = MessageBox.Show(text,"Confirmar eliminación",  MessageBoxButton.YesNo,  MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                await _usersService.DeleteAndRemoveAsync(u, Users, UsersView);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show( ex.Message, "Error al eliminar", MessageBoxButton.OK,  MessageBoxImage.Error);
+            }
         }
     }
 }
