@@ -1,0 +1,12 @@
+// Archivo para que el IDE haga validación del código JavaScript antes de la ejecución con JSDoc
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "target": "es2020",
+        "allowJs": true,
+        "baseUrl": ".",
+    },
+    "include": ["./src", "./types.d.ts"]
+}
