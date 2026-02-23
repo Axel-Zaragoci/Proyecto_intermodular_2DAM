@@ -14,6 +14,6 @@ router.post("/", verifyToken, authorizeRoles(["Admin", "Trabajador"]), createRoo
 router.get("/", verifyToken, getRoomsFiltered);
 router.get("/:roomID", verifyToken,getRoomById);
 router.patch("/:roomID", verifyToken, authorizeRoles(["Admin", "Trabajador"]), updateRoom);
-router.delete("/:roomID", verifyToken, authorizeRoles(["Admin", "Trabajador"]), deleteRoom);
+router.delete("/:roomID", verifyToken, authorizeRoles(["Admin"]), deleteRoom);
 
 export default router;
