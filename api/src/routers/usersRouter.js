@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser, deleteUserById, getMe, changeMyPassword} from './usersController.js';
+import { getOneUserByIdOrDni, getAllUsers, getUsersByRol, register, updateUser, deleteUserById, getMe, changeMyPassword} from '../controllers/usersController.js';
 import { verifyToken ,authorizeRoles } from '../middlewares/authMiddleware.js';    
 const usersRouter = Router();
 

@@ -6,7 +6,7 @@ import {
     getReviewsByRoom,
     getReviewsByUser,
     deleteReview
-} from "./reviewsController.js";
+} from "../controllers/reviewsController.js";
 
 const router = Router();
 

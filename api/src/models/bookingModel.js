@@ -1,6 +1,6 @@
 import { Schema, Types, model, isValidObjectId } from 'mongoose';
 import { roomDatabaseModel } from './roomsModel.js';
-import { userDatabaseModel } from '../users/usersModel.js';
+import { userDatabaseModel } from '../models/usersModel.js';
 
 /**
  * @typedef {Object} bookingSchema

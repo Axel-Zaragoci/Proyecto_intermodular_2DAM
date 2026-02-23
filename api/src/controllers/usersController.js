@@ -2,6 +2,8 @@ import { userDatabaseModel, UserEntryData, UserUpdateData, UserAdminUpdateData }
 import mongoose from "mongoose";
 import { comparePassword, hashPassword } from "../services/password.service.js";
 import e from "express";
+import { reviewDatabaseModel } from "../models/reviewsModel.js";
+import { bookingDatabaseModel } from "../models/bookingModel.js";
 
 /**
  *  Controlador para el registro de un nuevo usuario
@@ -270,6 +272,7 @@ export async function updateUser(req, res) {
     } catch (error) {
         if (error?.code === 11000) return res.status(400).json({ error: 'Ya existe un usuario con ese email o dni.' });
         console.error("Error al actualizar el usuario:", error);
+        if (error instanceof Error) return res.status(400).json({ error: error.message });
         return res.status(500).json({ error: 'Error del servidor' });
     }
 }
@@ -298,17 +301,25 @@ export async function deleteUserById(req, res) {
   try {
     const { id } = req.params;
 
-    console.log("ID recibido:", id);
+    if (!id) {
+      return res.status(400).json({ error: "ID requerido" });
+    }
+
+    await bookingDatabaseModel.deleteMany({ client: id });
+
+    await reviewDatabaseModel.deleteMany({ user: id });
 
     const deleted = await userDatabaseModel.findByIdAndDelete(id);
-
-    console.log("Resultado delete:", deleted);
 
     if (!deleted) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    return res.status(200).json({ message: "Usuario eliminado", id: deleted._id });
+    return res.status(200).json({
+      message: "Usuario, reservas y reseñas eliminadas",
+      id: deleted._id
+    });
+
   } catch (err) {
     console.error("Error al borrar:", err);
     return res.status(500).json({ error: "Error del servidor" });

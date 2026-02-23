@@ -8,12 +8,12 @@ import { fileURLToPath } from "url";
 import { connectEmail } from './lib/mail/mailing.js';
 import connectDB from './config/db.js';
 
-import bookingRouter from "./booking/bookingRouter.js";
-import roomsRouter from "./rooms/roomsRouter.js";
-import usersRouter from "./users/usersRouter.js";
-import authRouter from "./auth/authRouter.js";
+import bookingRouter from "./routers/bookingRouter.js";
+import roomsRouter from "./routers/roomsRouter.js";
+import usersRouter from "./routers/usersRouter.js";
+import authRouter from "./routers/authRouter.js";
 import photoRouter from "./lib/image/imageRouter.js";
-import reviewsRouter from "./reviews/reviewsRouter.js";
+import reviewsRouter from "./routers/reviewsRouter.js";
 dotenv.config();
 connectDB()
 connectEmail();
