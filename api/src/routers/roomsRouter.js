@@ -5,7 +5,7 @@ import {
   updateRoom,
   deleteRoom,
   getRoomsFiltered
-} from "./roomsController.js";
+} from "../controllers/roomsController.js";
 import { authorizeRoles, verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = Router();

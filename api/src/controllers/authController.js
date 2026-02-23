@@ -1,6 +1,6 @@
 import { SignJWT } from 'jose';
 import { comparePassword } from "../services/password.service.js";
-import { userDatabaseModel } from '../users/usersModel.js';
+import { userDatabaseModel } from '../models/usersModel.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

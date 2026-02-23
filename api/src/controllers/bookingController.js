@@ -1,9 +1,8 @@
 import { bookingDatabaseModel, BookingEntryData } from "../models/bookingModel.js";
-import { roomDatabaseModel } from "../rooms/roomsModel.js"
+import { roomDatabaseModel } from "../models/roomsModel.js"
 import mongoose from "mongoose";
-import { userDatabaseModel } from "../users/usersModel.js";
+import { userDatabaseModel } from "../models/usersModel.js";
 import { sendEmail } from "../lib/mail/mailing.js";
-
 /**
  * Obtener una reserva específica a partir de su ID
  * 

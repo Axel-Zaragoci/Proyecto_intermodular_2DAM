@@ -111,9 +111,12 @@ namespace desktop_app.Services
             };
 
             using var resp = await ApiService._httpClient.PostAsync("user/registerEsc", JsonBody(payload), ct);
-            resp.EnsureSuccessStatusCode();
-
-            return await ReadJsonAsync<UserModel>(resp, ct);
+            if (!resp.IsSuccessStatusCode)
+            {
+                var apiError = await TryReadApiErrorAsync(resp, ct);
+                throw new Exception(apiError ?? $"Error.");
+            }
+            return user;
         }
 
         /// <summary>
@@ -137,15 +140,15 @@ namespace desktop_app.Services
                 gender = user.Gender
             };
 
-            using var req = new HttpRequestMessage(HttpMethod.Put,"user/update")
+            using var resp = await ApiService._httpClient.PutAsync("user/update", JsonBody(payload), ct);
+
+            if (!resp.IsSuccessStatusCode)
             {
-                Content = JsonBody(payload)
-            };
+                var apiError = await TryReadApiErrorAsync(resp, ct);
+                throw new Exception(apiError ?? "Error.");
+            }
 
-            using var resp = await ApiService._httpClient.SendAsync(req, ct);
-            resp.EnsureSuccessStatusCode();
-
-            return await ReadJsonAsync<UserModel>(resp, ct);
+            return user;
         }
 
         /// <summary>
@@ -163,6 +166,29 @@ namespace desktop_app.Services
                 target.Add(u);
 
             viewToRefresh?.Refresh();
+        }
+
+        private static async Task<string?> TryReadApiErrorAsync(HttpResponseMessage resp, CancellationToken ct)
+        {
+            try
+            {
+                var body = await resp.Content.ReadAsStringAsync(ct);
+                if (string.IsNullOrWhiteSpace(body)) return null;
+
+                using var doc = JsonDocument.Parse(body);
+                var root = doc.RootElement;
+                if (root.ValueKind == JsonValueKind.Object)
+                {
+                    if (root.TryGetProperty("error", out var e) && e.ValueKind == JsonValueKind.String)
+                        return e.GetString();
+                }
+
+                return body;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
